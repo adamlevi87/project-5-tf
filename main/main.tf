@@ -8,6 +8,10 @@ locals {
     availability_zones = slice(data.aws_availability_zones.available.names, 0, var.availability_zones_to_use)
 }
 
+output "az_debug" {
+  value = local.availability_zones
+}
+
 module "vpc_network" {
     source = "../modules/vpc-network"
     
