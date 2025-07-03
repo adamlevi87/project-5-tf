@@ -1,6 +1,6 @@
 aws_region = "us-east-1"
 environment = "dev"
-aws_dynamodb_table_name = "terraform-locks"
+aws_dynamodb_table_name = "project-5-terraform-locks"
 github_org = "adamlevi87"
 github_repo = "project-5"
 
