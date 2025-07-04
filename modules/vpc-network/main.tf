@@ -1,3 +1,13 @@
+# Only allocate NATs based on nat_mode
+locals {
+  nat_gateway_count = (
+    var.nat_mode == "real"       ? length(var.public_subnet_cidrs) :
+    var.nat_mode == "single"     ? 1 :
+    var.nat_mode == "endpoints"  ? 0 :
+    0
+  )
+}
+
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr_block
   enable_dns_support   = true
@@ -76,7 +86,7 @@ resource "aws_route_table_association" "public_subnets" {
 
 # Creating Elastic IPs to be used in the NATs
 resource "aws_eip" "nat" {
-  count  = length(aws_subnet.private)
+  count  = local.nat_gateway_count
   domain = "vpc"
 
   tags = {
@@ -87,7 +97,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "this" {
-  count         = length(aws_subnet.private)
+  count         = local.nat_gateway_count
   allocation_id = aws_eip.nat[count.index].id
   subnet_id     = aws_subnet.public[count.index].id
   depends_on    = [aws_internet_gateway.igw]
@@ -100,7 +110,7 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "private" {
-  count  = length(aws_subnet.private)
+  count  = local.nat_gateway_count
   vpc_id = aws_vpc.main.id
 
   route {
@@ -116,7 +126,14 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private_subnets" {
-  count          = length(aws_subnet.private)
+  # this block will be skipped to avoid an error when nat_mode = endpoints
+  count          = var.nat_mode == "endpoints" ? 0 : length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
+
+  # Route table logic: one-per-AZ for real, one shared for single
+  # when ==real we will be using private[count.index] - meaning 1 route for each subnet
+  # else, we will be using the one and only route_table.private[0]
+  route_table_id = aws_route_table.private[
+    var.nat_mode == "real" ? count.index : 0
+  ].id
 }

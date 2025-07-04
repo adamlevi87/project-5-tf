@@ -35,6 +35,8 @@ module "vpc_network" {
         for pair in local.subnet_pairs : pair.private_cidr
     ]
 
+    nat_mode = var.nat_mode
+    
     environment = var.environment
     project_tag   = var.project_tag
 }

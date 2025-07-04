@@ -27,3 +27,13 @@ variable "environment" {
   description = "environment name for tagging resources"
   type        = string
 }
+
+variable "nat_mode" {
+  description = "Controls the NAT gateway setup. Options: single (1 NAT), real (3 NATs), endpoints (use VPC endpoints instead)"
+  type        = string
+  default     = "single"
+  validation {
+    condition     = contains(["real", "single", "endpoints"], var.nat_mode)
+    error_message = "nat_mode must be one of: single, real, endpoints"
+  }
+}
