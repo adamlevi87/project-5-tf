@@ -38,6 +38,8 @@ elif [[ "$MODE" == "for_retries" ]]; then
     'module.vpc_network.aws_nat_gateway.this\[0\]'
     'module.vpc_network.aws_eip.nat\[0\]'
     'module.vpc_network.aws_subnet.public\[0\]'
+    'module.vpc_network.aws_route_table.public'
+    'module.vpc_network.aws_route_table_association.public_subnets\[0\]'
     'module.vpc_network.aws_internet_gateway.igw'
     'module.vpc_network.aws_vpc.main'
   )
