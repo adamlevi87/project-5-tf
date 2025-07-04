@@ -1,12 +1,11 @@
 environment = "dev"
 aws_region = "us-east-1"
-github_org = "adamlevi87"
-github_repo = "project-5"
 project_tag = "project-5"
 vpc_cidr_block = "10.0.0.0/16"
 availability_zones_to_use = "3"
 
-
+# github_org = "adamlevi87"
+# github_repo = "project-5"
 # container_port = 3000
 # task_cpu = 256
 # task_memory = 512
