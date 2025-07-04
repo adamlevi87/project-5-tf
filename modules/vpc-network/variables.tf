@@ -9,13 +9,13 @@ variable "availability_zones" {
 }
 
 variable "public_subnet_cidrs" {
-  type        = list(string)
-  description = "List of public subnet CIDRs"
+  description = "Map of availability zones to their public subnet CIDRs"
+  type        = map(string)
 }
 
 variable "private_subnet_cidrs" {
-  type        = list(string)
-  description = "CIDR blocks for private subnets"
+  description = "Map of availability zones to their private subnet CIDRs"
+  type        = map(string)
 }
 
 variable "project_tag" {

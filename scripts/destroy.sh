@@ -42,6 +42,7 @@ elif [[ "$MODE" == "for_retries" ]]; then
     'module.vpc_network.aws_route_table_association.public_subnets\[0\]'
     'module.vpc_network.aws_internet_gateway.igw'
     'module.vpc_network.aws_vpc.main'
+    'data.aws_availability_zones.available'
   )
 
   GREP_EXCLUDE=$(printf "|%s" "${EXCLUDE_PATTERNS[@]}")
