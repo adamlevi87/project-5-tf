@@ -12,12 +12,14 @@ RESET="\033[0m"
 ENV="${1:-dev}"
 MODE="${2:-for_retries}"
 VAR_FILE="../environments/${ENV}/terraform.tfvars"
+TF_WORK_DIR="../main"
 
 # Help message
 echo -e "${CYAN}Terraform Destroy Helper Script${RESET}"
 echo -e "${YELLOW}Environment (arg #1):${RESET} ${GREEN}${ENV}${RESET}  (options: 'dev' [default], 'staging', 'prod')"
 echo -e "${YELLOW}Mode (arg #2):       ${RESET} ${GREEN}${MODE}${RESET}  (options: 'for_retries' [default], 'all')"
 echo -e "${YELLOW}Using variable file:${RESET} ${VAR_FILE}"
+echo -e "${YELLOW}Terraform working directory:${RESET} ${TF_WORK_DIR}"
 echo
 
 # Validate variable file
@@ -27,7 +29,7 @@ if [[ ! -f "$VAR_FILE" ]]; then
 fi
 
 if [[ "$MODE" == "all" ]]; then
-  terraform destroy -var-file="$VAR_FILE" -auto-approve
+  terraform -chdir="$TF_WORK_DIR" destroy -var-file="$VAR_FILE" -auto-approve
 
 elif [[ "$MODE" == "for_retries" ]]; then
   echo -e "${CYAN}Building target list (excluding NAT and dependencies)...${RESET}"
@@ -43,7 +45,7 @@ elif [[ "$MODE" == "for_retries" ]]; then
   GREP_EXCLUDE=$(printf "|%s" "${EXCLUDE_PATTERNS[@]}")
   GREP_EXCLUDE="${GREP_EXCLUDE:1}" # strip leading |
 
-  TARGETS=$(terraform state list | \
+  TARGETS=$(terraform -chdir="$TF_WORK_DIR" state list | \
     grep -Ev "$GREP_EXCLUDE" | \
     sed 's/^/-target=/')
 
@@ -56,7 +58,7 @@ elif [[ "$MODE" == "for_retries" ]]; then
   echo "$TARGETS"
 
   # shellcheck disable=SC2086
-  terraform destroy -var-file="$VAR_FILE" -auto-approve $TARGETS
+  terraform -chdir="$TF_WORK_DIR" destroy -var-file="$VAR_FILE" -auto-approve $TARGETS
 
 else
   echo -e "${RED}Invalid mode: ${MODE}${RESET}"
