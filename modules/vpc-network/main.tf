@@ -26,7 +26,7 @@ resource "aws_subnet" "public" {
 
   vpc_id                 = aws_vpc.main.id
   cidr_block             = var.public_subnet_cidrs[count.index]
-  availability_zone      = element(var.availability_zones, count.index)
+  availability_zone      = var.availability_zones[count.index]
 
   tags = {
     Name    = "${var.project_tag}-public-subnet-${count.index}"
@@ -41,7 +41,7 @@ resource "aws_subnet" "private" {
 
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.private_subnet_cidrs[count.index]
-  availability_zone       = element(var.availability_zones, count.index)
+  availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = false
 
   tags = {
@@ -74,39 +74,42 @@ resource "aws_route_table_association" "public_subnets" {
   route_table_id = aws_route_table.public.id
 }
 
-# Creating an Elastic IP to be used in the NAT
+# Creating Elastic IPs to be used in the NATs
 resource "aws_eip" "nat" {
+  count  = length(aws_subnet.private)
   domain = "vpc"
 
   tags = {
-    Name        = "${var.project_tag}-nat-eip"
+    Name        = "${var.project_tag}-nat-eip-${count.index}"
     Project     = var.project_tag
     Environment = var.environment
   }
 }
 
 resource "aws_nat_gateway" "this" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id
+  count         = length(aws_subnet.private)
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
   depends_on    = [aws_internet_gateway.igw]
 
   tags = {
-    Name        = "${var.project_tag}-nat-gw"
+    Name        = "${var.project_tag}-nat-gw-${count.index}"
     Project     = var.project_tag
     Environment = var.environment
   }
 }
 
 resource "aws_route_table" "private" {
+  count  = length(aws_subnet.private)
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.this.id
+    nat_gateway_id = aws_nat_gateway.this[count.index].id
   }
 
   tags = {
-    Name        = "${var.project_tag}-private-rt"
+    Name        = "${var.project_tag}-private-rt-${count.index}"
     Project     = var.project_tag
     Environment = var.environment
   }
@@ -115,5 +118,5 @@ resource "aws_route_table" "private" {
 resource "aws_route_table_association" "private_subnets" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private[count.index].id
 }

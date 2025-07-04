@@ -5,7 +5,16 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
+    # Will be working with a variable that controls how many Availability Zones we will be using
     availability_zones = slice(data.aws_availability_zones.available.names, 0, var.availability_zones_to_use)
+    # Will be working with 1public & 1private subnets for each AZ
+    subnet_pairs = {
+        for i, az in local.availability_zones :
+        az => {
+            public_cidr  = cidrsubnet(var.vpc_cidr_block, 8, 0 + i)
+            private_cidr = cidrsubnet(var.vpc_cidr_block, 8, 100 + i)
+        }
+    }
 }
 
 output "az_debug" {
@@ -16,17 +25,14 @@ module "vpc_network" {
     source = "../modules/vpc-network"
     
     vpc_cidr_block = var.vpc_cidr_block
-    # Will be working with 3 Availability Zones
+    
     availability_zones = local.availability_zones
-
-    # Will be working with 1public & 1private subnets for each AZ
     public_subnet_cidrs = [
-        for i in range(length(local.availability_zones)) : cidrsubnet(var.vpc_cidr_block, 8, 0 + i)
+        for pair in local.subnet_pairs : pair.public_cidr
     ]
 
-    # private index offset: 100,101,102,...
     private_subnet_cidrs = [
-        for i in range(length(local.availability_zones)) : cidrsubnet(var.vpc_cidr_block, 8, 100 + i)
+        for pair in local.subnet_pairs : pair.public_cidr
     ]
 
     environment = var.environment

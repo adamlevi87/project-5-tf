@@ -17,4 +17,3 @@
 #   value       = aws_subnet.private[*].id
 #   description = "List of private subnet IDs"
 # }
-
