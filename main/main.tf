@@ -32,7 +32,7 @@ module "vpc_network" {
     ]
 
     private_subnet_cidrs = [
-        for pair in local.subnet_pairs : pair.public_cidr
+        for pair in local.subnet_pairs : pair.private_cidr
     ]
 
     environment = var.environment
