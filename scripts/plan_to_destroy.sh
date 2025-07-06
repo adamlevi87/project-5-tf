@@ -77,14 +77,14 @@ elif [[ "$MODE" == "for_retries" ]]; then
   if [[ "$NAT_MODE" == "real" ]]; then
     # Exclude ALL NATs + ALL public subnets + their route table associations
     EXCLUDE_PATTERNS=(
-      'module.vpc_network.aws_nat_gateway.this\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat\[[^]]+\]'
-      'module.vpc_network.aws_subnet.public\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_subnets\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public'
-      'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_vpc.main'
       'data.aws_availability_zones.available'
+      'module.vpc_network.aws_eip.nat\[[^]]+\]'
+      'module.vpc_network.aws_internet_gateway.igw'
+      'module.vpc_network.aws_nat_gateway.this\[[^]]+\]'
+      'module.vpc_network.aws_route_table.public\[[^]]+\]'
+      'module.vpc_network.aws_route_table_association.public_subnets\[[^]]+\]'
+      'module.vpc_network.aws_subnet.public\[[^]]+\]'
+      'module.vpc_network.aws_vpc.main'
     )
 
   elif [[ "$NAT_MODE" == "single" ]]; then
@@ -101,14 +101,14 @@ elif [[ "$MODE" == "for_retries" ]]; then
     echo -e "${YELLOW}Single NAT detected in AZ:${RESET} $NAT_AZ"
 
     EXCLUDE_PATTERNS=(
-      "module.vpc_network.aws_nat_gateway.this\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_eip.nat\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_subnet.public\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_route_table_association.public_subnets\\[\"$NAT_AZ\"\\]"
-      'module.vpc_network.aws_route_table.public'
-      'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_vpc.main'
       'data.aws_availability_zones.available'
+      "module.vpc_network.aws_eip.nat\\[\"$NAT_AZ\"\\]"
+      'module.vpc_network.aws_internet_gateway.igw'
+      "module.vpc_network.aws_nat_gateway.this\\[\"$NAT_AZ\"\\]"
+      "module.vpc_network.aws_route_table.public\\[\"$NAT_AZ\"\\]"
+      "module.vpc_network.aws_route_table_association.public_subnets\\[\"$NAT_AZ\"\\]"
+      "module.vpc_network.aws_subnet.public\\[\"$NAT_AZ\"\\]"
+      'module.vpc_network.aws_vpc.main'
     )
   fi
 
