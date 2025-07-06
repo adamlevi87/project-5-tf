@@ -11,6 +11,11 @@ availability_zones_to_use = "3"
 # endpoints = will use VPC endpoints for specific servers (it means, limited access to the outside)
     nat_mode = "single"
 
+#
+
+
+
+
 # github_org = "adamlevi87"
 # github_repo = "project-5"
 # container_port = 3000
