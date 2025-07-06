@@ -68,7 +68,7 @@ resource "aws_subnet" "private" {
 
 # Public Traffic Routed via the IGW, 1 route table per public subnet
 resource "aws_route_table" "public" {
-  for_each = aws_subnet.public
+  for_each = var.public_subnet_cidrs
 
   vpc_id = aws_vpc.main.id
 
@@ -86,7 +86,7 @@ resource "aws_route_table" "public" {
 
 # Associate all public subnets with the public route
 resource "aws_route_table_association" "public_subnets" {
-  for_each       = aws_subnet.public
+  for_each       = var.public_subnet_cidrs
   subnet_id      = each.value.id
   route_table_id = aws_route_table.public[each.key].id
 }
@@ -126,7 +126,7 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name        = "${var.project_tag}-private-rt-${each.key}"
+    Name        = "${var.project_tag}-private-subnets-rt-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
   }
