@@ -59,6 +59,8 @@ elif [[ "$MODE" == "for_retries" ]]; then
 
   echo -e "${CYAN}Destroying with targets:${RESET}"
   echo "$TARGETS"
+  echo -e "${YELLOW}Exclude regex:${RESET} $GREP_EXCLUDE"
+  echo -e "${YELLOW}Filtered state list:${RESET}"
 
   # shellcheck disable=SC2086
   terraform -chdir="$TF_WORK_DIR" destroy -var-file="$VAR_FILE" -auto-approve $TARGETS
