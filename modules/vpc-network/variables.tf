@@ -1,40 +1,41 @@
+# modules/vpc-network/variables.tf
+
 variable "vpc_cidr_block" {
-  type        = string
   description = "CIDR block for the VPC"
+  type        = string
 }
 
-variable "core_public_subnet_cidrs" {
-  description = "Core public subnet CIDRs that should never be destroyed (houses NAT gateways)"
+variable "primary_public_subnet_cidrs" {
+  description = "Primary public subnet CIDRs that should always exist (houses primary NAT gateway)"
   type        = map(string)
 }
 
-variable "optional_public_subnet_cidrs" {
-  description = "Optional public subnet CIDRs that can be safely destroyed"
+variable "additional_public_subnet_cidrs" {
+  description = "Additional public subnet CIDRs (optional in single mode, required in real mode)"
   type        = map(string)
   default     = {}
 }
 
 variable "private_subnet_cidrs" {
-  description = "Map of availability zones to their private subnet CIDRs"
+  description = "Private subnet CIDRs"
   type        = map(string)
 }
 
-variable "project_tag" {
+variable "nat_mode" {
+  description = "NAT gateway mode: 'single' (primary NAT only), 'real' (NAT per AZ), or 'endpoints' (no NATs)"
   type        = string
-  description = "Tag used for project identification"
+  validation {
+    condition     = contains(["single", "real", "endpoints"], var.nat_mode)
+    error_message = "NAT mode must be one of: single, real, endpoints"
+  }
+}
+
+variable "project_tag" {
+  description = "Project tag for resource naming"
+  type        = string
 }
 
 variable "environment" {
-  description = "environment name for tagging resources"
+  description = "Environment tag (dev, staging, prod)"
   type        = string
-}
-
-variable "nat_mode" {
-  description = "Controls the NAT gateway setup. Options: single (1 NAT), real (3 NATs), endpoints (use VPC endpoints instead)"
-  type        = string
-  default     = "single"
-  validation {
-    condition     = contains(["real", "single", "endpoints"], var.nat_mode)
-    error_message = "nat_mode must be one of: single, real, endpoints"
-  }
 }

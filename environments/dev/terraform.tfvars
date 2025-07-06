@@ -1,23 +1,20 @@
-environment = "dev"
+# environments/dev/terraform.tfvars
+
 aws_region = "us-east-1"
-project_tag = "project-5"
+
+# Primary infrastructure (always exists - houses the primary NAT)
+primary_availability_zones = 1  # Always keep 1 AZ for primary NAT gateway
+
+# Additional infrastructure (optional in single mode, required in real mode)
+additional_availability_zones = 2  # Can be reduced in single mode without affecting primary NAT
+
+# Network configuration
 vpc_cidr_block = "10.0.0.0/16"
+nat_mode = "single"  # Options: "single", "real", "endpoints"
 
-# Core infrastructure (never change these in development)
-core_availability_zones = 1  # Always keep 1 AZ for NAT gateway
-
-# Optional infrastructure (safe to change)
-optional_availability_zones = 2  # Can be reduced to 1 or 0 without affecting NAT
-
-
-# Controls the method that will allow the private subnets to communicate with the outside
-# Expected values:
-# single = all Private subnets will use a single NAT, that will be placed on the first public subnet
-# real = 3 NATs, one for each pub/private subnet (Per AZ)
-# endpoints = will use VPC endpoints for specific servers (it means, limited access to the outside)
-    nat_mode = "single"
-
-#
+# Project configuration
+environment = "dev"
+project_tag = "project-5"
 
 
 

@@ -5,14 +5,14 @@ data "aws_availability_zones" "available" {
 
 locals {
     # Calculate total AZs needed
-    total_azs = var.core_availability_zones + var.optional_availability_zones
+    total_azs = var.primary_availability_zones + var.additional_availability_zones
     
     # Get all available AZs
     all_availability_zones = slice(data.aws_availability_zones.available.names, 0, local.total_azs)
     
-    # Separate core and optional AZs
-    core_azs = slice(local.all_availability_zones, 0, var.core_availability_zones)
-    optional_azs = slice(local.all_availability_zones, var.core_availability_zones, local.total_azs)
+    # Separate primary and additional AZs
+    primary_azs = slice(local.all_availability_zones, 0, var.primary_availability_zones)
+    additional_azs = slice(local.all_availability_zones, var.primary_availability_zones, local.total_azs)
     
     # Calculate subnet pairs for all AZs
     all_subnet_pairs = {
@@ -23,14 +23,14 @@ locals {
         }
     }
     
-    # Separate core and optional subnet pairs
-    core_subnet_pairs = {
-        for az in local.core_azs :
+    # Separate primary and additional subnet pairs
+    primary_subnet_pairs = {
+        for az in local.primary_azs :
         az => local.all_subnet_pairs[az]
     }
     
-    optional_subnet_pairs = {
-        for az in local.optional_azs :
+    additional_subnet_pairs = {
+        for az in local.additional_azs :
         az => local.all_subnet_pairs[az]
     }
 }
@@ -38,16 +38,16 @@ locals {
 # Debug outputs
 output "az_debug" {
   value = {
-    core_azs = local.core_azs
-    optional_azs = local.optional_azs
+    primary_azs = local.primary_azs
+    additional_azs = local.additional_azs
     total_azs = local.total_azs
   }
 }
 
 output "subnet_debug" {
   value = {
-    core_subnets = local.core_subnet_pairs
-    optional_subnets = local.optional_subnet_pairs
+    primary_subnets = local.primary_subnet_pairs
+    additional_subnets = local.additional_subnet_pairs
   }
 }
 
@@ -56,13 +56,13 @@ module "vpc_network" {
    
     vpc_cidr_block = var.vpc_cidr_block
    
-    # Pass separated core and optional subnet CIDRs
-    core_public_subnet_cidrs = {
-        for az, pair in local.core_subnet_pairs : az => pair.public_cidr
+    # Pass separated primary and additional subnet CIDRs
+    primary_public_subnet_cidrs = {
+        for az, pair in local.primary_subnet_pairs : az => pair.public_cidr
     }
     
-    optional_public_subnet_cidrs = {
-        for az, pair in local.optional_subnet_pairs : az => pair.public_cidr
+    additional_public_subnet_cidrs = {
+        for az, pair in local.additional_subnet_pairs : az => pair.public_cidr
     }
     
     private_subnet_cidrs = {

@@ -1,22 +1,10 @@
-# This file is the VPC module's main.tf
-# Variables are defined in variables.tf - this file uses them
+# modules/vpc-network/main.tf
 
 locals {
-  # Combine all public subnets for reference
-  all_public_subnet_cidrs = merge(var.core_public_subnet_cidrs, var.optional_public_subnet_cidrs)
+  # Get primary AZ for stable references
+  primary_az = keys(var.primary_public_subnet_cidrs)[0]
   
-  # Get primary AZ from core subnets
-  primary_az = keys(var.core_public_subnet_cidrs)[0]
-  
-  # NAT gateway configuration based on mode - uses the combined subnet map
-  nat_gateway_config = (
-    var.nat_mode == "real" ? local.all_public_subnet_cidrs :
-    var.nat_mode == "single" ? { (local.primary_az) = var.core_public_subnet_cidrs[local.primary_az] } :
-    var.nat_mode == "endpoints" ? {} :
-    {}
-  )
-  
-  # Determine which subnets need NAT routes - uses private_subnet_cidrs variable
+  # Determine which subnets need NAT routes
   subnets_needing_nat = var.nat_mode != "endpoints" ? var.private_subnet_cidrs : {}
 }
 
@@ -40,24 +28,24 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# Core public subnets (stable - never destroyed)
-resource "aws_subnet" "public_core" {
-  for_each = var.core_public_subnet_cidrs
+# Primary public subnets (always exist)
+resource "aws_subnet" "public_primary" {
+  for_each = var.primary_public_subnet_cidrs
   
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value
   availability_zone = each.key
   tags = {
-    Name        = "${var.project_tag}-public-subnet-core-${each.key}"
+    Name        = "${var.project_tag}-public-subnet-primary-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
-    Type        = "core"
+    Type        = "primary"
   }
 }
 
-# Optional public subnets (can be destroyed safely)
-resource "aws_subnet" "public_optional" {
-  for_each = var.optional_public_subnet_cidrs
+# Additional public subnets (additional AZs)
+resource "aws_subnet" "public_additional" {
+  for_each = var.additional_public_subnet_cidrs
   
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value
@@ -66,16 +54,8 @@ resource "aws_subnet" "public_optional" {
     Name        = "${var.project_tag}-public-subnet-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
-    Type        = "optional"
+    Type        = "additional"
   }
-}
-
-# All public subnets combined for reference
-locals {
-  all_public_subnets = merge(
-    aws_subnet.public_core,
-    aws_subnet.public_optional
-  )
 }
 
 resource "aws_subnet" "private" {
@@ -91,25 +71,25 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Core public route tables
-resource "aws_route_table" "public_core" {
-  for_each = var.core_public_subnet_cidrs
+# Primary public route tables
+resource "aws_route_table" "public_primary" {
+  for_each = var.primary_public_subnet_cidrs
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name        = "${var.project_tag}-public-rt-core-${each.key}"
+    Name        = "${var.project_tag}-public-rt-primary-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
-    Type        = "core"
+    Type        = "primary"
   }
 }
 
-# Optional public route tables
-resource "aws_route_table" "public_optional" {
-  for_each = var.optional_public_subnet_cidrs
+# Additional public route tables
+resource "aws_route_table" "public_additional" {
+  for_each = var.additional_public_subnet_cidrs
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -119,27 +99,50 @@ resource "aws_route_table" "public_optional" {
     Name        = "${var.project_tag}-public-rt-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
-    Type        = "optional"
+    Type        = "additional"
   }
 }
 
-# Core public route table associations
-resource "aws_route_table_association" "public_core" {
-  for_each = aws_subnet.public_core
+# Primary public route table associations
+resource "aws_route_table_association" "public_primary" {
+  for_each = aws_subnet.public_primary
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public_core[each.key].id
+  route_table_id = aws_route_table.public_primary[each.key].id
 }
 
-# Optional public route table associations
-resource "aws_route_table_association" "public_optional" {
-  for_each = aws_subnet.public_optional
+# Additional public route table associations
+resource "aws_route_table_association" "public_additional" {
+  for_each = aws_subnet.public_additional
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public_optional[each.key].id
+  route_table_id = aws_route_table.public_additional[each.key].id
 }
 
-# EIP for NAT gateways
-resource "aws_eip" "nat" {
-  for_each = local.nat_gateway_config
+# PRIMARY NAT GATEWAY (always created unless endpoints mode)
+resource "aws_eip" "nat_primary" {
+  count  = var.nat_mode != "endpoints" ? 1 : 0
+  domain = "vpc"
+  tags = {
+    Name        = "${var.project_tag}-nat-eip-primary"
+    Project     = var.project_tag
+    Environment = var.environment
+  }
+}
+
+resource "aws_nat_gateway" "nat_primary" {
+  count         = var.nat_mode != "endpoints" ? 1 : 0
+  allocation_id = aws_eip.nat_primary[0].id
+  subnet_id     = aws_subnet.public_primary[local.primary_az].id
+  depends_on    = [aws_internet_gateway.igw]
+  tags = {
+    Name        = "${var.project_tag}-nat-gw-primary"
+    Project     = var.project_tag
+    Environment = var.environment
+  }
+}
+
+# ADDITIONAL NAT GATEWAYS (only created in real mode)
+resource "aws_eip" "nat_additional" {
+  for_each = var.nat_mode == "real" ? var.additional_public_subnet_cidrs : {}
   domain   = "vpc"
   tags = {
     Name        = "${var.project_tag}-nat-eip-${each.key}"
@@ -148,11 +151,10 @@ resource "aws_eip" "nat" {
   }
 }
 
-# NAT gateways - supports all three modes
-resource "aws_nat_gateway" "nat" {
-  for_each      = local.nat_gateway_config
-  allocation_id = aws_eip.nat[each.key].id
-  subnet_id     = local.all_public_subnets[each.key].id
+resource "aws_nat_gateway" "nat_additional" {
+  for_each      = var.nat_mode == "real" ? var.additional_public_subnet_cidrs : {}
+  allocation_id = aws_eip.nat_additional[each.key].id
+  subnet_id     = aws_subnet.public_additional[each.key].id
   depends_on    = [aws_internet_gateway.igw]
   tags = {
     Name        = "${var.project_tag}-nat-gw-${each.key}"
@@ -161,7 +163,7 @@ resource "aws_nat_gateway" "nat" {
   }
 }
 
-# Private route tables with proper NAT routing logic
+# Private route tables with NAT routing
 resource "aws_route_table" "private" {
   for_each = local.subnets_needing_nat
   vpc_id = aws_vpc.main.id
@@ -169,11 +171,15 @@ resource "aws_route_table" "private" {
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = (
-      # REAL mode: each private subnet routes to NAT in same AZ
-      var.nat_mode == "real" ? aws_nat_gateway.nat[each.key].id :
-      # SINGLE mode: all private subnets route to the single NAT in primary AZ
-      var.nat_mode == "single" ? aws_nat_gateway.nat[local.primary_az].id :
-      # ENDPOINTS mode: no NAT routing (handled by condition above)
+      # SINGLE mode: all private subnets route to primary NAT
+      var.nat_mode == "single" ? aws_nat_gateway.nat_primary[0].id :
+      # REAL mode: route to corresponding NAT based on AZ
+      var.nat_mode == "real" ? (
+        # If this AZ has an additional NAT, use it; otherwise use primary
+        contains(keys(aws_nat_gateway.nat_additional), each.key) ? 
+          aws_nat_gateway.nat_additional[each.key].id : 
+          aws_nat_gateway.nat_primary[0].id
+      ) :
       null
     )
   }
@@ -193,27 +199,28 @@ resource "aws_route_table_association" "private_subnets" {
 # Outputs for reference
 output "nat_mode" {
   value = var.nat_mode
-  description = "Current NAT mode: real (3 NATs), single (1 NAT), or endpoints (no NATs)"
+  description = "Current NAT mode: single (primary NAT only), real (NAT per AZ), or endpoints (no NATs)"
 }
 
 output "nat_gateway_ids" {
-  value = {
-    for k, v in aws_nat_gateway.nat : k => v.id
-  }
+  value = merge(
+    var.nat_mode != "endpoints" ? { (local.primary_az) = aws_nat_gateway.nat_primary[0].id } : {},
+    { for k, v in aws_nat_gateway.nat_additional : k => v.id }
+  )
   description = "Map of NAT gateway IDs by AZ"
 }
 
 output "public_subnets" {
   value = {
-    core = {
-      for k, v in aws_subnet.public_core : k => {
+    primary = {
+      for k, v in aws_subnet.public_primary : k => {
         id = v.id
         cidr = v.cidr_block
         az = v.availability_zone
       }
     }
-    optional = {
-      for k, v in aws_subnet.public_optional : k => {
+    additional = {
+      for k, v in aws_subnet.public_additional : k => {
         id = v.id
         cidr = v.cidr_block
         az = v.availability_zone
