@@ -6,6 +6,7 @@ set -euo pipefail
 GREEN="\033[1;32m"
 CYAN="\033[1;36m"
 YELLOW="\033[1;33m"
+RED="\033[1;31m"
 RESET="\033[0m"
 
 # Arguments
@@ -63,6 +64,15 @@ elif [[ "$MODE" == "for_retries" ]]; then
   for TARGET in $TARGETS; do
     echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
     terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET"
+
+    echo
+    read -rp "Continue to next target? [Y/n]: " answer
+    case "$answer" in
+      [nN][oO]|[nN])
+        echo -e "${YELLOW}Aborting per user request.${RESET}"
+        exit 0
+        ;;
+    esac
   done
 
 else
