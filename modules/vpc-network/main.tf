@@ -11,6 +11,13 @@ locals {
     var.nat_mode == "endpoints" ? {} :
     {} # default
   )
+
+  public_subnet_objects = {
+    for az in keys(aws_subnet.public) : az => {
+      id             = aws_subnet.public[az].id
+      route_table_id = aws_route_table.public[az].id
+    }
+  }
 }
 
 resource "aws_vpc" "main" {
@@ -86,9 +93,9 @@ resource "aws_route_table" "public" {
 
 # Associate all public subnets with the public route
 resource "aws_route_table_association" "public_subnets" {
-  for_each       = var.public_subnet_cidrs
-  subnet_id      = aws_subnet.public[each.key].id
-  route_table_id = aws_route_table.public[each.key].id
+  for_each       = local.public_subnet_objects
+  subnet_id      = each.value.id
+  route_table_id = each.value.route_table_id
 }
 
 # Creating Elastic IPs to be used in the NATs
