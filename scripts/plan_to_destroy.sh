@@ -15,7 +15,7 @@ VAR_FILE="../environments/${ENV}/terraform.tfvars"
 TF_WORK_DIR="../main"
 
 # Help message
-echo -e "${CYAN}Terraform Destroy PLAN Script (dry-run)${RESET}"
+echo -e "${CYAN}Terraform Destroy PLAN Script${RESET}"
 echo -e "${YELLOW}Environment (arg #1):${RESET} ${GREEN}${ENV}${RESET}  (options: 'dev' [default], 'staging', 'prod')"
 echo -e "${YELLOW}Mode (arg #2):       ${RESET} ${GREEN}${MODE}${RESET}  (options: 'for_retries' [default], 'all')"
 echo -e "${YELLOW}Using variable file:${RESET} ${VAR_FILE}"
@@ -49,18 +49,20 @@ elif [[ "$MODE" == "for_retries" ]]; then
   GREP_EXCLUDE="${GREP_EXCLUDE:1}" # strip leading |
 
   TARGETS=$(terraform -chdir="$TF_WORK_DIR" state list | \
-    grep -Ev "$GREP_EXCLUDE")
+    grep -Ev "$GREP_EXCLUDE" | \
+    sed 's/^/-target=/')
 
   if [[ -z "$TARGETS" ]]; then
-    echo -e "${YELLOW}No targets found to plan destroy.${RESET}"
+    echo -e "${YELLOW}No targets found to destroy.${RESET}"
     exit 0
   fi
 
-  echo -e "${CYAN}Planning destroy for each target individually:${RESET}"
+  echo -e "${CYAN}Destroying with targets:${RESET}"
+  echo "$TARGETS"
 
   for TARGET in $TARGETS; do
     echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
-    terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" -target="$TARGET"
+    terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET"
   done
 
 else
