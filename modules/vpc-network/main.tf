@@ -87,7 +87,7 @@ resource "aws_route_table" "public" {
 # Associate all public subnets with the public route
 resource "aws_route_table_association" "public_subnets" {
   for_each       = var.public_subnet_cidrs
-  subnet_id      = each.value.id
+  subnet_id      = aws_subnet.public[each.key].id
   route_table_id = aws_route_table.public[each.key].id
 }
 
