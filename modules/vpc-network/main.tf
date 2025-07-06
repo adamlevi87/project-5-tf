@@ -66,8 +66,10 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Public Traffic Routed via the IGW
+# Public Traffic Routed via the IGW, 1 route table per public subnet
 resource "aws_route_table" "public" {
+  for_each = aws_subnet.public
+
   vpc_id = aws_vpc.main.id
 
   route {
@@ -76,7 +78,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name    = "${var.project_tag}-public-subnets-rt"
+    Name    = "${var.project_tag}-public-subnets-rt-${each.key}"
     Project = var.project_tag
     Environment = var.environment
   }
@@ -86,7 +88,7 @@ resource "aws_route_table" "public" {
 resource "aws_route_table_association" "public_subnets" {
   for_each       = aws_subnet.public
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public[each.key].id
 }
 
 # Creating Elastic IPs to be used in the NATs
