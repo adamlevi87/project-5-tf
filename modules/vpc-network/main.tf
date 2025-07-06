@@ -117,12 +117,21 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "private" {
-  for_each  = local.nat_gateway_azs
+  for_each = (
+    var.nat_mode == "real" || var.nat_mode == "single" ? var.private_subnet_cidrs :
+    var.nat_mode == "endpoints" ? {} : 
+    {}
+  )
   vpc_id    = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.this[each.key].id
+    nat_gateway_id = (
+      var.nat_mode == "real" ? aws_nat_gateway.this[each.key].id :
+      var.nat_mode == "single" ? aws_nat_gateway.this[keys(local.nat_gateway_azs)[0]].id :
+      var.nat_mode == "endpoints" ? null :
+      null
+    )
   }
 
   tags = {
@@ -148,10 +157,5 @@ resource "aws_route_table_association" "private_subnets" {
   # in 'real' mode, each subnet will be routed to each NAT
   # in 'single' mode, all subnets will be routed to the first and only NAT
   # no routing in endpoints
-  route_table_id = (
-    var.nat_mode == "real" ? aws_route_table.private[each.key].id :
-    var.nat_mode == "single" ? aws_route_table.private[keys(local.nat_gateway_azs)[0]].id :
-    var.nat_mode == "endpoints" ? null :
-    null
-  )
+  route_table_id = aws_route_table.private[each.key].id
 }
