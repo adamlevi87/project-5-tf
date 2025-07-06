@@ -68,10 +68,13 @@ TARGETS=$(terraform -chdir="$TF_WORK_DIR" state list | \
     echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
     terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET"
 
-    echo
+    #echo
     read -rp "Continue to next target? [Y/n]: " answer
     case "$answer" in
-      [nN][oO]|[nN])
+    [yY][eE][sS]|[yY])
+        # continue
+        ;;
+    *) # anything else, including empty input
         echo -e "${YELLOW}Aborting per user request.${RESET}"
         exit 0
         ;;
