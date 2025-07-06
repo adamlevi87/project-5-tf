@@ -3,14 +3,15 @@ variable "vpc_cidr_block" {
   description = "CIDR block for the VPC"
 }
 
-variable "availability_zones" {
-  type        = list(string)
-  description = "List of availability zones"
+variable "core_public_subnet_cidrs" {
+  description = "Core public subnet CIDRs that should never be destroyed (houses NAT gateways)"
+  type        = map(string)
 }
 
-variable "public_subnet_cidrs" {
-  description = "Map of availability zones to their public subnet CIDRs"
+variable "optional_public_subnet_cidrs" {
+  description = "Optional public subnet CIDRs that can be safely destroyed"
   type        = map(string)
+  default     = {}
 }
 
 variable "private_subnet_cidrs" {

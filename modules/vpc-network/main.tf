@@ -1,27 +1,22 @@
+# This file is the VPC module's main.tf
+# Variables are defined in variables.tf - this file uses them
+
 locals {
-  # Get all AZs for reference
-  all_azs = keys(var.public_subnet_cidrs)
-  primary_az = local.all_azs[0]
+  # Combine all public subnets for reference
+  all_public_subnet_cidrs = merge(var.core_public_subnet_cidrs, var.optional_public_subnet_cidrs)
   
-  # Separate core from optional subnets
-  core_public_cidrs = {
-    (local.primary_az) = var.public_subnet_cidrs[local.primary_az]
-  }
+  # Get primary AZ from core subnets
+  primary_az = keys(var.core_public_subnet_cidrs)[0]
   
-  optional_public_cidrs = {
-    for az, cidr in var.public_subnet_cidrs : az => cidr
-    if az != local.primary_az
-  }
-  
-  # NAT gateway configuration based on mode
+  # NAT gateway configuration based on mode - uses the combined subnet map
   nat_gateway_config = (
-    var.nat_mode == "real" ? var.public_subnet_cidrs :
-    var.nat_mode == "single" ? { (local.primary_az) = var.public_subnet_cidrs[local.primary_az] } :
+    var.nat_mode == "real" ? local.all_public_subnet_cidrs :
+    var.nat_mode == "single" ? { (local.primary_az) = var.core_public_subnet_cidrs[local.primary_az] } :
     var.nat_mode == "endpoints" ? {} :
     {}
   )
   
-  # Determine which subnets need NAT routes
+  # Determine which subnets need NAT routes - uses private_subnet_cidrs variable
   subnets_needing_nat = var.nat_mode != "endpoints" ? var.private_subnet_cidrs : {}
 }
 
@@ -45,13 +40,15 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# Core public subnet (stable - always exists for NAT in single/real mode)
+# Core public subnets (stable - never destroyed)
 resource "aws_subnet" "public_core" {
+  for_each = var.core_public_subnet_cidrs
+  
   vpc_id            = aws_vpc.main.id
-  cidr_block        = local.core_public_cidrs[local.primary_az]
-  availability_zone = local.primary_az
+  cidr_block        = each.value
+  availability_zone = each.key
   tags = {
-    Name        = "${var.project_tag}-public-subnet-core-${local.primary_az}"
+    Name        = "${var.project_tag}-public-subnet-core-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
     Type        = "core"
@@ -60,7 +57,7 @@ resource "aws_subnet" "public_core" {
 
 # Optional public subnets (can be destroyed safely)
 resource "aws_subnet" "public_optional" {
-  for_each = local.optional_public_cidrs
+  for_each = var.optional_public_subnet_cidrs
   
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value
@@ -76,7 +73,7 @@ resource "aws_subnet" "public_optional" {
 # All public subnets combined for reference
 locals {
   all_public_subnets = merge(
-    { (local.primary_az) = aws_subnet.public_core },
+    aws_subnet.public_core,
     aws_subnet.public_optional
   )
 }
@@ -94,15 +91,16 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Core public route table (stable)
+# Core public route tables
 resource "aws_route_table" "public_core" {
+  for_each = var.core_public_subnet_cidrs
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
   tags = {
-    Name        = "${var.project_tag}-public-rt-core-${local.primary_az}"
+    Name        = "${var.project_tag}-public-rt-core-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
     Type        = "core"
@@ -111,7 +109,7 @@ resource "aws_route_table" "public_core" {
 
 # Optional public route tables
 resource "aws_route_table" "public_optional" {
-  for_each = local.optional_public_cidrs
+  for_each = var.optional_public_subnet_cidrs
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -125,10 +123,11 @@ resource "aws_route_table" "public_optional" {
   }
 }
 
-# Core public route table association (stable)
+# Core public route table associations
 resource "aws_route_table_association" "public_core" {
-  subnet_id      = aws_subnet.public_core.id
-  route_table_id = aws_route_table.public_core.id
+  for_each = aws_subnet.public_core
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.public_core[each.key].id
 }
 
 # Optional public route table associations
@@ -206,12 +205,20 @@ output "nat_gateway_ids" {
 
 output "public_subnets" {
   value = {
-    for k, v in local.all_public_subnets : k => {
-      id = v.id
-      cidr = v.cidr_block
-      az = v.availability_zone
-      type = k == local.primary_az ? "core" : "optional"
+    core = {
+      for k, v in aws_subnet.public_core : k => {
+        id = v.id
+        cidr = v.cidr_block
+        az = v.availability_zone
+      }
+    }
+    optional = {
+      for k, v in aws_subnet.public_optional : k => {
+        id = v.id
+        cidr = v.cidr_block
+        az = v.availability_zone
+      }
     }
   }
-  description = "All public subnets with their properties"
+  description = "All public subnets organized by type"
 }

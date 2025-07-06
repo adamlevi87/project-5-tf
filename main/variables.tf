@@ -8,18 +8,33 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
-variable "availability_zones_to_use" {
-  description = "The number of Availability zones to use"
-  type        = string
+variable "core_availability_zones" {
+  description = "Number of core AZs that should always exist (houses NAT gateways)"
+  type        = number
+  default     = 1
+  validation {
+    condition     = var.core_availability_zones >= 1 && var.core_availability_zones <= 3
+    error_message = "Core availability zones must be between 1 and 3"
+  }
+}
+
+variable "optional_availability_zones" {
+  description = "Number of additional optional AZs (can be safely destroyed)"
+  type        = number
+  default     = 0
+  validation {
+    condition     = var.optional_availability_zones >= 0
+    error_message = "Optional availability zones must be 0 or greater"
+  }
 }
 
 variable "nat_mode" {
-  description = "Controls the NAT gateway setup. Options: single (1 NAT), real (3 NATs), endpoints (use VPC endpoints instead)"
+  description = "NAT gateway mode: 'real' (NAT per AZ), 'single' (one NAT), or 'endpoints' (no NATs)"
   type        = string
   default     = "single"
   validation {
     condition     = contains(["real", "single", "endpoints"], var.nat_mode)
-    error_message = "nat_mode must be one of: single, real, endpoints"
+    error_message = "NAT mode must be one of: real, single, endpoints"
   }
 }
 

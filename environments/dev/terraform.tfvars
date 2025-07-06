@@ -2,7 +2,13 @@ environment = "dev"
 aws_region = "us-east-1"
 project_tag = "project-5"
 vpc_cidr_block = "10.0.0.0/16"
-availability_zones_to_use = "3"
+
+# Core infrastructure (never change these in development)
+core_availability_zones = 1  # Always keep 1 AZ for NAT gateway
+
+# Optional infrastructure (safe to change)
+optional_availability_zones = 2  # Can be reduced to 1 or 0 without affecting NAT
+
 
 # Controls the method that will allow the private subnets to communicate with the outside
 # Expected values:
