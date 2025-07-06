@@ -36,15 +36,16 @@ elif [[ "$MODE" == "for_retries" ]]; then
   echo -e "${CYAN}Building target list (excluding NAT and dependencies)...${RESET}"
 
 EXCLUDE_PATTERNS=(
-  'module.vpc_network.aws_nat_gateway.this\[0\]'
-  'module.vpc_network.aws_eip.nat\[0\]'
-  'module.vpc_network.aws_subnet.public\[0\]'
+  'module.vpc_network.aws_nat_gateway.this\[[^]]+\]'
+  'module.vpc_network.aws_eip.nat\[[^]]+\]'
+  'module.vpc_network.aws_subnet.public\[[^]]+\]'
   'module.vpc_network.aws_route_table.public'
-  'module.vpc_network.aws_route_table_association.public_subnets\[0\]'
+  'module.vpc_network.aws_route_table_association.public_subnets\[[^]]+\]'
   'module.vpc_network.aws_internet_gateway.igw'
   'module.vpc_network.aws_vpc.main'
   'data.aws_availability_zones.available'
 )
+
 
 # Properly join the patterns into a single grep-safe regex
 GREP_EXCLUDE=$(IFS="|"; echo "${EXCLUDE_PATTERNS[*]}")
@@ -62,7 +63,6 @@ TARGETS=$(terraform -chdir="$TF_WORK_DIR" state list | \
   echo -e "${CYAN}Destroying with targets:${RESET}"
   echo "$TARGETS"
   echo -e "${YELLOW}Exclude regex:${RESET} $GREP_EXCLUDE"
-  echo -e "${YELLOW}Filtered state list:${RESET}"
 
   for TARGET in $TARGETS; do
     echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
