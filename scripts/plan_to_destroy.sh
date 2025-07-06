@@ -78,19 +78,22 @@ elif [[ "$MODE" == "for_retries" ]]; then
     # Exclude ALL NATs + ALL public subnets + their route table associations
     EXCLUDE_PATTERNS=(
       'data.aws_availability_zones.available'
-      'module.vpc_network.aws_eip.nat\[[^]]+\]'
       'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_nat_gateway.this\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_subnets\[[^]]+\]'
-      'module.vpc_network.aws_subnet.public\[[^]]+\]'
+      'module.vpc_network.aws_subnet.public_core'
+      'module.vpc_network.aws_route_table.public_core'
+      'module.vpc_network.aws_route_table_association.public_core'
+      'module.vpc_network.aws_eip.nat\[[^]]+\]'
+      'module.vpc_network.aws_nat_gateway.nat\[[^]]+\]'
+      'module.vpc_network.aws_route_table.public_optional\[[^]]+\]'
+      'module.vpc_network.aws_route_table_association.public_optional\[[^]]+\]'
+      'module.vpc_network.aws_subnet.public_optional\[[^]]+\]'
       'module.vpc_network.aws_vpc.main'
     )
 
   elif [[ "$NAT_MODE" == "single" ]]; then
     # Detect which AZ the single NAT is in
     NAT_AZ=$(terraform -chdir="$TF_WORK_DIR" state list | \
-      grep 'module.vpc_network.aws_nat_gateway.this' | \
+      grep 'module.vpc_network.aws_nat_gateway.nat' | \
       sed -E 's/.*\["([^"]+)"\]/\1/')
 
     if [[ -z "$NAT_AZ" ]]; then
@@ -102,12 +105,12 @@ elif [[ "$MODE" == "for_retries" ]]; then
 
     EXCLUDE_PATTERNS=(
       'data.aws_availability_zones.available'
-      "module.vpc_network.aws_eip.nat\\[\"$NAT_AZ\"\\]"
       'module.vpc_network.aws_internet_gateway.igw'
-      "module.vpc_network.aws_nat_gateway.this\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_route_table.public\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_route_table_association.public_subnets\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_subnet.public\\[\"$NAT_AZ\"\\]"
+      'module.vpc_network.aws_subnet.public_core'
+      'module.vpc_network.aws_route_table.public_core'
+      'module.vpc_network.aws_route_table_association.public_core'
+      "module.vpc_network.aws_eip.nat\\[\"$NAT_AZ\"\\]"
+      "module.vpc_network.aws_nat_gateway.nat\\[\"$NAT_AZ\"\\]"
       'module.vpc_network.aws_vpc.main'
     )
   fi
