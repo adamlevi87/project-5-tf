@@ -51,7 +51,7 @@ show_help() {
   echo
 }
 # Help option
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+if [[ "$ENV" == "--help" || "$ENV" == "-h" ]]; then
   show_help
   exit 0
 else
@@ -60,17 +60,6 @@ else
   echo -e "${YELLOW}Press Enter to continue or Ctrl+C to cancel...${RESET}"
   read -r
 fi
-
-
-# # Help message
-# echo -e "${CYAN}Terraform Destroy PLAN Script${RESET}"
-# echo -e "${YELLOW}Environment (arg #1):${RESET} ${GREEN}${ENV}${RESET}   (options: 'dev' [default], 'staging', 'prod')"
-# echo -e "${YELLOW}Mode (arg #2):       ${RESET} ${GREEN}${MODE}${RESET}  (options: 'for_retries' [default], 'all')"
-# echo -e "${YELLOW}NAT Mode (arg #3):   ${RESET} ${GREEN}${NAT_MODE}${RESET}  (options: 'single' [default], 'real')"
-# echo -e "${YELLOW}Strategy (arg #4):   ${RESET} ${GREEN}${STRATEGY}${RESET}  (options: 'separate' [default], 'together')"
-# echo -e "${YELLOW}Using variable file:${RESET} ${VAR_FILE}"
-# echo -e "${YELLOW}Terraform working directory:${RESET} ${TF_WORK_DIR}"
-# echo
 
 # Validate ENV
 if [[ "$ENV" != "dev" && "$ENV" != "staging" && "$ENV" != "prod"]]; then
