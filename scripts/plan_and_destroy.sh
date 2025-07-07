@@ -121,8 +121,8 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
       'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
       'module.vpc_network.aws_route_table.public_primary\[[^]]+\]'
       'module.vpc_network.aws_route_table_association.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat_primary[0]'
-      'module.vpc_network.aws_nat_gateway.nat_primary[0]'
+      'module.vpc_network.aws_eip.nat_primary\[0\]'
+      'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
       'module.vpc_network.aws_subnet.public_additional\[[^]]+\]'
       'module.vpc_network.aws_route_table.public_additional\[[^]]+\]'
       'module.vpc_network.aws_route_table_association.public_additional\[[^]]+\]'
@@ -150,8 +150,8 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
       'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
       'module.vpc_network.aws_route_table.public_primary\[[^]]+\]'
       'module.vpc_network.aws_route_table_association.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat_primary[0]'
-      'module.vpc_network.aws_nat_gateway.nat_primary[0]'
+      'module.vpc_network.aws_eip.nat_primary\[0\]'
+      'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
       'module.vpc_network.aws_vpc.main'
     )
   fi
