@@ -101,7 +101,7 @@ fi
 if [[ "$RUN_MODE" == "plan" ]]; then
   COMMAND_RUN_MODE="plan -destroy"
 elif [[ "$RUN_MODE" == "destroy"  ]]; then
-  COMMAND_RUN_MODE="destroy"
+  COMMAND_RUN_MODE="destroy -auto-approve"
 fi
 
 ################ Script starts here ################
