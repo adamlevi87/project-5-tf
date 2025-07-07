@@ -79,14 +79,16 @@ elif [[ "$MODE" == "for_retries" ]]; then
     EXCLUDE_PATTERNS=(
       'data.aws_availability_zones.available'
       'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_subnet.public_core'
-      'module.vpc_network.aws_route_table.public_core'
-      'module.vpc_network.aws_route_table_association.public_core'
-      'module.vpc_network.aws_eip.nat\[[^]]+\]'
-      'module.vpc_network.aws_nat_gateway.nat\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public_optional\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_optional\[[^]]+\]'
-      'module.vpc_network.aws_subnet.public_optional\[[^]]+\]'
+      'module.vpc_network.aws_subnet.public_primary[0]'
+      'module.vpc_network.aws_route_table.public_primary[0]'
+      'module.vpc_network.aws_route_table_association.public_primary[0]'
+      'module.vpc_network.aws_eip.nat_primary[0]'
+      'module.vpc_network.aws_nat_gateway.nat_primary[0]'
+      'module.vpc_network.aws_subnet.public_additional\[[^]]+\]'
+      'module.vpc_network.aws_route_table.public_additional\[[^]]+\]'
+      'module.vpc_network.aws_route_table_association.public_additional\[[^]]+\]'
+      'module.vpc_network.aws_eip.nat_additional\[[^]]+\]'
+      'module.vpc_network.aws_nat_gateway.nat_additional\[[^]]+\]'
       'module.vpc_network.aws_vpc.main'
     )
 
@@ -106,11 +108,11 @@ elif [[ "$MODE" == "for_retries" ]]; then
     EXCLUDE_PATTERNS=(
       'data.aws_availability_zones.available'
       'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_subnet.public_core'
-      'module.vpc_network.aws_route_table.public_core'
-      'module.vpc_network.aws_route_table_association.public_core'
-      "module.vpc_network.aws_eip.nat\\[\"$NAT_AZ\"\\]"
-      "module.vpc_network.aws_nat_gateway.nat\\[\"$NAT_AZ\"\\]"
+      'module.vpc_network.aws_subnet.public_primary[0]'
+      'module.vpc_network.aws_route_table.public_primary[0]'
+      'module.vpc_network.aws_route_table_association.public_primary[0]'
+      'module.vpc_network.aws_eip.nat_primary[0]'
+      'module.vpc_network.aws_nat_gateway.nat_primary[0]'
       'module.vpc_network.aws_vpc.main'
     )
   fi
