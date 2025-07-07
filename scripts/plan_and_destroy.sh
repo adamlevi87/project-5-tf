@@ -195,11 +195,11 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
           ;;
       esac
     done
+  elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "destroy" ]]; then
+    echo -e "\n${GREEN}========  debug and destroy - doing nothing ========${RESET}"
   fi
 
-
 else
-  echo -e "${RED}Invalid mode: ${MODE}${RESET}"
-  echo "Usage: $0 [env=dev|prod|staging] [mode=all|for_retries] [nat_mode=single|real]"
+  echo "Usage: $0 [env=dev|prod|staging] [run_mode=plan|destroy] [selection_method=filter|all] [nat_mode=single|real] [debug=debug|normal]"
   exit 1
 fi
