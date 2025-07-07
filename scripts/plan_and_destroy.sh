@@ -62,19 +62,19 @@ else
 fi
 
 # Validate ENV
-if [[ "$ENV" != "dev" && "$ENV" != "staging" && "$ENV" != "prod"]]; then
+if [[ "$ENV" != "dev" && "$ENV" != "staging" && "$ENV" != "prod" ]]; then
   echo -e "${RED}ERROR:${RESET} Invalid ENV'${ENV}'. Use 'dev' or 'staging' or 'prod'."
   exit 1
 fi
 
 # Validate RUN_MODE
-if [[ "$RUN_MODE" != "plan" && "$RUN_MODE" != "destroy"]]; then
+if [[ "$RUN_MODE" != "plan" && "$RUN_MODE" != "destroy" ]]; then
   echo -e "${RED}ERROR:${RESET} Invalid RUN_MODE'${RUN_MODE}'. Use 'plan' or 'destroy'."
   exit 1
 fi
 
 # Validate SELECTION_METHOD
-if [[ "$SELECTION_METHOD" != "filter" && "$SELECTION_METHOD" != "all"]]; then
+if [[ "$SELECTION_METHOD" != "filter" && "$SELECTION_METHOD" != "all" ]]; then
   echo -e "${RED}ERROR:${RESET} Invalid SELECTION_METHOD'${SELECTION_METHOD}'. Use 'filter' or 'all'."
   exit 1
 fi
@@ -179,7 +179,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE} (all targets together) ========${RESET}"
     # shellcheck disable=SC2086
     terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" $TARGETS
-  elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan"]]; then
+  elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
     for TARGET in $TARGETS; do
       echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
       terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET"
