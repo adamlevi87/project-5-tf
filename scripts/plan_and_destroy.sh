@@ -11,44 +11,84 @@ RESET="\033[0m"
 
 # Arguments
 ENV="${1:-dev}"
-MODE="${2:-for_retries}"
-NAT_MODE="${3:-single}"
-STRATEGY="${4:-separate}"
+RUN_MODE="${2:-plan}"
+SELECTION_METHOD="${3:-filter}"
+NAT_MODE="${4:-single}"
+DEBUG="${5:-normal}"
+
+# Handle dash as "use default"
+[[ "$ENV" == "-" ]] && ENV="dev"
+[[ "$RUN_MODE" == "-" ]] && RUN_MODE="plan"
+[[ "$SELECTION_METHOD" == "-" ]] && SELECTION_METHOD="filter"
+[[ "$NAT_MODE" == "-" ]] && NAT_MODE="single"
+[[ "$DEBUG" == "-" ]] && DEBUG="normal"
+
 VAR_FILE="../environments/${ENV}/terraform.tfvars"
 TF_WORK_DIR="../main"
 
-# Help option
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+show_help() {
   echo -e "${CYAN}Terraform Destroy PLAN Script - Help${RESET}"
   echo
-  echo -e "${YELLOW}Usage:${RESET} $0 [env] [mode] [nat_mode] [strategy]"
+  echo -e "${YELLOW}Usage:${RESET} $0 [env] [run_mode] [selection_method] [nat_mode] [debug]"
+  echo -e "${YELLOW}Use '-' to hit the defaults ${RESET}"
   echo
   echo -e "${YELLOW}Arguments:${RESET}"
   echo -e "  ${GREEN}1. env        ${RESET}→ Environment to target.         Default: ${CYAN}dev${RESET}"
   echo -e "                 Options: ${CYAN}dev${RESET}, ${CYAN}staging${RESET}, ${CYAN}prod${RESET}"
-  echo -e "  ${GREEN}2. mode       ${RESET}→ Destroy mode.                 Default: ${CYAN}for_retries${RESET}"
-  echo -e "                 Options: ${CYAN}for_retries${RESET}, ${CYAN}all${RESET}"
-  echo -e "  ${GREEN}3. nat_mode   ${RESET}→ NAT Gateway mode.             Default: ${CYAN}single${RESET}"
+  echo -e "  ${GREEN}2. run_mode   ${RESET}→ terraform plan -destroy or terraform destroy.      Default: ${CYAN}plan${RESET}"
+  echo -e "                 Options: ${CYAN}plan${RESET},${CYAN}destroy${RESET}"
+  echo -e "  ${GREEN}3. selection_method       ${RESET}→ selection method.                 Default: ${CYAN}filter${RESET}"
+  echo -e "                 Options: ${CYAN}filter${RESET}, ${CYAN}all${RESET}"
+  echo -e "  ${GREEN}4. nat_mode   ${RESET}→ NAT Gateway mode. How many NATs, a single one or per AZ.             Default: ${CYAN}single${RESET}"
   echo -e "                 Options: ${CYAN}single${RESET}, ${CYAN}real${RESET}"
-  echo -e "  ${GREEN}4. strategy   ${RESET}→ Plan execution strategy.      Default: ${CYAN}separate${RESET}"
-  echo -e "                 Options: ${CYAN}separate${RESET} (each target), ${CYAN}together${RESET} (all targets at once)"
+  echo -e "  ${GREEN}5. debug   ${RESET}→ Debug mode, used with run_mode:plan & selection_method: filter to iterate over the filtered terraform resource list one by one       Default: ${CYAN}normal${RESET}"
+  echo -e "                 Options: ${CYAN}debug${RESET} (each target), ${CYAN}normal${RESET} (all targets at once)"
   echo
   echo -e "Example:"
-  echo -e "  ${GREEN}$0 dev for_retries single separate${RESET}"
+  echo -e "  ${GREEN}$0 dev plan filter single normal${RESET}"
+  echo -e "Example 2:"
+  echo -e "  ${GREEN}$0 dev destroy all real debug${RESET}"
   echo
+}
+# Help option
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  show_help
   exit 0
+else
+  show_help
+  echo -e "${YELLOW}Running:${RESET} ${GREEN}$0 $ENV $RUN_MODE $SELECTION_METHOD $NAT_MODE $DEBUG${RESET}"
+  echo -e "${YELLOW}Press Enter to continue or Ctrl+C to cancel...${RESET}"
+  read -r
 fi
 
 
-# Help message
-echo -e "${CYAN}Terraform Destroy PLAN Script${RESET}"
-echo -e "${YELLOW}Environment (arg #1):${RESET} ${GREEN}${ENV}${RESET}   (options: 'dev' [default], 'staging', 'prod')"
-echo -e "${YELLOW}Mode (arg #2):       ${RESET} ${GREEN}${MODE}${RESET}  (options: 'for_retries' [default], 'all')"
-echo -e "${YELLOW}NAT Mode (arg #3):   ${RESET} ${GREEN}${NAT_MODE}${RESET}  (options: 'single' [default], 'real')"
-echo -e "${YELLOW}Strategy (arg #4):   ${RESET} ${GREEN}${STRATEGY}${RESET}  (options: 'separate' [default], 'together')"
-echo -e "${YELLOW}Using variable file:${RESET} ${VAR_FILE}"
-echo -e "${YELLOW}Terraform working directory:${RESET} ${TF_WORK_DIR}"
-echo
+# # Help message
+# echo -e "${CYAN}Terraform Destroy PLAN Script${RESET}"
+# echo -e "${YELLOW}Environment (arg #1):${RESET} ${GREEN}${ENV}${RESET}   (options: 'dev' [default], 'staging', 'prod')"
+# echo -e "${YELLOW}Mode (arg #2):       ${RESET} ${GREEN}${MODE}${RESET}  (options: 'for_retries' [default], 'all')"
+# echo -e "${YELLOW}NAT Mode (arg #3):   ${RESET} ${GREEN}${NAT_MODE}${RESET}  (options: 'single' [default], 'real')"
+# echo -e "${YELLOW}Strategy (arg #4):   ${RESET} ${GREEN}${STRATEGY}${RESET}  (options: 'separate' [default], 'together')"
+# echo -e "${YELLOW}Using variable file:${RESET} ${VAR_FILE}"
+# echo -e "${YELLOW}Terraform working directory:${RESET} ${TF_WORK_DIR}"
+# echo
+
+# Validate ENV
+if [[ "$ENV" != "dev" && "$ENV" != "staging" && "$ENV" != "prod"]]; then
+  echo -e "${RED}ERROR:${RESET} Invalid ENV'${ENV}'. Use 'dev' or 'staging' or 'prod'."
+  exit 1
+fi
+
+# Validate RUN_MODE
+if [[ "$RUN_MODE" != "plan" && "$RUN_MODE" != "destroy"]]; then
+  echo -e "${RED}ERROR:${RESET} Invalid RUN_MODE'${RUN_MODE}'. Use 'plan' or 'destroy'."
+  exit 1
+fi
+
+# Validate SELECTION_METHOD
+if [[ "$SELECTION_METHOD" != "filter" && "$SELECTION_METHOD" != "all"]]; then
+  echo -e "${RED}ERROR:${RESET} Invalid SELECTION_METHOD'${SELECTION_METHOD}'. Use 'filter' or 'all'."
+  exit 1
+fi
 
 # Validate NAT mode
 if [[ "$NAT_MODE" != "single" && "$NAT_MODE" != "real" ]]; then
@@ -56,9 +96,9 @@ if [[ "$NAT_MODE" != "single" && "$NAT_MODE" != "real" ]]; then
   exit 1
 fi
 
-# Validate Strategy
-if [[ "$STRATEGY" != "separate" && "$STRATEGY" != "together" ]]; then
-  echo -e "${RED}ERROR:${RESET} Invalid strategy '${STRATEGY}'. Use 'separate' or 'together'."
+# Validate Debug
+if [[ "$DEBUG" != "debug" && "$DEBUG" != "normal" ]]; then
+  echo -e "${RED}ERROR:${RESET} Invalid Debug '${DEBUG}'. Use 'debug' or 'normal'."
   exit 1
 fi
 
@@ -68,10 +108,20 @@ if [[ ! -f "$VAR_FILE" ]]; then
   exit 1
 fi
 
-if [[ "$MODE" == "all" ]]; then
-  terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE"
+# Validate RUN_MODE
+if [[ "$RUN_MODE" == "plan" ]]; then
+  COMMAND_RUN_MODE="plan -destroy"
+elif [[ "$RUN_MODE" == "destroy"  ]]; then
+  COMMAND_RUN_MODE="destroy"
+fi
 
-elif [[ "$MODE" == "for_retries" ]]; then
+################ Script starts here ################
+
+if [[ "$SELECTION_METHOD" == "all" ]]; then
+  terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE"
+
+elif [[ "$SELECTION_METHOD" == "filter" ]]; then
+
   echo -e "${CYAN}Building target list based on NAT mode '${NAT_MODE}'...${RESET}"
 
   if [[ "$NAT_MODE" == "real" ]]; then
@@ -133,14 +183,14 @@ elif [[ "$MODE" == "for_retries" ]]; then
     exit 0
   fi
 
-  echo -e "${CYAN}Destroying with targets:${RESET}"
+  echo -e "${CYAN}working with targets:${RESET}"
   echo "$TARGETS"
 
-  if [[ "$STRATEGY" == "together" ]]; then
-    echo -e "\n${GREEN}======== PLAN DESTROY (all targets together) ========${RESET}"
+  if [[ "$DEBUG" == "normal" ]]; then
+    echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE} (all targets together) ========${RESET}"
     # shellcheck disable=SC2086
-    terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" $TARGETS
-  else
+    terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" $TARGETS
+  elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan"]]; then
     for TARGET in $TARGETS; do
       echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
       terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET"
