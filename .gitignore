@@ -6,3 +6,6 @@
 # --- Terraform working directory ---
 .terraform/
 .terraform.lock.hcl
+
+# Lambda function zipped code
+*lambda-deployment.zip
