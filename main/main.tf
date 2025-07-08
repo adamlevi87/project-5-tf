@@ -67,7 +67,11 @@ output "subnet_debug" {
 module "vpc_network" {
     source = "../modules/vpc-network"
    
+    project_tag   = var.project_tag
+    environment   = var.environment
+
     vpc_cidr_block = var.vpc_cidr_block
+    nat_mode = var.nat_mode
    
     # Pass separated primary and additional subnet CIDRs
     # Primary Public
@@ -82,8 +86,72 @@ module "vpc_network" {
     private_subnet_cidrs = {
         for az, pair in local.all_subnet_pairs : az => pair.private_cidr
     }
-    
-    nat_mode = var.nat_mode
-    environment = var.environment
-    project_tag = var.project_tag
+}
+
+module "s3_app_data" {
+  source = "../modules/s3"
+
+  project_tag   = var.project_tag
+  environment   = var.environment
+  
+  # Lifecycle configuration
+  enable_lifecycle_policy = true
+  data_retention_days     = var.environment == "prod" ? 0 : 365  # Keep prod data forever, dev/staging for 1 year
+}
+
+module "sqs" {
+  source = "../modules/sqs"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # Queue configuration
+  queue_name                = "app-messages"
+  visibility_timeout_seconds = 60  # Give lambda 60 seconds to process
+  receive_wait_time_seconds  = 20  # Enable long polling
+  
+  # Dead letter queue
+  enable_dlq        = true
+  max_receive_count = 3  # Try 3 times before moving to DLQ
+  
+  # Retention settings
+  message_retention_seconds     = var.environment == "prod" ? 1209600 : 604800  # 14 days prod, 7 days dev/staging
+  dlq_message_retention_seconds = 1209600  # Keep failed messages for 14 days
+}
+
+module "lambda" {
+  source = "../modules/lambda"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # Lambda configuration
+  function_name     = "message-processor"
+  lambda_source_dir = "./lambda-code"  # Directory with your Lambda code
+  handler           = "index.handler"
+  runtime           = "nodejs18.x"
+  timeout           = 60
+  memory_size       = 256
+  
+  # SQS integration (from SQS module)
+  sqs_queue_arn          = module.sqs.queue_arn
+  sqs_lambda_policy_arn  = module.sqs.lambda_sqs_policy_arn
+  
+  # S3 integration (from S3 module)
+  s3_bucket_name        = module.s3_app_data.bucket_name
+  s3_lambda_policy_arn  = module.s3_app_data.lambda_s3_policy_arn
+  
+  # Event source mapping configuration
+  batch_size                         = 1    # Process one message at a time
+  maximum_batching_window_in_seconds = 5    # Wait max 5 seconds before invoking
+  maximum_concurrency                = 10   # Max 10 concurrent executions
+  
+  # Logging
+  log_retention_days = var.environment == "prod" ? 30 : 14
+  
+  # Custom environment variables
+  environment_variables = {
+    NODE_ENV = var.environment
+    DEBUG    = var.environment == "dev" ? "true" : "false"
+  }
 }
