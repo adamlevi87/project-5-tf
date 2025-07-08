@@ -1,10 +1,23 @@
 # modules/lambda/main.tf
 
+# Install npm dependencies before creating zip
+resource "null_resource" "npm_install" {
+  triggers = {
+    package_json = filebase64("${var.lambda_source_dir}/package.json")
+  }
+
+  provisioner "local-exec" {
+    command = "cd ${var.lambda_source_dir} && npm install"
+  }
+}
+
 # Create zip file from source code
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = var.lambda_source_dir
   output_path = "./lambda-deployment.zip"
+  
+  depends_on = [null_resource.npm_install]
 }
 
 # Lambda function

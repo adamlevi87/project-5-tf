@@ -127,7 +127,7 @@ module "lambda" {
   
   # Lambda configuration
   function_name     = "message-processor"
-  lambda_source_dir = "./lambda-code"  # Directory with your Lambda code
+  lambda_source_dir = "./lambda-code"  # Module will auto-run npm install here
   handler           = "index.handler"
   runtime           = "nodejs18.x"
   timeout           = 60
