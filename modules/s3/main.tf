@@ -56,6 +56,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "app_data_lifecycle" {
     id     = "app_data_lifecycle"
     status = "Enabled"
 
+    # Apply to all objects in the bucket
+    filter {
+      prefix = ""
+    }
     # Move to IA after 30 days
     transition {
       days          = 30
