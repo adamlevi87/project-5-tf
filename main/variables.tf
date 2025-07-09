@@ -51,3 +51,78 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+# RDS Database Configuration
+variable "rds_postgres_version" {
+  description = "PostgreSQL version for RDS"
+  type        = string
+}
+
+variable "rds_instance_class" {
+  description = "RDS instance class"
+  type        = string
+}
+
+variable "rds_database_name" {
+  description = "Name of the database to create"
+  type        = string
+}
+
+variable "rds_database_username" {
+  description = "Username for the database"
+  type        = string
+}
+
+# RDS Storage Configuration
+variable "rds_allocated_storage" {
+  description = "Initial storage allocation in GB"
+  type        = number
+}
+
+variable "rds_max_allocated_storage" {
+  description = "Maximum storage allocation in GB (for autoscaling)"
+  type        = number
+}
+
+variable "rds_storage_type" {
+  description = "Storage type (gp2, gp3, io1, io2)"
+  type        = string
+}
+
+# RDS Backup and Maintenance
+variable "rds_backup_retention_period" {
+  description = "Backup retention period in days"
+  type        = number
+}
+
+variable "rds_backup_window" {
+  description = "Backup window in UTC (format: hh24:mi-hh24:mi)"
+  type        = string
+}
+
+variable "rds_maintenance_window" {
+  description = "Maintenance window in UTC (format: ddd:hh24:mi-ddd:hh24:mi)"
+  type        = string
+}
+
+# RDS Protection and Snapshots
+variable "rds_deletion_protection" {
+  description = "Enable deletion protection for RDS instance"
+  type        = bool
+}
+
+variable "rds_skip_final_snapshot" {
+  description = "Skip final snapshot when destroying RDS instance"
+  type        = bool
+}
+
+# RDS Monitoring
+variable "rds_enable_performance_insights" {
+  description = "Enable Performance Insights for RDS"
+  type        = bool
+}
+
+variable "rds_monitoring_interval" {
+  description = "Monitoring interval in seconds (0 to disable)"
+  type        = number
+}

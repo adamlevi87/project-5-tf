@@ -1,19 +1,29 @@
-# output "vpc_id" {
-#   value       = aws_vpc.main.id
-#   description = "VPC ID"
-# }
+# modules/vpc-network/outputs.tf
 
-# output "nat_gateway_id" {
-#   value       = aws_nat_gateway.this.id
-#   description = "NAT Gateway ID"
-# }
+output "vpc_id" {
+  value       = aws_vpc.main.id
+  description = "VPC ID"
+}
 
-# output "public_subnet_ids" {
-#   description = "List of public subnet IDs"
-#   value       = aws_subnet.public[*].id
-# }
+output "private_subnet_ids" {
+  value       = [for subnet in aws_subnet.private : subnet.id]
+  description = "List of private subnet IDs"
+}
 
-# output "private_subnet_ids" {
-#   value       = aws_subnet.private[*].id
-#   description = "List of private subnet IDs"
-# }
+output "public_subnet_ids" {
+  value = concat(
+    [for subnet in aws_subnet.public_primary : subnet.id],
+    [for subnet in aws_subnet.public_additional : subnet.id]
+  )
+  description = "List of public subnet IDs"
+}
+
+# NAT gateways id, in single mode- only 1 nat - the primary nat
+# in real mode - the primary nat + the additional nats will be in the output
+output "nat_gateway_ids" {
+  value = merge(
+    var.nat_mode != "endpoints" ? { (local.primary_az) = aws_nat_gateway.nat_primary[0].id } : {},
+    var.nat_mode == "real" ? { for k, v in aws_nat_gateway.nat_additional : k => v.id } : {}
+  )
+  description = "Map of NAT gateway IDs by AZ"
+}

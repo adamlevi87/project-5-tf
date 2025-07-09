@@ -16,7 +16,32 @@ nat_mode = "single"  # Options: "single", "real", "endpoints"
 environment = "dev"
 project_tag = "project-5"
 
+# RDS Configuration
+rds_postgres_version    = "15.4"
+rds_instance_class      = "db.t3.micro"        # Smallest/cheapest option
+rds_database_name       = "myapp_db"           # Match your local postgres
+rds_database_username   = "myapp"              # Match your local postgres
 
+# Storage (minimal cost)
+rds_allocated_storage     = 20      # AWS minimum for PostgreSQL
+rds_max_allocated_storage = 100     # Allow some autoscaling growth
+rds_storage_type          = "gp2"   # Cheapest storage option
+
+# Backup and maintenance (minimal)
+rds_backup_retention_period = 1                    # 1 day minimum for dev
+rds_backup_window          = "03:00-04:00"         # Low traffic time UTC
+rds_maintenance_window     = "sun:04:00-sun:05:00" # Sunday early morning UTC
+
+# Protection and snapshot settings
+rds_deletion_protection = false  # Allow easy deletion for dev environment
+# skip_final_snapshot options:
+# true  = No final snapshot when destroying (faster, no storage costs)
+# false = Create final snapshot when destroying (data protection, costs money to store)
+rds_skip_final_snapshot = true   # No final snapshot for dev environment
+
+# Monitoring (minimal to save costs)
+rds_enable_performance_insights = false  # Disable to save money
+rds_monitoring_interval         = 0      # 0 = disabled, saves costs
 
 
 # github_org = "adamlevi87"

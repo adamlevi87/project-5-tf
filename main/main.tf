@@ -158,3 +158,68 @@ module "lambda" {
     DEBUG    = var.environment == "dev" ? "true" : "false"
   }
 }
+
+module "secrets" {
+  source = "../modules/secrets-manager"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  secrets = {
+    # RDS database password - auto-generated
+    rds-password = {
+      description        = "Database password for RDS instance"
+      generate_password  = true
+      password_length    = 16
+      password_special   = true
+    }
+    
+    # Future secrets can be added here
+    # api-key = {
+    #   description        = "External API key"
+    #   generate_password  = false
+    #   secret_value       = var.external_api_key
+    # }
+  }
+}
+
+# main/main.tf - RDS Module Usage
+
+module "rds" {
+  source = "../modules/rds"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # Secrets Manager integration
+  db_password_secret_arn = module.secrets.secret_arns["rds-password"]
+  
+  # Networking (from VPC module)
+  vpc_id             = module.vpc_network.vpc_id
+  private_subnet_ids = module.vpc_network.private_subnet_ids
+  allowed_cidr_blocks = [var.vpc_cidr_block]  # Allow access from entire VPC
+  
+  # Database configuration
+  postgres_version    = var.rds_postgres_version
+  instance_class      = var.rds_instance_class
+  database_name       = var.rds_database_name
+  database_username   = var.rds_database_username
+  
+  # Storage
+  allocated_storage     = var.rds_allocated_storage
+  max_allocated_storage = var.rds_max_allocated_storage
+  storage_type          = var.rds_storage_type
+  
+  # Backup and maintenance
+  backup_retention_period = var.rds_backup_retention_period
+  backup_window          = var.rds_backup_window
+  maintenance_window     = var.rds_maintenance_window
+  
+  # Protection settings (controlled by environment)
+  deletion_protection = var.rds_deletion_protection
+  skip_final_snapshot = var.rds_skip_final_snapshot
+  
+  # Monitoring
+  enable_performance_insights = var.rds_enable_performance_insights
+  monitoring_interval         = var.rds_monitoring_interval
+}
