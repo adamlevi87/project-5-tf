@@ -3,6 +3,9 @@
 resource "aws_s3_bucket" "app_data" {
   bucket = "${var.project_tag}-${var.environment}-app-data-${random_string.bucket_suffix.result}"
 
+  # Enable force destroy to allow deletion of non-empty bucket
+  force_destroy = var.force_destroy
+
   tags = {
     Name        = "${var.project_tag}-${var.environment}-app-data"
     Project     = var.project_tag

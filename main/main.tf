@@ -97,6 +97,9 @@ module "s3_app_data" {
   # Lifecycle configuration
   enable_lifecycle_policy = true
   data_retention_days     = var.environment == "prod" ? 0 : 365  # Keep prod data forever, dev/staging for 1 year
+
+  # Allow force destroy for non-prod environments
+  force_destroy = var.environment != "prod"
 }
 
 module "sqs" {

@@ -1,5 +1,11 @@
 # modules/s3/variables.tf
 
+variable "force_destroy" {
+  description = "Allow deletion of non-empty bucket (WARNING: will delete all objects)"
+  type        = bool
+  default     = false
+}
+
 variable "project_tag" {
   description = "Project tag for resource naming"
   type        = string
