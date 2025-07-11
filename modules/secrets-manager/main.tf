@@ -17,6 +17,7 @@ resource "aws_secretsmanager_secret" "secrets" {
 
   name        = "${var.project_tag}-${var.environment}-${each.key}"
   description = each.value.description
+  recovery_window_in_days = 0  # Force immediate deletion for dev environments
 
   tags = {
     Name        = "${var.project_tag}-${var.environment}-${each.key}"
