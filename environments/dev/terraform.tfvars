@@ -17,7 +17,7 @@ environment = "dev"
 project_tag = "project-5"
 
 # RDS Configuration
-rds_postgres_version    = "15.4"
+rds_postgres_version    = "16.9"
 rds_instance_class      = "db.t3.micro"        # Smallest/cheapest option
 rds_database_name       = "myapp_db"           # Match your local postgres
 rds_database_username   = "myapp"              # Match your local postgres

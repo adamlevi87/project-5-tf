@@ -223,4 +223,7 @@ module "rds" {
   # Monitoring
   enable_performance_insights = var.rds_enable_performance_insights
   monitoring_interval         = var.rds_monitoring_interval
+
+  # Add this line at the end
+  depends_on = [module.secrets]
 }
