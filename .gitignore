@@ -9,3 +9,7 @@
 
 # Lambda function zipped code
 *lambda-deployment.zip
+
+# dependencies
+/node_modules
+lambda-code/package-lock.json
