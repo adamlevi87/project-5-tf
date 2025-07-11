@@ -150,7 +150,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}" "${REAL_MODE_ADDITIONAL_PATTERNS[@]}")
 
   elif [[ "$NAT_MODE" == "single" ]]; then
-    echo -e "${YELLOW}Single NAT detected in AZ:${RESET} $NAT_AZ"
+    echo -e "${YELLOW}Single NAT detected ${RESET}"
 
     EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}")
   fi
