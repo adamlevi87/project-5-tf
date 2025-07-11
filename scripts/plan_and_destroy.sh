@@ -181,7 +181,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
     for TARGET in $TARGETS; do
       echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
-      terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" | GREP_COLOR='1;31' grep --color=always -E "rds|database|$"
+      terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" | GREP_COLOR='1;36' grep --color=always -E "rds|database|$"
 
       
       echo
