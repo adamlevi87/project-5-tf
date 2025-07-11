@@ -229,37 +229,3 @@ resource "aws_route_table_association" "private_subnets" {
   subnet_id      = aws_subnet.private[each.key].id
   route_table_id = aws_route_table.private[each.key].id
 }
-
-# Outputs for reference
-output "nat_mode" {
-  value = var.nat_mode
-  description = "Current NAT mode: single (primary NAT only), real (NAT per AZ), or endpoints (no NATs)"
-}
-
-output "nat_gateway_ids" {
-  value = merge(
-    var.nat_mode != "endpoints" ? { (local.primary_az) = aws_nat_gateway.nat_primary[0].id } : {},
-    { for k, v in aws_nat_gateway.nat_additional : k => v.id }
-  )
-  description = "Map of NAT gateway IDs by AZ"
-}
-
-output "public_subnets" {
-  value = {
-    primary = {
-      for k, v in aws_subnet.public_primary : k => {
-        id = v.id
-        cidr = v.cidr_block
-        az = v.availability_zone
-      }
-    }
-    additional = {
-      for k, v in aws_subnet.public_additional : k => {
-        id = v.id
-        cidr = v.cidr_block
-        az = v.availability_zone
-      }
-    }
-  }
-  description = "All public subnets organized by type"
-}
