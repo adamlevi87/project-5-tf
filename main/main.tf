@@ -159,6 +159,7 @@ module "lambda" {
   }
 }
 
+# Creates secrets by generating a password or inserting a value
 module "secrets" {
   source = "../modules/secrets-manager"
 
