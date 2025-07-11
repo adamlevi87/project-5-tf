@@ -112,48 +112,47 @@ if [[ "$SELECTION_METHOD" == "all" ]]; then
 elif [[ "$SELECTION_METHOD" == "filter" ]]; then
 
   echo -e "${CYAN}Building target list based on NAT mode '${NAT_MODE}'...${RESET}"
+  # Base exclude patterns (common to both single and real modes)
+  BASE_EXCLUDE_PATTERNS=(
+    'data.aws_availability_zones.available'
+    'module.vpc_network.aws_internet_gateway.igw'
+    'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
+    'module.vpc_network.aws_route_table.public_primary\[[^]]+\]'
+    'module.vpc_network.aws_route_table_association.public_primary\[[^]]+\]'
+    'module.vpc_network.aws_eip.nat_primary\[0\]'
+    'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
+    'module.vpc_network.aws_vpc.main'
+    # RDS patterns (slow to create)
+    'module.rds.aws_db_instance.main'
+    'module.rds.aws_db_subnet_group.main'
+    'module.secrets.aws_secretsmanager_secret.secrets\[\"rds-password\"\]'
+    'module.secrets.aws_secretsmanager_secret_version.secrets\[\"rds-password\"\]'
+  )
+
+  # Additional patterns for real mode only
+  REAL_MODE_ADDITIONAL_PATTERNS=(
+    'module.vpc_network.aws_subnet.public_additional\[[^]]+\]'
+    'module.vpc_network.aws_route_table.public_additional\[[^]]+\]'
+    'module.vpc_network.aws_route_table_association.public_additional\[[^]]+\]'
+    'module.vpc_network.aws_eip.nat_additional\[[^]]+\]'
+    'module.vpc_network.aws_nat_gateway.nat_additional\[[^]]+\]'
+  )
+
+  # Check if VPC NAT gateways exist before applying mode-specific logic
+  NAT_GATEWAYS=$(terraform -chdir="$TF_WORK_DIR" state list | grep 'module.vpc_network.aws_nat_gateway')
+  if [[ -z "$NAT_GATEWAYS" ]]; then
+    echo -e "${RED}ERROR:${RESET} No NAT Gateway found in state."
+    exit 1
+  fi
 
   if [[ "$NAT_MODE" == "real" ]]; then
     # Exclude ALL NATs + ALL public subnets + their route table associations
-    EXCLUDE_PATTERNS=(
-      'data.aws_availability_zones.available'
-      'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat_primary\[0\]'
-      'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
-      'module.vpc_network.aws_subnet.public_additional\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public_additional\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_additional\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat_additional\[[^]]+\]'
-      'module.vpc_network.aws_nat_gateway.nat_additional\[[^]]+\]'
-      'module.vpc_network.aws_vpc.main'
-    )
+    EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}" "${REAL_MODE_ADDITIONAL_PATTERNS[@]}")
 
   elif [[ "$NAT_MODE" == "single" ]]; then
-    # Detect which AZ the single NAT is in
-    NAT_AZ=$(terraform -chdir="$TF_WORK_DIR" state list | \
-      grep 'module.vpc_network.aws_nat_gateway.nat' | \
-      sed -E 's/.*\["([^"]+)"\]/\1/')
-
-    if [[ -z "$NAT_AZ" ]]; then
-      echo -e "${RED}ERROR:${RESET} No NAT Gateway found in state."
-      exit 1
-    fi
-
     echo -e "${YELLOW}Single NAT detected in AZ:${RESET} $NAT_AZ"
 
-    EXCLUDE_PATTERNS=(
-      'data.aws_availability_zones.available'
-      'module.vpc_network.aws_internet_gateway.igw'
-      'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_route_table.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_route_table_association.public_primary\[[^]]+\]'
-      'module.vpc_network.aws_eip.nat_primary\[0\]'
-      'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
-      'module.vpc_network.aws_vpc.main'
-    )
+    EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}")
   fi
 
   # Build grep pattern

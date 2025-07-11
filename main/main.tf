@@ -46,6 +46,11 @@ locals {
         for az in local.additional_azs :
         az => local.all_subnet_pairs[az]
     }
+
+    # Private - all subnets
+    private_subnet_cidrs = {
+        for az, pair in local.all_subnet_pairs : az => pair.private_cidr
+    }
 }
 
 # Debug outputs
@@ -83,9 +88,7 @@ module "vpc_network" {
         for az, pair in local.additional_subnet_pairs : az => pair.public_cidr
     }
     # Private - all subnets
-    private_subnet_cidrs = {
-        for az, pair in local.all_subnet_pairs : az => pair.private_cidr
-    }
+    private_subnet_cidrs = local.private_subnet_cidrs
 }
 
 module "s3_app_data" {
@@ -198,7 +201,7 @@ module "rds" {
   # Networking (from VPC module)
   vpc_id             = module.vpc_network.vpc_id
   private_subnet_ids = module.vpc_network.private_subnet_ids
-  allowed_cidr_blocks = [var.vpc_cidr_block]  # Allow access from entire VPC
+  allowed_cidr_blocks = values(local.private_subnet_cidrs) # Allow access from entire VPC
   
   # Database configuration
   postgres_version    = var.rds_postgres_version
