@@ -146,17 +146,43 @@ resource "aws_eks_node_group" "main" {
   }
 }
 
-# AWS Load Balancer Controller Add-on
-resource "aws_eks_addon" "aws_load_balancer_controller" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name   = "aws-load-balancer-controller"
-
-  depends_on = [aws_eks_node_group.main]
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-alb-controller"
-    Project     = var.project_tag
-    Environment = var.environment
-    Purpose     = "load-balancer"
+provider "helm" {
+  kubernetes {
+    host                   = aws_eks_cluster.main.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.main.name]
+    }
   }
+}
+
+# Install AWS Load Balancer Controller via Helm
+resource "helm_release" "aws_load_balancer_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+  version    = "1.13.3"  # Latest stable version
+
+  set {
+    name  = "clusterName"
+    value = aws_eks_cluster.main.name
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+
+  depends_on = [
+    aws_eks_node_group.main,
+    aws_iam_role_policy_attachment.load_balancer_controller
+  ]
 }
