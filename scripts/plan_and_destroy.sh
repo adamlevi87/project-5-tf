@@ -123,10 +123,15 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.vpc_network.aws_nat_gateway.nat_primary\[0\]'
     'module.vpc_network.aws_vpc.main'
     # RDS patterns (slow to create)
+    'module.vpc_network.aws_subnet.aws_subnet.private\[[^]]+\]'
     'module.rds.aws_db_instance.main'
     'module.rds.aws_db_subnet_group.main'
+    'module.rds.data.aws_secretsmanager_secret_version.db_password'
+    'module.rds.aws_security_group.rds'
     'module.secrets.aws_secretsmanager_secret.secrets\[\"rds-password\"\]'
     'module.secrets.aws_secretsmanager_secret_version.secrets\[\"rds-password\"\]'
+    'module.secrets.random_password.generated_passwords\[\"rds-password\"\]'
+
   )
 
   # Additional patterns for real mode only
