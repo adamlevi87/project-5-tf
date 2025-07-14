@@ -24,7 +24,7 @@ variable "aws_dynamodb_table_name" {
 }
 
 variable "aws_iam_role_github_actions_name" {
-  description = "Terraform backend - Dynamodb table name"
+  description = "AWS iam role name for github actions"
   type        = string
 }
 

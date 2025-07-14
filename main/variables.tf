@@ -161,3 +161,41 @@ variable "subdomain_name" {
   type        = string
   description = "The subdomain for the app (e.g., chatbot)"
 }
+
+# EKS Cluster Configuration
+variable "eks_kubernetes_version" {
+  description = "Kubernetes version for the EKS cluster"
+  type        = string
+}
+
+variable "kubectl_access_cidr" {
+  description = "CIDR block allowed to access the EKS cluster endpoint (your host IP)"
+  type        = string
+}
+
+# EKS Node Group Configuration
+variable "eks_node_instance_types" {
+  description = "EC2 instance types for the EKS node group"
+  type        = list(string)
+}
+
+variable "eks_node_desired_capacity" {
+  description = "Desired number of nodes in the EKS node group"
+  type        = number
+}
+
+variable "eks_node_max_capacity" {
+  description = "Maximum number of nodes in the EKS node group"
+  type        = number
+}
+
+variable "eks_node_min_capacity" {
+  description = "Minimum number of nodes in the EKS node group"
+  type        = number
+}
+
+# EKS Logging Configuration
+variable "eks_log_retention_days" {
+  description = "CloudWatch log retention period in days for EKS cluster"
+  type        = number
+}

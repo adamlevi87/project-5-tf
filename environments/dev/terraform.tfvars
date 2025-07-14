@@ -60,8 +60,27 @@ ecr_repository_name = "project-5"
 domain_name = "projects-devops.cfd"
 subdomain_name = "project-5"
 
+# EKS Cluster Configuration
+eks_kubernetes_version = "1.28"
+kubectl_access_cidr    = "85.64.239.117/32"  # Replace with your actual host IP
+
+# EKS Node Group Configuration (minimal for dev)
+eks_node_instance_types   = ["t3.small"]  # Bare minimum instance type
+eks_node_desired_capacity = 1             # Single node for dev
+eks_node_max_capacity     = 3             # Allow scaling if needed
+eks_node_min_capacity     = 1             # Keep at least one node
+
+# EKS Logging Configuration (minimal retention for cost)
+eks_log_retention_days = 7  # 1 week retention for dev environment
+
+
+
+
+
 # github_org = "adamlevi87"
-# github_repo = "project-5"
+# github_repo = "project-5-tf"
+
+
 # container_port = 3000
 # task_cpu = 256
 # task_memory = 512

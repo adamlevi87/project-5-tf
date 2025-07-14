@@ -181,3 +181,34 @@ module "acm" {
   route53_zone_id  = module.route53.zone_id
   route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
 }
+
+data "aws_iam_role" "github_actions" {
+  name = "your-github-actions-role-name"
+}
+
+# main/main.tf - EKS Module Usage
+
+module "eks" {
+  source = "../modules/eks"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # Cluster configuration
+  cluster_name        = "${var.project_tag}-${var.environment}-cluster"
+  kubernetes_version  = var.eks_kubernetes_version
+  
+  # Networking (from VPC module)
+  vpc_id               = module.vpc_network.vpc_id
+  private_subnet_ids   = module.vpc_network.private_subnet_ids
+  allowed_cidr_blocks  = [var.kubectl_access_cidr]  # Your host IP
+  
+  # Node group configuration
+  node_group_instance_types   = var.eks_node_instance_types
+  node_group_desired_capacity = var.eks_node_desired_capacity
+  node_group_max_capacity     = var.eks_node_max_capacity
+  node_group_min_capacity     = var.eks_node_min_capacity
+  
+  # Logging
+  cluster_log_retention_days = var.eks_log_retention_days
+}
