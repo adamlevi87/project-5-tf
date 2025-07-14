@@ -13,3 +13,6 @@
 # dependencies
 /node_modules
 lambda-code/package-lock.json
+
+# plan & destroy shell script logs
+dependency_warnings_*.log

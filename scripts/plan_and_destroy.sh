@@ -188,7 +188,9 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     echo -e "${YELLOW}Full terraform output will be logged to: ${LOG_FILE}${RESET}"
     
     DEPENDENCY_VIOLATIONS=0
-    
+    # Build single grep pattern with OR conditions - do this ONCE outside the target loop
+    COMBINED_EXCLUDE_PATTERN=$(IFS="|"; echo "${EXCLUDE_PATTERNS[*]}")
+
     for TARGET in $TARGETS; do
         echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
         
@@ -202,17 +204,25 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
         
         # Check for dependency violations
         VIOLATION_FOUND=false
-        for EXCLUDE_PATTERN in "${EXCLUDE_PATTERNS[@]}"; do
-            # Handle regex patterns properly
-            if echo "$PLAN_OUTPUT" | grep -qE "${EXCLUDE_PATTERN}.*will be destroyed"; then
-                echo -e "${RED}⚠️  WARNING: ${TARGET} will destroy excluded resource matching: ${EXCLUDE_PATTERN}${RESET}"
-                echo "VIOLATION: $TARGET -> $EXCLUDE_PATTERN" >> "$LOG_FILE"
-                VIOLATION_FOUND=true
-                ((DEPENDENCY_VIOLATIONS++))
-                break
-            fi
-        done
+        # for EXCLUDE_PATTERN in "${EXCLUDE_PATTERNS[@]}"; do
+        #     # Handle regex patterns properly
+        #     if echo "$PLAN_OUTPUT" | grep -qE "${EXCLUDE_PATTERN}.*will be destroyed"; then
+        #         echo -e "${RED}⚠️  WARNING: ${TARGET} will destroy excluded resource matching: ${EXCLUDE_PATTERN}${RESET}"
+        #         echo "VIOLATION: $TARGET -> $EXCLUDE_PATTERN" >> "$LOG_FILE"
+        #         VIOLATION_FOUND=true
+        #         ((DEPENDENCY_VIOLATIONS++))
+        #         break
+        #     fi
+        # done
         
+        # Single grep call per target instead of multiple
+        if echo "$PLAN_OUTPUT" | grep -qE "(${COMBINED_EXCLUDE_PATTERN}).*will be destroyed"; then
+            echo -e "${RED}⚠️  WARNING: ${TARGET} will destroy one of the excluded resource ${RESET}"
+            echo "VIOLATION: $TARGET " >> "$LOG_FILE"
+            VIOLATION_FOUND=true
+            ((DEPENDENCY_VIOLATIONS++))
+        fi
+
         if [[ "$VIOLATION_FOUND" == "false" ]]; then
             echo -e "${GREEN}✓ Safe to destroy${RESET}"
         fi
