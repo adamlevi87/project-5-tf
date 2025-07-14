@@ -134,6 +134,9 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.secrets.random_password.generated_passwords\[\"rds-password\"\]'
     # Route53
     'module.route53.aws_route53_zone.this'
+    # ACM
+    'module.acm.aws_acm_certificate.this'
+    'module.acm.aws_route53_record.cert_validation\[[^]]+\]'
   )
 
   # Additional patterns for real mode only
