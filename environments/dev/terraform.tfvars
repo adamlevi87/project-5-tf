@@ -43,6 +43,19 @@ rds_skip_final_snapshot = true   # No final snapshot for dev environment
 rds_enable_performance_insights = false  # Disable to save money
 rds_monitoring_interval         = 0      # 0 = disabled, saves costs
 
+# Configuration for secrets
+secrets_config = {
+    rds-password = {
+        description        = "Database password for RDS instance"
+        generate_password  = true
+        password_length    = 16
+        password_special   = true
+        password_override_special = "!#$%&*()-_=+[]{}|;:,.<>?"
+    }
+    # Future secrets go here
+}
+
+
 
 # github_org = "adamlevi87"
 # github_repo = "project-5"

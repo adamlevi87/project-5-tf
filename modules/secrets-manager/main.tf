@@ -1,19 +1,34 @@
 # modules/secrets-manager/main.tf
 
-# Generate random passwords for secrets that need them
-resource "random_password" "secrets" {
+# Generate passwords in main (optional - can stay in module)
+resource "random_password" "generated_passwords" {
   for_each = {
-    for name, config in var.secrets : name => config
+    for name, config in var.secrets_config : name => config
     if config.generate_password == true
   }
-
+  
   length  = each.value.password_length
   special = each.value.password_special
+
+  override_special = lookup(each.value, "password_override_special", null)
+  
+  lifecycle {
+    ignore_changes = [result]
+  }
+}
+
+locals {
+  # Merge generated passwords into the configuration
+    secrets_with_passwords = {
+      for name, config in var.secrets_config : name => merge(config, {
+        secret_value = config.generate_password ? random_password.generated_passwords[name].result : config.secret_value
+      })
+    }
 }
 
 # Create secrets in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "secrets" {
-  for_each = var.secrets
+  for_each = locals.secrets_with_passwords
 
   name        = "${var.project_tag}-${var.environment}-${each.key}"
   description = each.value.description
@@ -30,9 +45,9 @@ resource "aws_secretsmanager_secret" "secrets" {
 
 # Store secret values
 resource "aws_secretsmanager_secret_version" "secrets" {
-  for_each = var.secrets
+  for_each = local.secrets_with_passwords
 
   secret_id = aws_secretsmanager_secret.secrets[each.key].id
   
-  secret_string = each.value.generate_password ? random_password.secrets[each.key].result : each.value.secret_value
+  secret_string = each.value.generate_password ? random_password.generated_passwords[each.key].result : each.value.secret_value
 }
