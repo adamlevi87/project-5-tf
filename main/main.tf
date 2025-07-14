@@ -214,3 +214,12 @@ module "rds" {
   # Add this line at the end
   depends_on = [module.secrets]
 }
+
+module "ecr" {
+  source = "../modules/ecr"
+
+  environment = var.environment
+  project_tag  = var.project_tag
+  
+  name = var.ecr_repository_name
+}

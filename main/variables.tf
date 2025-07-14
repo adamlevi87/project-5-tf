@@ -146,3 +146,8 @@ variable "secrets_config" {
     error_message = "Each secret must either have generate_password=true or provide a secret_value."
   }
 }
+
+variable "ecr_repository_name" {
+  description = "ECR repository name"
+  type        = string
+}

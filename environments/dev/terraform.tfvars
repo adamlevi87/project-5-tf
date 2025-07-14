@@ -55,6 +55,7 @@ secrets_config = {
     # Future secrets go here
 }
 
+ecr_repository_name = "project-5"
 
 
 # github_org = "adamlevi87"
@@ -66,7 +67,7 @@ secrets_config = {
 # ecs_network_mode = "awsvpc"
 # ecs_protocol = "tcp"
 # ecs_requires_compatibilities = "FARGATE"
-# ecr_repository_name = "chatbot-ui-gpt4-playground"
+
 # container_name = "chatbot-ui-gpt4-playground"
 # domain_name = "projects-devops.cfd"
 # subdomain_name = "chatbot-ui-gpt4-playground"
