@@ -28,7 +28,7 @@ locals {
 
 # Create secrets in AWS Secrets Manager
 resource "aws_secretsmanager_secret" "secrets" {
-  for_each = locals.secrets_with_passwords
+  for_each = local.secrets_with_passwords
 
   name        = "${var.project_tag}-${var.environment}-${each.key}"
   description = each.value.description

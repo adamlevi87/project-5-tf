@@ -172,8 +172,6 @@ module "secrets" {
   secrets_config = var.secrets_config
 }
 
-
-
 module "rds" {
   source = "../modules/rds"
 
