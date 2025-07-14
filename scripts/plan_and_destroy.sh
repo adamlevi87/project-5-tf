@@ -131,7 +131,6 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.secrets.aws_secretsmanager_secret.secrets\[\"rds-password\"\]'
     'module.secrets.aws_secretsmanager_secret_version.secrets\[\"rds-password\"\]'
     'module.secrets.random_password.generated_passwords\[\"rds-password\"\]'
-
   )
 
   # Additional patterns for real mode only
@@ -184,22 +183,67 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     # shellcheck disable=SC2086
     terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" $TARGETS
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
+    LOG_FILE="dependency_warnings_${ENV}_$(date +%Y%m%d_%H%M%S).log"
+    echo -e "${CYAN}Running dependency analysis mode...${RESET}"
+    echo -e "${YELLOW}Full terraform output will be logged to: ${LOG_FILE}${RESET}"
+    
+    DEPENDENCY_VIOLATIONS=0
+    
     for TARGET in $TARGETS; do
-      echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
-      terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" | GREP_COLOR='1;36' grep --color=always -E "rds|database|$"
+        echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
+        
+        # Capture terraform plan output
+        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" 2>&1)
+        
+        # Log full output
+        echo "=== Analysis for $TARGET ===" >> "$LOG_FILE"
+        echo "$PLAN_OUTPUT" >> "$LOG_FILE"
+        echo "" >> "$LOG_FILE"
+        
+        # Check for dependency violations
+        VIOLATION_FOUND=false
+        for EXCLUDE_PATTERN in "${EXCLUDE_PATTERNS[@]}"; do
+            # Handle regex patterns properly
+            if echo "$PLAN_OUTPUT" | grep -qE "${EXCLUDE_PATTERN}.*will be destroyed"; then
+                echo -e "${RED}⚠️  WARNING: ${TARGET} will destroy excluded resource matching: ${EXCLUDE_PATTERN}${RESET}"
+                echo "VIOLATION: $TARGET -> $EXCLUDE_PATTERN" >> "$LOG_FILE"
+                VIOLATION_FOUND=true
+                ((DEPENDENCY_VIOLATIONS++))
+                break
+            fi
+        done
+        
+        if [[ "$VIOLATION_FOUND" == "false" ]]; then
+            echo -e "${GREEN}✓ Safe to destroy${RESET}"
+        fi
+    done
+    
+    echo -e "\n${CYAN}=== DEPENDENCY ANALYSIS SUMMARY ===${RESET}"
+    echo -e "Total targets analyzed: $(echo "$TARGETS" | wc -l)"
+    echo -e "Dependency violations found: ${DEPENDENCY_VIOLATIONS}"
+    echo -e "Detailed log saved to: ${LOG_FILE}"
+    
+    if [[ $DEPENDENCY_VIOLATIONS -gt 0 ]]; then
+        echo -e "${RED}WARNING: Found dependency violations! Review the log before proceeding.${RESET}"
+    else
+        echo -e "${GREEN}All targets are safe to destroy without affecting excluded resources.${RESET}"
+    fi
+    # for TARGET in $TARGETS; do
+    #   echo -e "\n${GREEN}======== PLAN DESTROY FOR: ${TARGET} ========${RESET}"
+    #   terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" | GREP_COLOR='1;36' grep --color=always -E "rds|database|$"
 
       
-      echo
-      read -rp "Continue to next target? [Y/n]: " answer
-      case "$answer" in
-        [yY][eE][sS]|[yY])
-          ;;
-        *) # Anything else, including empty input
-          echo -e "${YELLOW}Aborting per user request.${RESET}"
-          exit 0
-          ;;
-      esac
-    done
+    #   echo
+    #   read -rp "Continue to next target? [Y/n]: " answer
+    #   case "$answer" in
+    #     [yY][eE][sS]|[yY])
+    #       ;;
+    #     *) # Anything else, including empty input
+    #       echo -e "${YELLOW}Aborting per user request.${RESET}"
+    #       exit 0
+    #       ;;
+    #   esac
+    # done
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "destroy" ]]; then
     echo -e "\n${GREEN}========  debug and destroy - doing nothing ========${RESET}"
   fi
