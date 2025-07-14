@@ -93,9 +93,6 @@ resource "aws_lb_target_group" "app_target_groups" {
     port                = each.value.health_check.port
   }
 
-  # Preserve client IP for applications
-  preserve_client_ip = each.value.target_type == "ip" ? "true" : "false"
-
   tags = {
     Name        = "${var.project_tag}-${var.environment}-${each.value.name}-tg"
     Project     = var.project_tag
