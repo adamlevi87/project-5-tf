@@ -182,12 +182,6 @@ module "acm" {
   route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
 }
 
-data "aws_iam_role" "github_actions" {
-  name = "your-github-actions-role-name"
-}
-
-# main/main.tf - EKS Module Usage
-
 module "eks" {
   source = "../modules/eks"
 
