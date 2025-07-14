@@ -151,3 +151,13 @@ variable "ecr_repository_name" {
   description = "ECR repository name"
   type        = string
 }
+
+variable "domain_name" {
+  type        = string
+  description = "The root domain to configure (e.g., yourdomain.com)"
+}
+
+# variable "subdomain_name" {
+#   type        = string
+#   description = "The subdomain for the app (e.g., chatbot)"
+# }

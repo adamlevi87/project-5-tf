@@ -223,3 +223,15 @@ module "ecr" {
   
   name = var.ecr_repository_name
 }
+
+module "route53" {
+  source       = "../modules/route53"
+
+  project_tag  = var.project_tag
+  environment  = var.environment
+  
+  domain_name  = var.domain_name
+  #subdomain_name = var.subdomain_name
+  
+  #alb_dns_name = module.alb.alb_dns_name
+}

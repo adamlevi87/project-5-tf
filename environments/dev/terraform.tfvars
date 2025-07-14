@@ -57,6 +57,8 @@ secrets_config = {
 
 ecr_repository_name = "project-5"
 
+domain_name = "projects-devops.cfd"
+#subdomain_name = "project-5"
 
 # github_org = "adamlevi87"
 # github_repo = "project-5"
@@ -69,7 +71,6 @@ ecr_repository_name = "project-5"
 # ecs_requires_compatibilities = "FARGATE"
 
 # container_name = "chatbot-ui-gpt4-playground"
-# domain_name = "projects-devops.cfd"
-# subdomain_name = "chatbot-ui-gpt4-playground"
+
 
 # allow_destroy_hosted_zone = "true"
