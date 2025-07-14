@@ -157,7 +157,7 @@ variable "domain_name" {
   description = "The root domain to configure (e.g., yourdomain.com)"
 }
 
-# variable "subdomain_name" {
-#   type        = string
-#   description = "The subdomain for the app (e.g., chatbot)"
-# }
+variable "subdomain_name" {
+  type        = string
+  description = "The subdomain for the app (e.g., chatbot)"
+}

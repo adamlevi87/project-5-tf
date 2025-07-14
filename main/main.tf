@@ -170,3 +170,14 @@ module "route53" {
   
   #alb_dns_name = module.alb.alb_dns_name
 }
+
+module "acm" {
+  source           = "../modules/acm"
+
+  project_tag      = var.project_tag
+  environment      = var.environment
+
+  cert_domain_name  = "${var.subdomain_name}.${var.domain_name}"
+  route53_zone_id  = module.route53.zone_id
+  route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
+}

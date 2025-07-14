@@ -58,7 +58,7 @@ secrets_config = {
 ecr_repository_name = "project-5"
 
 domain_name = "projects-devops.cfd"
-#subdomain_name = "project-5"
+subdomain_name = "project-5"
 
 # github_org = "adamlevi87"
 # github_repo = "project-5"
