@@ -1,4 +1,5 @@
 # main/main.tf
+# 0001
 data "aws_availability_zones" "available" {
     state = "available"
 }
