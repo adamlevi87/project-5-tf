@@ -12,9 +12,9 @@ resource "random_password" "generated_passwords" {
 
   override_special = each.value.password_override_special != "" ? each.value.password_override_special : null
   
-  lifecycle {
-    ignore_changes = [result]
-  }
+  # lifecycle {
+  #   ignore_changes = [result]
+  # }
 }
 
 locals {
