@@ -15,12 +15,17 @@ variable "environment" {
   description = "Deployment environment name (e.g. dev, prod)"
 }
 
-# variable "subdomain_name" {
-#   type        = string
-#   description = "Subdomain to use for the ALB (e.g. chatbot)"
-# }
+variable "subdomain_name" {
+  type        = string
+  description = "Subdomain to use for the ALB (e.g. project-5)"
+}
 
-# variable "alb_dns_name" {
-#   type        = string
-#   description = "DNS name of the Application Load Balancer (used for the CNAME record)"
-# }
+variable "alb_dns_name" {
+  type        = string
+  description = "DNS name of the Application Load Balancer"
+}
+
+variable "alb_zone_id" {
+  type        = string
+  description = "Zone ID of the Application Load Balancer"
+}

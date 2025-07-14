@@ -199,3 +199,15 @@ variable "eks_log_retention_days" {
   description = "CloudWatch log retention period in days for EKS cluster"
   type        = number
 }
+
+# Add this to main/variables.tf
+
+variable "alb_deletion_protection" {
+  description = "Enable deletion protection for the Application Load Balancer"
+  type        = bool
+  default     = false
+  validation {
+    condition     = can(var.alb_deletion_protection)
+    error_message = "ALB deletion protection must be a boolean value (true or false)."
+  }
+}

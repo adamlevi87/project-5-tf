@@ -10,10 +10,15 @@ resource "aws_route53_zone" "this" {
   }
 }
 
-# resource "aws_route53_record" "app_dns" {
-#   zone_id = aws_route53_zone.this.zone_id
-#   name    = "${var.subdomain_name}.${var.domain_name}"
-#   type    = "CNAME"
-#   ttl     = 300
-#   records = [var.alb_dns_name]
-# }
+# A record pointing to the ALB
+resource "aws_route53_record" "app_dns" {
+  zone_id = aws_route53_zone.this.zone_id
+  name    = var.subdomain_name
+  type    = "A"
+
+  alias {
+    name                   = var.alb_dns_name
+    zone_id                = var.alb_zone_id
+    evaluate_target_health = true
+  }
+}

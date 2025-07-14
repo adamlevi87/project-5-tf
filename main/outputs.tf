@@ -89,3 +89,25 @@ output "ecr_repository_url" {
   description = "URL of the ECR repository"
   value       = module.ecr.repository_url
 }
+
+# ALB outputs
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = module.alb.alb_dns_name
+}
+
+output "alb_zone_id" {
+  description = "Zone ID of the Application Load Balancer"
+  value       = module.alb.alb_zone_id
+}
+
+output "target_group_arns" {
+  description = "ARNs of the target groups"
+  value       = module.alb.target_group_arns
+}
+
+# Application URL
+output "application_url" {
+  description = "URL to access the application"
+  value       = "https://${var.subdomain_name}.${var.domain_name}"
+}
