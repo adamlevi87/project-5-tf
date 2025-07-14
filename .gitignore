@@ -2,23 +2,18 @@
 *.tfstate
 *.tfstate.backup
 *.tfplan
-*terraform.tfstate.*.backup
+**/terraform.tfstate.*.backup
 
 # --- Terraform working directory ---
 .terraform/
 .terraform.lock.hcl
 
 # Lambda function zipped code
-*lambda-deployment.zip
+**/lambda-deployment.zip
 
 # dependencies
-*lambda-code/node_modules/
-*lambda-code/package-lock.json
+**/lambda-code/node_modules/
+**/lambda-code/package-lock.json
 
 # plan & destroy shell script logs
-dependency_warnings_*.log
-
-
-
-        
-        
+**/dependency_warnings_*.log
