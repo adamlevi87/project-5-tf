@@ -187,7 +187,7 @@ module "eks" {
 
   project_tag = var.project_tag
   environment = var.environment
-  
+
   # Cluster configuration
   cluster_name        = "${var.project_tag}-${var.environment}-cluster"
   kubernetes_version  = var.eks_kubernetes_version

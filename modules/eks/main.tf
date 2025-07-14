@@ -497,6 +497,16 @@ resource "helm_release" "aws_load_balancer_controller" {
     value = "aws-load-balancer-controller"
   }
 
+  set {
+    name  = "vpcId"
+    value = var.vpc_id
+  }
+
+  set {
+    name  = "region"
+    value = data.aws_region.current.name
+  }
+  
   depends_on = [
     aws_eks_node_group.main,
     aws_iam_role_policy_attachment.load_balancer_controller,
