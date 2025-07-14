@@ -114,6 +114,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
   echo -e "${CYAN}Building target list based on NAT mode '${NAT_MODE}'...${RESET}"
   # Base exclude patterns (common to both single and real modes)
   BASE_EXCLUDE_PATTERNS=(
+    # The Basics
     'data.aws_availability_zones.available'
     'module.vpc_network.aws_internet_gateway.igw'
     'module.vpc_network.aws_subnet.public_primary\[[^]]+\]'
@@ -131,6 +132,8 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.secrets.aws_secretsmanager_secret.secrets\[\"rds-password\"\]'
     'module.secrets.aws_secretsmanager_secret_version.secrets\[\"rds-password\"\]'
     'module.secrets.random_password.generated_passwords\[\"rds-password\"\]'
+    # Route53
+    'module.route53.aws_route53_zone.this'
   )
 
   # Additional patterns for real mode only
