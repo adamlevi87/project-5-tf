@@ -111,3 +111,26 @@ output "application_url" {
   description = "URL to access the application"
   value       = "https://${var.subdomain_name}.${var.domain_name}"
 }
+
+# ALB Target Groups (for AWS Load Balancer Controller)
+output "frontend_target_group_arn" {
+  description = "Frontend target group ARN"
+  value       = module.alb.target_group_arns["frontend"]
+}
+
+output "backend_target_group_arn" {
+  description = "Backend target group ARN"
+  value       = module.alb.target_group_arns["backend"]
+}
+
+# AWS Region
+output "aws_region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
+# Secrets Manager (for database password)
+output "rds_password_secret_arn" {
+  description = "ARN of RDS password secret in Secrets Manager"
+  value       = module.secrets.secret_arns["rds-password"]
+}
