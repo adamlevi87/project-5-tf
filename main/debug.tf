@@ -14,3 +14,7 @@ output "subnet_debug" {
     additional_subnets = local.additional_subnet_pairs
   }
 }
+
+output "ns_records_to_set" {
+  value = module.route53.name_servers
+}
