@@ -3,6 +3,21 @@ data "aws_availability_zones" "available" {
     state = "available"
 }
 
+# Generate passwords in main (optional - can stay in module)
+resource "random_password" "generated_passwords" {
+  for_each = {
+    for name, config in local.secrets_config : name => config
+    if config.generate_password == true
+  }
+  
+  length  = each.value.password_length
+  special = each.value.password_special
+  
+  lifecycle {
+    ignore_changes = [result]
+  }
+}
+
 locals {
     # Calculate total AZs needed
     total_azs = var.primary_availability_zones + var.additional_availability_zones
@@ -50,6 +65,21 @@ locals {
     # Private - all subnets
     private_subnet_cidrs = {
         for az, pair in local.all_subnet_pairs : az => pair.private_cidr
+    }
+    secrets_config = {
+      rds-password = {
+        description        = "Database password for RDS instance"
+        generate_password  = true
+        password_length    = 16
+        password_special   = true
+      }
+      # Future secrets go here
+    }
+    # Merge generated passwords into the configuration
+    secrets_with_passwords = {
+      for name, config in local.secrets_config : name => merge(config, {
+        secret_value = config.generate_password ? random_password.generated_passwords[name].result : config.secret_value
+      })
     }
 }
 
@@ -169,25 +199,10 @@ module "secrets" {
   project_tag = var.project_tag
   environment = var.environment
   
-  secrets = {
-    # RDS database password - auto-generated
-    rds-password = {
-      description        = "Database password for RDS instance"
-      generate_password  = true
-      password_length    = 16
-      password_special   = true
-    }
-    
-    # Future secrets can be added here
-    # api-key = {
-    #   description        = "External API key"
-    #   generate_password  = false
-    #   secret_value       = var.external_api_key
-    # }
-  }
+  secrets = local.secrets_with_passwords
 }
 
-# main/main.tf - RDS Module Usage
+
 
 module "rds" {
   source = "../modules/rds"
