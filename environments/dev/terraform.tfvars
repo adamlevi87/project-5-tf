@@ -61,7 +61,7 @@ domain_name = "projects-devops.cfd"
 subdomain_name = "project-5"
 
 # EKS Cluster Configuration
-eks_kubernetes_version = "1.28"
+eks_kubernetes_version = "1.33"
 kubectl_access_cidr    = "85.64.239.117/32"  # Replace with your actual host IP
 
 # EKS Node Group Configuration (minimal for dev)
