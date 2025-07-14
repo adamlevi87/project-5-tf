@@ -437,19 +437,18 @@ resource "aws_iam_role_policy_attachment" "load_balancer_controller" {
   role       = aws_iam_role.load_balancer_controller.name
 }
 
-# Kubernetes service account
-resource "kubernetes_service_account" "aws_load_balancer_controller" {
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.load_balancer_controller.arn
-    }
+# Kubernetes provider configuration
+provider "kubernetes" {
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.main.name]
   }
-
-  depends_on = [aws_eks_node_group.main]
 }
 
+# Helm provider configuration  
 provider "helm" {
   kubernetes {
     host                   = aws_eks_cluster.main.endpoint
@@ -460,6 +459,19 @@ provider "helm" {
       args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.main.name]
     }
   }
+}
+
+# Kubernetes service account for AWS Load Balancer Controller
+resource "kubernetes_service_account" "aws_load_balancer_controller" {
+  metadata {
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.load_balancer_controller.arn
+    }
+  }
+
+  depends_on = [aws_eks_node_group.main]
 }
 
 # Install AWS Load Balancer Controller via Helm
@@ -477,7 +489,7 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "serviceAccount.create"
-    value = "false"
+    value = "false"  # We create it manually above
   }
 
   set {
