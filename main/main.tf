@@ -12,6 +12,8 @@ resource "random_password" "generated_passwords" {
   
   length  = each.value.password_length
   special = each.value.password_special
+
+  override_special = lookup(each.value, "password_override_special", null)
   
   lifecycle {
     ignore_changes = [result]
@@ -72,6 +74,7 @@ locals {
         generate_password  = true
         password_length    = 16
         password_special   = true
+        password_override_special = "!#$%&*()-_=+[]{}|;:,.<>?"
       }
       # Future secrets go here
     }
