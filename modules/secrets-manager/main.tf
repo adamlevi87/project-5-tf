@@ -10,7 +10,7 @@ resource "random_password" "generated_passwords" {
   length  = each.value.password_length
   special = each.value.password_special
 
-  override_special = lookup(each.value, "password_override_special", null)
+  override_special = each.value.password_override_special != "" ? each.value.password_override_special : null
   
   lifecycle {
     ignore_changes = [result]
