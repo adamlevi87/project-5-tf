@@ -49,3 +49,8 @@ output "cluster_primary_security_group_id" {
   description = "The cluster primary security group ID created by EKS"
   value       = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
 }
+
+output "aws_iam_openid_connect_provider_arn" {
+  description = "openid_connect_provider_arn"
+  value = aws_iam_openid_connect_provider.cluster.arn
+}

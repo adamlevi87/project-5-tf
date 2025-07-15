@@ -214,5 +214,5 @@ module "external_dns" {
   domain_filter      = var.domain_name
   txt_owner_id       = module.route53.zone_id
   oidc_provider_arn  = module.eks.oidc_provider_arn
-  oidc_provider_url  = aws_eks_cluster.main.identity[0].oidc[0].issuer
+  oidc_provider_url  = module.eks.cluster_oidc_issuer_url
 }
