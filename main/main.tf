@@ -228,3 +228,15 @@ module "cluster_autoscaler" {
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
 }
+
+module "backend_irsa" {
+  source       = "../modules/backend_irsa"
+
+  cluster_name = module.eks.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  namespace    = "default"
+  service_account_name = "backend-sa"
+  s3_bucket_arn = module.s3_app_data.bucket_arn
+  sqs_queue_arn = module.sqs.queue_arn
+}
+
