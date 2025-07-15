@@ -10,15 +10,15 @@ resource "aws_route53_zone" "this" {
   }
 }
 
-# A record pointing to the ALB
-resource "aws_route53_record" "app_dns" {
-  zone_id = aws_route53_zone.this.zone_id
-  name    = var.subdomain_name
-  type    = "A"
+# # A record pointing to the ALB
+# resource "aws_route53_record" "app_dns" {
+#   zone_id = aws_route53_zone.this.zone_id
+#   name    = var.subdomain_name
+#   type    = "A"
 
-  alias {
-    name                   = var.alb_dns_name
-    zone_id                = var.alb_zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = var.alb_dns_name
+#     zone_id                = var.alb_zone_id
+#     evaluate_target_health = true
+#   }
+# }

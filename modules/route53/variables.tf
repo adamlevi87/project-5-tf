@@ -20,12 +20,12 @@ variable "subdomain_name" {
   description = "Subdomain to use for the ALB (e.g. project-5)"
 }
 
-variable "alb_dns_name" {
-  type        = string
-  description = "DNS name of the Application Load Balancer"
-}
+# variable "alb_dns_name" {
+#   type        = string
+#   description = "DNS name of the Application Load Balancer"
+# }
 
-variable "alb_zone_id" {
-  type        = string
-  description = "Zone ID of the Application Load Balancer"
-}
+# variable "alb_zone_id" {
+#   type        = string
+#   description = "Zone ID of the Application Load Balancer"
+# }

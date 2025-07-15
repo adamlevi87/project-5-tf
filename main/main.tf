@@ -167,13 +167,6 @@ module "route53" {
   
   domain_name    = var.domain_name
   subdomain_name = var.subdomain_name
-  
-  # ALB DNS information (from ALB module)
-  alb_dns_name = module.alb.alb_dns_name
-  alb_zone_id  = module.alb.alb_zone_id
-
-  # Add dependency to ensure ALB is created first
-  depends_on = [module.alb]
 }
 
 module "acm" {
@@ -212,96 +205,14 @@ module "eks" {
   cluster_log_retention_days = var.eks_log_retention_days
 }
 
-# Add this to your main/main.tf file
+module "external_dns" {
+  source = "../modules/external-dns"
 
-module "alb" {
-  source = "../modules/alb"
+  project_tag        = var.project_tag
+  environment        = var.environment
 
-  project_tag = var.project_tag
-  environment = var.environment
-  
-  # ALB Configuration
-  alb_name = "app-alb"
-  
-  # Networking (from VPC module)
-  vpc_id            = module.vpc_network.vpc_id
-  public_subnet_ids = module.vpc_network.public_subnet_ids
-  
-  # SSL Certificate (from ACM module)
-  certificate_arn = module.acm.this_certificate_arn
-  
-  # Security
-  allowed_cidr_blocks = ["0.0.0.0/0"]  # Allow from internet
-  
-  # Load Balancer Settings
-  enable_deletion_protection = var.alb_deletion_protection
-  idle_timeout              = 60
-  enable_http2              = true
-  
-  # Target Groups for your applications
-  target_groups = {
-    frontend = {
-      name        = "frontend"
-      port        = 80
-      protocol    = "HTTP"
-      target_type = "ip"  # For EKS pods
-      health_check = {
-        enabled             = true
-        healthy_threshold   = 2
-        unhealthy_threshold = 2
-        timeout             = 5
-        interval            = 30
-        path                = "/"
-        matcher             = "200"
-        protocol            = "HTTP"
-        port                = "traffic-port"
-      }
-    }
-    backend = {
-      name        = "backend"
-      port        = 3000
-      protocol    = "HTTP"
-      target_type = "ip"  # For EKS pods
-      health_check = {
-        enabled             = true
-        healthy_threshold   = 2
-        unhealthy_threshold = 2
-        timeout             = 5
-        interval            = 30
-        path                = "/health"
-        matcher             = "200"
-        protocol            = "HTTP"
-        port                = "traffic-port"
-      }
-    }
-  }
-  
-  # Listener Rules for routing
-  listener_rules = {
-    frontend = {
-      priority = 100
-      conditions = [
-        {
-          type   = "path-pattern"
-          values = ["/", "/*"]
-        }
-      ]
-      target_group_key = "frontend"
-    }
-    backend = {
-      priority = 200
-      conditions = [
-        {
-          type   = "path-pattern"
-          values = ["/submit", "/health", "/api/*"]
-        }
-      ]
-      target_group_key = "backend"
-    }
-  }
-  
-  # Logging (optional - requires S3 bucket)
-  enable_access_logs = false
-  # access_logs_bucket = module.s3_app_data.bucket_name
-  # access_logs_prefix = "alb-logs"
+  domain_filter      = var.domain_name
+  txt_owner_id       = module.route53.zone_id
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_url  = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }
