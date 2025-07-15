@@ -217,3 +217,14 @@ module "external_dns" {
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
 }
+
+module "cluster_autoscaler" {
+  source = "../modules/cluster-autoscaler"
+
+  project_tag        = var.project_tag
+  environment        = var.environment
+  
+  cluster_name       = module.eks.cluster_name
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.oidc_provider_url
+}
