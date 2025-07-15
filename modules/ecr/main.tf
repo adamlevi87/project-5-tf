@@ -1,7 +1,9 @@
 # modules/ecr/main.tf
 
 resource "aws_ecr_repository" "this" {
-  name                 = var.name
+  for_each             = toset(var.ecr_repositories_applications)
+
+  name                 = "${var.ecr_repository_name}-${var.environment}-${each.key}"
   force_delete         = true
   image_tag_mutability = "MUTABLE"
 
@@ -12,11 +14,14 @@ resource "aws_ecr_repository" "this" {
   tags = {
     Project = var.project_tag
     Environment = var.environment
+    Application = each.key
   }
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
-  repository = aws_ecr_repository.this.name
+  for_each   = aws_ecr_repository.this
+  
+  repository = each.value.name
 
   policy = jsonencode({
     rules = [

@@ -148,8 +148,13 @@ variable "secrets_config" {
 }
 
 variable "ecr_repository_name" {
-  description = "ECR repository name"
+  description = "Base name prefix for all ECR repositories"
   type        = string
+}
+
+variable "ecr_repositories_applications" {
+  description = "List of application names to create ECR repositories for"
+  type        = list(string)
 }
 
 variable "domain_name" {

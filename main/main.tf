@@ -156,7 +156,8 @@ module "ecr" {
   environment = var.environment
   project_tag  = var.project_tag
   
-  name = var.ecr_repository_name
+  ecr_repository_name = var.ecr_repository_name
+  ecr_repositories_applications = var.ecr_repositories_applications
 }
 
 module "route53" {

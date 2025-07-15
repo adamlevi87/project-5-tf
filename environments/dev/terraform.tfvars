@@ -56,6 +56,7 @@ secrets_config = {
 }
 
 ecr_repository_name = "project-5"
+ecr_repository_apps = ["backend","frontend"]
 
 domain_name = "projects-devops.cfd"
 subdomain_name = "project-5"
