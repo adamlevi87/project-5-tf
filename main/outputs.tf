@@ -90,21 +90,21 @@ output "ecr_repository_url" {
   value       = module.ecr.repository_url
 }
 
-# ALB outputs
-output "alb_dns_name" {
-  description = "DNS name of the Application Load Balancer"
-  value       = module.alb.alb_dns_name
-}
+# # ALB outputs
+# output "alb_dns_name" {
+#   description = "DNS name of the Application Load Balancer"
+#   value       = module.alb.alb_dns_name
+# }
 
-output "alb_zone_id" {
-  description = "Zone ID of the Application Load Balancer"
-  value       = module.alb.alb_zone_id
-}
+# output "alb_zone_id" {
+#   description = "Zone ID of the Application Load Balancer"
+#   value       = module.alb.alb_zone_id
+# }
 
-output "target_group_arns" {
-  description = "ARNs of the target groups"
-  value       = module.alb.target_group_arns
-}
+# output "target_group_arns" {
+#   description = "ARNs of the target groups"
+#   value       = module.alb.target_group_arns
+# }
 
 # Application URL
 output "application_url" {
@@ -112,16 +112,16 @@ output "application_url" {
   value       = "https://${var.subdomain_name}.${var.domain_name}"
 }
 
-# ALB Target Groups (for AWS Load Balancer Controller)
-output "frontend_target_group_arn" {
-  description = "Frontend target group ARN"
-  value       = module.alb.target_group_arns["frontend"]
-}
+# # ALB Target Groups (for AWS Load Balancer Controller)
+# output "frontend_target_group_arn" {
+#   description = "Frontend target group ARN"
+#   value       = module.alb.target_group_arns["frontend"]
+# }
 
-output "backend_target_group_arn" {
-  description = "Backend target group ARN"
-  value       = module.alb.target_group_arns["backend"]
-}
+# output "backend_target_group_arn" {
+#   description = "Backend target group ARN"
+#   value       = module.alb.target_group_arns["backend"]
+# }
 
 # AWS Region
 output "aws_region" {
