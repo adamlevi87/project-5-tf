@@ -67,7 +67,7 @@ kubectl_access_cidr    = "85.64.239.117/32"  # Replace with your actual host IP
 
 # EKS Node Group Configuration (minimal for dev)
 eks_node_instance_types   = ["t3.small"]  # Bare minimum instance type
-eks_node_desired_capacity = 1             # Single node for dev
+eks_node_desired_capacity = 2             # Single node for dev
 eks_node_max_capacity     = 3             # Allow scaling if needed
 eks_node_min_capacity     = 1             # Keep at least one node
 
