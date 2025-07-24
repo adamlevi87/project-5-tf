@@ -1,0 +1,79 @@
+name: Terraform Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Environment to manage"
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - stagin
+          - prod
+      action:
+        description: "Terraform action to perform"
+        required: true
+        default: plan
+        type: choice
+        options:
+          - plan
+          - apply
+          - plan-and-apply
+          - destroy
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write  # Required for OIDC
+      
+    defaults:
+      run:
+        working-directory: main/
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend-config=../environments/${{ github.event.inputs.env }}/backend.config
+
+      - name: Terraform Action
+        env:
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          PROVIDER_GITHUB_ARN: ${{ secrets.PROVIDER_GITHUB_ARN }}
+        run: |
+          case "${{ github.event.inputs.action }}" in
+            plan)
+              terraform plan -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              ;;
+            apply)
+              terraform apply -auto-approve -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              ;;
+            plan-and-apply)
+              terraform plan -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              terraform apply -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -auto-approve -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              ;;
+            destroy)
+              terraform destroy -auto-approve -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              ;;
+            *)
+              echo "Invalid action: ${{ github.event.inputs.action }}"; exit 1
+              ;;
+          esac
