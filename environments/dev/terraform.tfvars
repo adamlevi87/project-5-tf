@@ -77,10 +77,12 @@ eks_log_retention_days = 7  # 1 week retention for dev environment
 # ALB Configuration
 alb_deletion_protection = false  # Allow easy deletion in dev environment
 
+github_org = "adamlevi87"
+github_application_repo = "project-5-app"
 
 
-# github_org = "adamlevi87"
-# github_repo = "project-5-tf"
+
+
 
 
 # container_port = 3000

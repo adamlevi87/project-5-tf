@@ -205,8 +205,6 @@ variable "eks_log_retention_days" {
   type        = number
 }
 
-# Add this to main/variables.tf
-
 variable "alb_deletion_protection" {
   description = "Enable deletion protection for the Application Load Balancer"
   type        = bool
@@ -216,3 +214,34 @@ variable "alb_deletion_protection" {
     error_message = "ALB deletion protection must be a boolean value (true or false)."
   }
 }
+
+variable "github_application_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+
+variable "github_org" {
+  description = "GitHub organization"
+  type        = string
+}
+
+# Application's repo PAT github token to allow TF repo to write into the application repo
+# When run from the workflow: will be pulled from the TF's application repo secrets so it must exists beforehand
+# example for the cli command usage: terraform plan -var="github_token=YOURKEY" ..."
+variable "github_token" {
+description = "GitHub PAT with access to manage secrets"
+type        = string
+sensitive   = true
+}
+
+# github provider ARN, created using the requirements folder
+# When run from the workflow: will be pulled from the TF's application repo secrets
+# example: terraform plan -var="aws_iam_openid_connect_provider_github_arn=ARN"
+variable "aws_iam_openid_connect_provider_github_arn" {
+  type        = string
+  description = "github provider arn [created beforhand, using .requirements folder]"
+  sensitive   = true
+}
+
+
+
