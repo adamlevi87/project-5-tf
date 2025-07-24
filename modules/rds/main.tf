@@ -21,8 +21,8 @@ resource "aws_security_group" "rds" {
 
   # Allow PostgreSQL access from backend applications
   ingress {
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = var.rds_database_port
+    to_port     = var.rds_database_port
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
     description = "PostgreSQL access from backend"
@@ -62,7 +62,7 @@ resource "aws_db_instance" "main" {
   db_name  = var.database_name
   username = var.database_username
   password = data.aws_secretsmanager_secret_version.db_password.secret_string
-  port     = 5432
+  port     = var.rds_database_port
   
   # Storage configuration
   allocated_storage     = var.allocated_storage

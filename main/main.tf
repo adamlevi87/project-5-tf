@@ -234,8 +234,8 @@ module "backend_irsa" {
 
   cluster_name = module.eks.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
-  namespace    = "default"
-  service_account_name = "backend-sa"
+  namespace    = var.backend_service_namespace
+  service_account_name = var.backend_service_account_name
   s3_bucket_arn = module.s3_app_data.bucket_arn
   sqs_queue_arn = module.sqs.queue_arn
 }
@@ -261,18 +261,18 @@ module "github_repo_secrets" {
 
     # Inject backend-specific values
     ECR_REPOSITORY_BACKEND = "${module.ecr.repository_url["backend"]}"
-    SERVICE_NAME_BACKEND   = module.backend.service_name
+    SERVICE_NAME_BACKEND   = var.backend_service_account_name
 
     # Inject frontend-specific values
     ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_url["frontend"]}"
-    SERVICE_NAME_FRONTEND   = module.frontend.service_name
+    #SERVICE_NAME_FRONTEND   = module.frontend.service_name
 
     # Shared values (if needed in CI workflows)
     CLUSTER_NAME    = module.eks.cluster_name
     DB_HOST         = module.rds.db_instance_address
     DB_NAME         = var.rds_database_name
     DB_USER         = var.rds_database_username
-    DB_PORT         = "5432"
+    DB_PORT         = var.rds_database_port
     SQS_QUEUE_URL   = module.sqs.queue_url
   }
 }

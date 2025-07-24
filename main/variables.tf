@@ -73,6 +73,12 @@ variable "rds_database_username" {
   type        = string
 }
 
+variable "rds_database_port" {
+  description = "Port number for the RDS PostgreSQL instance"
+  type        = number
+  default     = 5432
+}
+
 # RDS Storage Configuration
 variable "rds_allocated_storage" {
   description = "Initial storage allocation in GB"
@@ -213,6 +219,18 @@ variable "alb_deletion_protection" {
     condition     = can(var.alb_deletion_protection)
     error_message = "ALB deletion protection must be a boolean value (true or false)."
   }
+}
+
+variable "backend_service_namespace" {
+  description = "Namespace where the backend service account is deployed"
+  type        = string
+  default     = "default"
+}
+
+variable "backend_service_account_name" {
+  description = "Name of the backend service account"
+  type        = string
+  default     = "backend-sa"
 }
 
 variable "github_application_repo" {

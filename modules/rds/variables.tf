@@ -66,6 +66,12 @@ variable "database_username" {
   default     = "appuser"
 }
 
+variable "rds_database_port" {
+  description = "Port number for the RDS PostgreSQL instance"
+  type        = number
+  default     = 5432
+}
+
 # Storage Configuration
 variable "allocated_storage" {
   description = "Initial storage allocation in GB"
