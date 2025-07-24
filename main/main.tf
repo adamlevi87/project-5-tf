@@ -260,8 +260,8 @@ module "github_repo_secrets" {
     AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
 
     # ECR
-    ECR_REPOSITORY_BACKEND  = "${module.ecr.repository_urls[var.ecr_repositories_applications[0]]}"
-    ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_urls[var.ecr_repositories_applications[1]]}"
+    ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]]}"
+    ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
     
     # Inject backend-specific values
     SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
