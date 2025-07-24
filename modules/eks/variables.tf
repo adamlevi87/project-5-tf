@@ -32,7 +32,7 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "allowed_cidr_blocks" {
+variable "eks_allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access the cluster endpoint"
   type        = list(string)
   default     = []

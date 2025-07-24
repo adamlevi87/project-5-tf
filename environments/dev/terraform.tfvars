@@ -64,7 +64,9 @@ subdomain_name = "project-5"
 
 # EKS Cluster Configuration
 eks_kubernetes_version = "1.33"
-kubectl_access_cidr    = "85.64.239.117/32"  # Replace with your actual host IP
+# Whitelist your host + temporary - for github - all IPs - EKS api access
+eks_allowed_cidr_blocks    = ["85.64.239.117/32","0.0.0.0/0"]
+
 
 # EKS Node Group Configuration (minimal for dev)
 eks_node_instance_types   = ["t3.small"]  # Bare minimum instance type

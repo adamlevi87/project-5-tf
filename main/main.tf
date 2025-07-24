@@ -194,7 +194,7 @@ module "eks" {
   # Networking (from VPC module)
   vpc_id               = module.vpc_network.vpc_id
   private_subnet_ids   = module.vpc_network.private_subnet_ids
-  allowed_cidr_blocks  = [var.kubectl_access_cidr]  # Your host IP
+  eks_allowed_cidr_blocks  = var.eks_allowed_cidr_blocks
   
   # Node group configuration
   node_group_instance_types   = var.eks_node_instance_types

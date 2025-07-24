@@ -95,7 +95,7 @@ resource "aws_eks_cluster" "main" {
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
-    public_access_cidrs     = var.allowed_cidr_blocks
+    public_access_cidrs     = var.eks_allowed_cidr_blocks
   }
 
   enabled_cluster_log_types = var.cluster_enabled_log_types

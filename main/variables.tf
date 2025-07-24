@@ -179,9 +179,10 @@ variable "eks_kubernetes_version" {
   type        = string
 }
 
-variable "kubectl_access_cidr" {
-  description = "CIDR block allowed to access the EKS cluster endpoint (your host IP)"
-  type        = string
+variable "eks_allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to access the cluster endpoint"
+  type        = list(string)
+  default     = []
 }
 
 # EKS Node Group Configuration
