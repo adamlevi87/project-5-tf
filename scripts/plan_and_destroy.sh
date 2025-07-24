@@ -15,6 +15,8 @@ RUN_MODE="${2:-plan}"
 SELECTION_METHOD="${3:-filter}"
 NAT_MODE="${4:-single}"
 DEBUG="${5:-normal}"
+GITHUB_TOKEN="${6}"
+AWS_ROLE="${7}"
 
 # Handle dash as "use default"
 [[ "$ENV" == "-" ]] && ENV="dev"
@@ -43,11 +45,13 @@ show_help() {
   echo -e "                 Options: ${CYAN}single${RESET}, ${CYAN}real${RESET}"
   echo -e "  ${GREEN}5. debug   ${RESET}→ Debug mode, used with run_mode:plan & selection_method: filter to iterate over the filtered terraform resource list one by one       Default: ${CYAN}normal${RESET}"
   echo -e "                 Options: ${CYAN}debug${RESET} (each target), ${CYAN}normal${RESET} (all targets at once)"
+  echo -e "  ${GREEN}6. GITHUB_TOKEN: ${RESET}→ Supply Github Token       Default: ${CYAN}no Default${RESET}"
+  echo -e "  ${GREEN}7. AWS_ROLE: ${RESET}→ Supply AWS role to assume       Default: ${CYAN}no Default${RESET}"
   echo
   echo -e "Example:"
-  echo -e "  ${GREEN}$0 dev plan filter single normal${RESET}"
+  echo -e "  ${GREEN}$0 dev plan filter single normal "token" "role_arn"${RESET}"
   echo -e "Example 2:"
-  echo -e "  ${GREEN}$0 dev destroy all real debug${RESET}"
+  echo -e "  ${GREEN}$0 dev destroy all real debug "token" "role_arn" ${RESET}"
   echo
 }
 # Help option
@@ -56,7 +60,7 @@ if [[ "$ENV" == "--help" || "$ENV" == "-h" ]]; then
   exit 0
 else
   show_help
-  echo -e "${YELLOW}Running:${RESET} ${GREEN}$0 $ENV $RUN_MODE $SELECTION_METHOD $NAT_MODE $DEBUG${RESET}"
+  echo -e "${YELLOW}Running:${RESET} ${GREEN}$0 $ENV $RUN_MODE $SELECTION_METHOD $NAT_MODE $DEBUG $GITHUB_TOKEN $AWS_ROLE${RESET}"
   echo -e "${YELLOW}Press Enter to continue or Ctrl+C to cancel...${RESET}"
   read -r
 fi
@@ -91,6 +95,12 @@ if [[ "$DEBUG" != "debug" && "$DEBUG" != "normal" ]]; then
   exit 1
 fi
 
+# Required environment variables
+if [[ -z "$GITHUB_TOKEN" || -z "$AWS_ROLE" ]]; then
+  echo "❌ GITHUB_TOKEN and AWS_ROLE must be set"
+  exit 1
+fi
+
 # Validate variable file
 if [[ ! -f "$VAR_FILE" ]]; then
   echo -e "${RED}ERROR:${RESET} Variable file '${VAR_FILE}' not found!"
@@ -99,9 +109,13 @@ fi
 
 # Validate RUN_MODE
 if [[ "$RUN_MODE" == "plan" ]]; then
-  COMMAND_RUN_MODE="plan -destroy"
+  COMMAND_RUN_MODE=(plan -destroy \
+    -var="github_token=${GITHUB_TOKEN}" \
+    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 elif [[ "$RUN_MODE" == "destroy"  ]]; then
-  COMMAND_RUN_MODE="destroy -auto-approve"
+  COMMAND_RUN_MODE=(destroy -auto-approve \
+    -var="github_token=${GITHUB_TOKEN}" \
+    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 fi
 
 ################ Script starts here ################
