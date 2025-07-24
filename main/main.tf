@@ -240,39 +240,39 @@ module "backend_irsa" {
   sqs_queue_arn = module.sqs.queue_arn
 }
 
-module "github_oidc" {
-  source = "../modules/iam-github-oidc"
-  github_org         = var.github_org
-  github_repo        = var.github_application_repo
-  aws_iam_openid_connect_provider_github_arn = var.aws_iam_openid_connect_provider_github_arn
-}
+# module "github_oidc" {
+#   source = "../modules/iam-github-oidc"
+#   github_org         = var.github_org
+#   github_repo        = var.github_application_repo
+#   aws_iam_openid_connect_provider_github_arn = var.aws_iam_openid_connect_provider_github_arn
+# }
 
-module "github_repo_secrets" {
-  source = "../modules/github-repo-secrets"
+# module "github_repo_secrets" {
+#   source = "../modules/github-repo-secrets"
 
-  repository_name = var.github_application_repo
+#   repository_name = var.github_application_repo
 
-  github_variables = {
-    AWS_REGION = var.aws_region
-  }
+#   github_variables = {
+#     AWS_REGION = var.aws_region
+#   }
 
-  github_secrets = {
-    AWS_ROLE_TO_ASSUME = module.github_oidc.github_actions_role_arn
+#   github_secrets = {
+#     AWS_ROLE_TO_ASSUME = module.github_oidc.github_actions_role_arn
 
-    # Inject backend-specific values
-    ECR_REPOSITORY_BACKEND = "${module.ecr.repository_url["backend"]}"
-    SERVICE_NAME_BACKEND   = module.backend.service_name
+#     # Inject backend-specific values
+#     ECR_REPOSITORY_BACKEND = "${module.ecr.repository_url["backend"]}"
+#     SERVICE_NAME_BACKEND   = module.backend.service_name
 
-    # Inject frontend-specific values
-    ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_url["frontend"]}"
-    SERVICE_NAME_FRONTEND   = module.frontend.service_name
+#     # Inject frontend-specific values
+#     ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_url["frontend"]}"
+#     SERVICE_NAME_FRONTEND   = module.frontend.service_name
 
-    # Shared values (if needed in CI workflows)
-    CLUSTER_NAME    = module.eks.cluster_name
-    DB_HOST         = module.rds.db_instance_address
-    DB_NAME         = var.rds_database_name
-    DB_USER         = var.rds_database_username
-    DB_PORT         = "5432"
-    SQS_QUEUE_URL   = module.sqs.queue_url
-  }
-}
+#     # Shared values (if needed in CI workflows)
+#     CLUSTER_NAME    = module.eks.cluster_name
+#     DB_HOST         = module.rds.db_instance_address
+#     DB_NAME         = var.rds_database_name
+#     DB_USER         = var.rds_database_username
+#     DB_PORT         = "5432"
+#     SQS_QUEUE_URL   = module.sqs.queue_url
+#   }
+# }
