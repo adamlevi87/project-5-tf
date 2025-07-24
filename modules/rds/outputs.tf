@@ -17,7 +17,7 @@ output "db_endpoint" {
 
 output "db_instance_address" {
   description = "RDS endpoint address"
-  value       = aws_db_instance.this.address
+  value       = aws_db_instance.main.address
 }
 
 output "db_port" {
