@@ -248,7 +248,7 @@ module "github_oidc" {
 }
 
 module "github_repo_secrets" {
-  source = "../modules/github_repo_secrets"
+  source = "../modules/github-repo-secrets"
 
   repository_name = var.github_application_repo
 
