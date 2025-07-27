@@ -111,19 +111,15 @@ fi
 
 # Validate RUN_MODE
 if [[ "$RUN_MODE" == "plan" ]]; then
-  COMMAND_RUN_MODE=(plan -destroy \
-    -var="github_token=${GITHUB_TOKEN}" \
-    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
+  COMMAND_RUN_MODE=(plan -destroy -var="github_token=${GITHUB_TOKEN}" -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 elif [[ "$RUN_MODE" == "destroy"  ]]; then
-  COMMAND_RUN_MODE=(destroy -auto-approve \
-    -var="github_token=${GITHUB_TOKEN}" \
-    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
+  COMMAND_RUN_MODE=(destroy -auto-approve -var="github_token=${GITHUB_TOKEN}" -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 fi
 
 ################ Script starts here ################
 
 if [[ "$SELECTION_METHOD" == "all" ]]; then
-  terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE"
+  terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" 
 
 elif [[ "$SELECTION_METHOD" == "filter" ]]; then
 
@@ -217,7 +213,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
         echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
         
         # Capture terraform plan output
-        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE plan -destroy -var-file="$VAR_FILE" "$TARGET" 2>&1)
+        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" "$TARGET" 2>&1)
         
         # Log full output
         echo "=== Analysis for $TARGET ===" >> "$LOG_FILE"
