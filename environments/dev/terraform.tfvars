@@ -87,6 +87,17 @@ backend_service_account_name = "backend-sa"
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
 
+eks_user_access_map = {
+  adam_local = {
+    username = "adam.local"
+    groups   = ["system:masters"]
+  }
+#   qa_user = {
+#     userarn  = "arn:aws:iam::593793036161:user/qa.user"
+#     username = "qa.user"
+#     groups   = ["system:masters"]
+#   }
+}
 
 
 

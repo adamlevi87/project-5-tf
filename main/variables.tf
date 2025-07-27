@@ -262,5 +262,23 @@ variable "aws_iam_openid_connect_provider_github_arn" {
   sensitive   = true
 }
 
+# this is the arn that was created using the requirements folder
+# which we then set as the secret: AWS_ROLE_TO_ASSUME for the TF repo
+variable "github_oidc_role_arn" {
+  description = "ARN of the GitHub OIDC role used to deploy from GitHub Actions"
+  type        = string
+}
+
+variable "eks_user_access_map" {
+  description = "Map of IAM users to be added to aws-auth with their usernames and groups"
+  type = map(object({
+    username = string
+    groups   = list(string)
+  }))
+  default = {}
+}
+
+
+
 
 

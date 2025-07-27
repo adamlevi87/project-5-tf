@@ -48,4 +48,14 @@ locals {
     private_subnet_cidrs = {
         for az, pair in local.all_subnet_pairs : az => pair.private_cidr
     }
+
+    account_id = data.aws_caller_identity.current.account_id
+
+    map_users = {
+        for name, user in var.eks_user_access_map : name => {
+        userarn  = "arn:aws:iam::${local.account_id}:user/${user.username}"
+        username = user.username
+        groups   = user.groups
+        }
+    }
 }

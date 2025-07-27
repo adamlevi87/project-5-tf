@@ -5,6 +5,8 @@ data "aws_availability_zones" "available" {
     state = "available"
 }
 
+data "aws_caller_identity" "current" {}
+
 module "vpc_network" {
     source = "../modules/vpc-network"
    
@@ -279,4 +281,21 @@ module "github_repo_secrets" {
     # DB_PORT         = "${var.rds_database_port}"
     # SQS_QUEUE_URL   = "${module.sqs.queue_url}"
   }
+}
+
+module "aws_auth_config" {
+  source = "../modules/aws_auth_config"
+
+  map_roles = [
+    {
+      rolearn  = var.github_oidc_role_arn
+      username = "github"
+      groups   = ["system:masters"]
+    }
+  ]
+
+  eks_user_access_map = local.map_users
+
+
+  eks_dependency = module.eks
 }
