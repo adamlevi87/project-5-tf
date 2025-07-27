@@ -54,6 +54,13 @@ show_help() {
   echo -e "  ${GREEN}$0 dev destroy all real debug "token" "role_arn" ${RESET}"
   echo
 }
+
+# Required environment variables
+if [[ -z "$GITHUB_TOKEN" || -z "$AWS_ROLE" ]]; then
+  echo "❌ GITHUB_TOKEN and AWS_ROLE must be set - script moved to using them- similar to the github workflow"
+  exit 1
+fi
+
 # Help option
 if [[ "$ENV" == "--help" || "$ENV" == "-h" ]]; then
   show_help
@@ -92,12 +99,6 @@ fi
 # Validate Debug
 if [[ "$DEBUG" != "debug" && "$DEBUG" != "normal" ]]; then
   echo -e "${RED}ERROR:${RESET} Invalid Debug '${DEBUG}'. Use 'debug' or 'normal'."
-  exit 1
-fi
-
-# Required environment variables
-if [[ -z "$GITHUB_TOKEN" || -z "$AWS_ROLE" ]]; then
-  echo "❌ GITHUB_TOKEN and AWS_ROLE must be set"
   exit 1
 fi
 
