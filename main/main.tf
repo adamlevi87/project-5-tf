@@ -251,6 +251,7 @@ module "github_repo_secrets" {
   source = "../modules/github-repo-secrets"
 
   repository_name = "${var.github_application_repo}"
+  environment = var.environment
 
   github_variables = {
     AWS_REGION = "${var.aws_region}"
@@ -264,18 +265,18 @@ module "github_repo_secrets" {
     ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
     
     # Inject backend-specific values
-    SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
+    # SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
 
     # Inject frontend-specific values
     #ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_urls["frontend"]}"
     #SERVICE_NAME_FRONTEND   = module.frontend.service_name
 
     # Shared values (if needed in CI workflows)
-    CLUSTER_NAME    = "${module.eks.cluster_name}"
-    DB_HOST         = "${module.rds.db_instance_address}"
-    DB_NAME         = "${var.rds_database_name}"
-    DB_USER         = "${var.rds_database_username}"
-    DB_PORT         = "${var.rds_database_port}"
-    SQS_QUEUE_URL   = "${module.sqs.queue_url}"
+    # CLUSTER_NAME    = "${module.eks.cluster_name}"
+    # DB_HOST         = "${module.rds.db_instance_address}"
+    # DB_NAME         = "${var.rds_database_name}"
+    # DB_USER         = "${var.rds_database_username}"
+    # DB_PORT         = "${var.rds_database_port}"
+    # SQS_QUEUE_URL   = "${module.sqs.queue_url}"
   }
 }

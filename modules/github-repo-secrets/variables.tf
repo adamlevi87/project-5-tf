@@ -12,3 +12,9 @@ variable "github_variables" {
   description = "Map of plain variables to set in the GitHub repo"
   type        = map(string)
 }
+
+variable "environment" {
+  description = "Environment tag (dev, staging, prod)"
+  type        = string
+  default     = "dev"
+}
