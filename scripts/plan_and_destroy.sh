@@ -111,9 +111,13 @@ fi
 
 # Validate RUN_MODE
 if [[ "$RUN_MODE" == "plan" ]]; then
-  COMMAND_RUN_MODE=(plan -destroy -var="github_token=${GITHUB_TOKEN}" -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
+  COMMAND_RUN_MODE=(plan -destroy \
+    -var="github_token=${GITHUB_TOKEN}" \
+    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 elif [[ "$RUN_MODE" == "destroy"  ]]; then
-  COMMAND_RUN_MODE=(destroy -auto-approve -var="github_token=${GITHUB_TOKEN}" -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
+  COMMAND_RUN_MODE=(destroy -auto-approve \
+    -var="github_token=${GITHUB_TOKEN}" \
+    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
 fi
 
 ################ Script starts here ################
@@ -197,7 +201,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
   echo "$TARGETS"
 
   if [[ "$DEBUG" == "normal" ]]; then
-    echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE} (all targets together) ========${RESET}"
+    echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE[*]} (all targets together) ========${RESET}"
     # shellcheck disable=SC2086
     terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" $TARGETS
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
