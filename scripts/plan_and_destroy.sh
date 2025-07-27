@@ -119,7 +119,7 @@ fi
 ################ Script starts here ################
 
 if [[ "$SELECTION_METHOD" == "all" ]]; then
-  terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" 
+  terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" 
 
 elif [[ "$SELECTION_METHOD" == "filter" ]]; then
 
@@ -199,7 +199,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
   if [[ "$DEBUG" == "normal" ]]; then
     echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE} (all targets together) ========${RESET}"
     # shellcheck disable=SC2086
-    terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" $TARGETS
+    terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" $TARGETS
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
     LOG_FILE="dependency_warnings_${ENV}_$(date +%Y%m%d_%H%M%S).log"
     echo -e "${CYAN}Running dependency analysis mode...${RESET}"
@@ -213,7 +213,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
         echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
         
         # Capture terraform plan output
-        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE -var-file="$VAR_FILE" "$TARGET" 2>&1)
+        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" "$TARGET" 2>&1)
         
         # Log full output
         echo "=== Analysis for $TARGET ===" >> "$LOG_FILE"
