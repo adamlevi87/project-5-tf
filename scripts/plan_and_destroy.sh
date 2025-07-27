@@ -217,7 +217,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
         echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
         
         # Capture terraform plan output
-        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" plan -destroy -var-file="$VAR_FILE" "$TARGET" 2>&1)
+        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" $COMMAND_RUN_MODE plan -destroy -var-file="$VAR_FILE" "$TARGET" 2>&1)
         
         # Log full output
         echo "=== Analysis for $TARGET ===" >> "$LOG_FILE"
