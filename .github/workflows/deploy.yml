@@ -60,8 +60,14 @@ jobs:
           PROVIDER_GITHUB_ARN: ${{ secrets.PROVIDER_GITHUB_ARN }}
           AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         run: |
+          if [[ -z "$PROVIDER_GITHUB_ARN" ]]; then
+            echo "❌ PROVIDER_GITHUB_ARN is NOT set"
+            exit 1
+          else
+            echo "✅ PROVIDER_GITHUB_ARN is set"
+          fi
           COMMON_VARS=(
-            -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars
+            -var-file="../environments/${{ github.event.inputs.env }}/terraform.tfvars"
             -var="github_token=$TOKEN_GITHUB"
             -var="aws_region=$AWS_REGION"
             -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
@@ -69,17 +75,17 @@ jobs:
           )
           case "${{ github.event.inputs.action }}" in
             plan)
-              terraform plan    
+              terraform plan "${COMMON_VARS[@]}"
               ;;
             apply)
-              terraform apply -auto-approve
+              terraform apply -auto-approve "${COMMON_VARS[@]}"
               ;;
             plan-and-apply)
-              terraform plan
-              terraform apply -auto-approve
+              terraform plan "${COMMON_VARS[@]}"
+              terraform apply -auto-approve "${COMMON_VARS[@]}"
               ;;
             destroy)
-              terraform destroy -auto-approve
+              terraform destroy -auto-approve "${COMMON_VARS[@]}"
               ;;
             *)
               echo "Invalid action: ${{ github.event.inputs.action }}"; exit 1
