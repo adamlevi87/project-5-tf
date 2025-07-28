@@ -60,12 +60,6 @@ jobs:
           PROVIDER_GITHUB_ARN: ${{ secrets.PROVIDER_GITHUB_ARN }}
           AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         run: |
-          if [[ -z "$PROVIDER_GITHUB_ARN" ]]; then
-            echo "❌ PROVIDER_GITHUB_ARN is NOT set"
-            exit 1
-          else
-            echo "✅ PROVIDER_GITHUB_ARN is set"
-          fi
           COMMON_VARS=(
             -var-file="../environments/${{ github.event.inputs.env }}/terraform.tfvars"
             -var="github_token=$TOKEN_GITHUB"
