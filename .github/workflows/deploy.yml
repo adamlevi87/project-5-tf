@@ -10,7 +10,7 @@ on:
         type: choice
         options:
           - dev
-          - stagin
+          - staging
           - prod
       action:
         description: "Terraform action to perform"
