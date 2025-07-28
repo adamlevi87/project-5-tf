@@ -19,6 +19,7 @@ data "aws_eks_cluster_auth" "main" {
 resource "null_resource" "delete_default_aws_auth" {
   provisioner "local-exec" {
     command = <<EOT
+mkdir -p ~/.kube
 
 cat <<EOF > ~/.kube/config
 apiVersion: v1
