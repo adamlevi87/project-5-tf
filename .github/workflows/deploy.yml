@@ -58,20 +58,28 @@ jobs:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
           AWS_REGION: ${{ env.AWS_REGION }}
           PROVIDER_GITHUB_ARN: ${{ secrets.PROVIDER_GITHUB_ARN }}
+          AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         run: |
+          COMMON_VARS=(
+            -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars
+            -var="github_token=$TOKEN_GITHUB"
+            -var="aws_region=$AWS_REGION"
+            -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+            -var="github_oidc_role_arn=$AWS_ROLE_TO_ASSUME"
+          )
           case "${{ github.event.inputs.action }}" in
             plan)
-              terraform plan -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              terraform plan    
               ;;
             apply)
-              terraform apply -auto-approve -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              terraform apply -auto-approve
               ;;
             plan-and-apply)
-              terraform plan -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
-              terraform apply -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -auto-approve -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              terraform plan
+              terraform apply -auto-approve
               ;;
             destroy)
-              terraform destroy -auto-approve -var-file=../environments/${{ github.event.inputs.env }}/terraform.tfvars -var="github_token=$TOKEN_GITHUB" -var="aws_region=$AWS_REGION" -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
+              terraform destroy -auto-approve
               ;;
             *)
               echo "Invalid action: ${{ github.event.inputs.action }}"; exit 1
