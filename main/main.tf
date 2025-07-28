@@ -286,6 +286,10 @@ module "github_repo_secrets" {
 module "aws_auth_config" {
   source = "../modules/aws_auth_config"
 
+  aws_region = var.aws_region
+  cluster_name = module.eks.cluster_name
+  github_oidc_role_arn = var.github_oidc_role_arn
+
   map_roles = [
     {
       rolearn  = "${module.eks.node_group_role_arn}"

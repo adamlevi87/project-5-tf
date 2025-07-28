@@ -11,6 +11,12 @@ locals {
 resource "null_resource" "delete_default_aws_auth" {
   provisioner "local-exec" {
     command = <<EOT
+
+aws eks update-kubeconfig \
+  --region "${var.aws_region}" \
+  --name "${var.cluster_name}" \
+  --role-arn ${var.github_oidc_role_arn}
+
 if ! kubectl get configmap aws-auth -n kube-system -o yaml | grep -q '${local.github_actions_role_arn}'; then
   echo "Default aws-auth configmap detected. Deleting..."
   kubectl delete configmap aws-auth -n kube-system
