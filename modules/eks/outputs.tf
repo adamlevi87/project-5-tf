@@ -35,6 +35,11 @@ output "node_group_arn" {
   value       = aws_eks_node_group.main.arn
 }
 
+output "node_group_role_arn" {
+  value       = aws_iam_role.node_group_role.arn
+  description = "IAM role ARN for the EKS node group"
+}
+
 output "node_group_status" {
   description = "EKS node group status"
   value       = aws_eks_node_group.main.status
