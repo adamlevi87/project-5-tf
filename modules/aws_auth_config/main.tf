@@ -7,15 +7,39 @@ locals {
   ][0]
 }
 
+data "aws_eks_cluster" "main" {
+  name = var.cluster_name
+}
+
+data "aws_eks_cluster_auth" "main" {
+  name = var.cluster_name
+}
+
 # the delete will only run if the config map that exists does not have the github actions arn
 resource "null_resource" "delete_default_aws_auth" {
   provisioner "local-exec" {
     command = <<EOT
 
-aws eks update-kubeconfig \
-  --region "${var.aws_region}" \
-  --name "${var.cluster_name}" \
-  --role-arn ${var.github_oidc_role_arn}
+cat <<EOF > ~/.kube/config
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    server: "${data.aws_eks_cluster.main.endpoint}"
+    certificate-authority-data: "${data.aws_eks_cluster.main.certificate_authority[0].data}"
+  name: eks
+contexts:
+- context:
+    cluster: eks
+    user: eks-user
+  name: eks
+current-context: eks
+users:
+- name: eks-user
+  user:
+    token: "${data.aws_eks_cluster_auth.main.token}"
+EOF
+
 
 if ! kubectl get configmap aws-auth -n kube-system -o yaml | grep -q '${local.github_actions_role_arn}'; then
   echo "Default aws-auth configmap detected. Deleting..."
