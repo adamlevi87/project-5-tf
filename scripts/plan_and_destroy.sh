@@ -49,7 +49,7 @@ show_help() {
   echo -e "                 Options: ${CYAN}debug${RESET} (each target), ${CYAN}normal${RESET} (all targets at once)"
   echo -e "  ${GREEN}6. GITHUB_TOKEN: ${RESET}→ Supply Github Token       Default: ${CYAN}no Default${RESET}"
   echo -e "  ${GREEN}7. AWS_PROVIDER: ${RESET}→ Supply AWS github provider arn       Default: ${CYAN}no Default${RESET}"
-  echo -e "  ${GREEN}7. AWS_GITHUB_OIDC_ROLE: ${RESET}→ Supply AWS_GITHUB_OIDC_ROLE arn       Default: ${CYAN}no Default${RESET}"
+  echo -e "  ${GREEN}8. AWS_GITHUB_OIDC_ROLE: ${RESET}→ Supply AWS_GITHUB_OIDC_ROLE arn       Default: ${CYAN}no Default${RESET}"
   echo
   echo -e "Example:"
   echo -e "  ${GREEN}$0 dev plan filter single normal "token" "provider_arn""github_oidc_role_arn" ${RESET}"
