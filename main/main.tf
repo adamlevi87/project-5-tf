@@ -288,7 +288,7 @@ module "aws_auth_config" {
 
   map_roles = [
     {
-      rolearn  = module.eks.node_group_arn
+      rolearn  = "${module.eks.node_group_arn}"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = [
         "system:bootstrappers",
@@ -296,7 +296,7 @@ module "aws_auth_config" {
       ]
     },
     {
-      rolearn  = var.github_oidc_role_arn
+      rolearn  = "${var.github_oidc_role_arn}"
       username = "github"
       groups   = ["system:masters"]
     }
