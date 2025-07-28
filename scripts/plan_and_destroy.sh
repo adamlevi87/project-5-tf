@@ -59,7 +59,7 @@ show_help() {
 }
 
 # Required environment variables
-if [[ -z "$GITHUB_TOKEN" || -z "$AWS_PROVIDER" || -z "$AWS_GITHUB_OIDC_ROLE"]]; then
+if [[ -z "$GITHUB_TOKEN" || -z "$AWS_PROVIDER" || -z "$AWS_GITHUB_OIDC_ROLE" ]]; then
   show_help
   echo "❌ GITHUB_TOKEN and AWS_PROVIDER and AWS_GITHUB_OIDC_ROLE must be set - script moved to using them- similar to the github workflow"
   exit 1
