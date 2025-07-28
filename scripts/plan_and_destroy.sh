@@ -16,7 +16,9 @@ SELECTION_METHOD="${3:-filter}"
 NAT_MODE="${4:-single}"
 DEBUG="${5:-normal}"
 GITHUB_TOKEN="${6:-}"
-AWS_ROLE="${7:-}"
+AWS_PROVIDER="${7:-}"
+AWS_GITHUB_OIDC_ROLE="${8:-}"
+
 
 # Handle dash as "use default"
 [[ "$ENV" == "-" ]] && ENV="dev"
@@ -46,19 +48,20 @@ show_help() {
   echo -e "  ${GREEN}5. debug   ${RESET}→ Debug mode, used with run_mode:plan & selection_method: filter to iterate over the filtered terraform resource list one by one       Default: ${CYAN}normal${RESET}"
   echo -e "                 Options: ${CYAN}debug${RESET} (each target), ${CYAN}normal${RESET} (all targets at once)"
   echo -e "  ${GREEN}6. GITHUB_TOKEN: ${RESET}→ Supply Github Token       Default: ${CYAN}no Default${RESET}"
-  echo -e "  ${GREEN}7. AWS_ROLE: ${RESET}→ Supply AWS role to assume       Default: ${CYAN}no Default${RESET}"
+  echo -e "  ${GREEN}7. AWS_PROVIDER: ${RESET}→ Supply AWS github provider arn       Default: ${CYAN}no Default${RESET}"
+  echo -e "  ${GREEN}7. AWS_GITHUB_OIDC_ROLE: ${RESET}→ Supply AWS_GITHUB_OIDC_ROLE arn       Default: ${CYAN}no Default${RESET}"
   echo
   echo -e "Example:"
-  echo -e "  ${GREEN}$0 dev plan filter single normal "token" "role_arn"${RESET}"
+  echo -e "  ${GREEN}$0 dev plan filter single normal "token" "provider_arn""github_oidc_role_arn" ${RESET}"
   echo -e "Example 2:"
-  echo -e "  ${GREEN}$0 dev destroy all real debug "token" "role_arn" ${RESET}"
+  echo -e "  ${GREEN}$0 dev destroy all real debug "token" "provider_arn" "github_oidc_role_arn" ${RESET}"
   echo
 }
 
 # Required environment variables
-if [[ -z "$GITHUB_TOKEN" || -z "$AWS_ROLE" ]]; then
+if [[ -z "$GITHUB_TOKEN" || -z "$AWS_PROVIDER" || -z "$AWS_GITHUB_OIDC_ROLE"]]; then
   show_help
-  echo "❌ GITHUB_TOKEN and AWS_ROLE must be set - script moved to using them- similar to the github workflow"
+  echo "❌ GITHUB_TOKEN and AWS_PROVIDER and AWS_GITHUB_OIDC_ROLE must be set - script moved to using them- similar to the github workflow"
   exit 1
 fi
 
@@ -68,7 +71,7 @@ if [[ "$ENV" == "--help" || "$ENV" == "-h" ]]; then
   exit 0
 else
   show_help
-  echo -e "${YELLOW}Running:${RESET} ${GREEN}$0 $ENV $RUN_MODE $SELECTION_METHOD $NAT_MODE $DEBUG $GITHUB_TOKEN $AWS_ROLE${RESET}"
+  echo -e "${YELLOW}Running:${RESET} ${GREEN}$0 $ENV $RUN_MODE $SELECTION_METHOD $NAT_MODE $DEBUG $GITHUB_TOKEN $AWS_PROVIDER${RESET}"
   echo -e "${YELLOW}Press Enter to continue or Ctrl+C to cancel...${RESET}"
   read -r
 fi
@@ -111,14 +114,17 @@ fi
 
 # Validate RUN_MODE
 if [[ "$RUN_MODE" == "plan" ]]; then
-  COMMAND_RUN_MODE=(plan -destroy \
-    -var="github_token=${GITHUB_TOKEN}" \
-    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
-elif [[ "$RUN_MODE" == "destroy"  ]]; then
-  COMMAND_RUN_MODE=(destroy -auto-approve \
-    -var="github_token=${GITHUB_TOKEN}" \
-    -var="aws_iam_openid_connect_provider_github_arn=${AWS_ROLE}")
+  COMMAND_RUN_MODE=(plan -destroy)
+elif [[ "$RUN_MODE" == "destroy" ]]; then
+  COMMAND_RUN_MODE=(destroy -auto-approve)
 fi
+
+# Common vars
+COMMAND_RUN_MODE+=(
+  -var="github_token=${GITHUB_TOKEN}" \
+  -var="aws_iam_openid_connect_provider_github_arn=${AWS_PROVIDER}" \
+  -var="github_oidc_role_arn=${AWS_GITHUB_OIDC_ROLE}"
+)
 
 ################ Script starts here ################
 
