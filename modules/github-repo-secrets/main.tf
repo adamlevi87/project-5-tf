@@ -21,7 +21,7 @@ resource "github_actions_secret" "secrets" {
   plaintext_value = each.value
 
   lifecycle {
-  ignore_changes = [plaintext_value]
+    ignore_changes = [plaintext_value]
   }
 }
 
@@ -32,6 +32,6 @@ resource "github_actions_variable" "variables" {
   value           = each.value
 
   lifecycle {
-  ignore_changes = [value]
+    ignore_changes = [value]
   }
 }
