@@ -1,3 +1,5 @@
+# modules/external-secrets-operator/cluster_secret_store.tf
+
 resource "kubernetes_manifest" "eso_cluster_secret_store" {
   manifest = {
     apiVersion = "external-secrets.io/v1beta1"
