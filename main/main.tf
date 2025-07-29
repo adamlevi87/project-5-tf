@@ -347,7 +347,7 @@ module "external_secrets_operator" {
 }
 
 module "aws_load_balancer_controller" {
-  source        = "../modules/helm/aws_load_balancer_controller"
+  source        = "../modules/helm/aws-load-balancer-controller"
   
   project_tag        = var.project_tag
   environment        = var.environment
