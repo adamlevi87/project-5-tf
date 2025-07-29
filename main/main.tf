@@ -264,8 +264,7 @@ module "github_oidc" {
 
 module "github_repo_secrets" {
   source = "../modules/github-repo-secrets"
-
-  github_org = var.github_org
+  
   repository_name = "${var.github_application_repo}"
   environment = var.environment
 
