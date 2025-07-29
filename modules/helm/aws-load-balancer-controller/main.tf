@@ -1,18 +1,16 @@
 # modules/aws_load_balancer_controller/main.tf
 
-locals {
-  aws_load_balancer_controller = "aws-load-balancer-controller"
-}
-
 # Install AWS Load Balancer Controller via Helm
-resource "helm_release" "aws_load_balancer_controller" {
-  name       = "${local.aws_load_balancer_controller}"
+resource "helm_release" "this" {
+  name       = "${var.release_name}"
+  
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-  create_namespace = false
   version    = "1.13.3"  # Latest stable version
-
+  
+  namespace  = "${var.namespace}"
+  create_namespace = false
+  
   set {
     name  = "clusterName"
     value = var.cluster_name
@@ -25,17 +23,22 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "serviceAccount.name"
-    value = "${local.aws_load_balancer_controller}"
+    value = "${var.service_account_name}"
   }
 
   set {
     name  = "vpcId"
     value = var.vpc_id
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.this,
+    kubernetes_service_account.this
+  ]
 }
 
 # IAM role for AWS Load Balancer Controller
-resource "aws_iam_role" "load_balancer_controller" {
+resource "aws_iam_role" "this" {
   name = "${var.project_tag}-${var.environment}-aws-load-balancer-controller"
 
   assume_role_policy = jsonencode({
@@ -49,7 +52,7 @@ resource "aws_iam_role" "load_balancer_controller" {
         }
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
             "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
@@ -66,7 +69,7 @@ resource "aws_iam_role" "load_balancer_controller" {
 }
 
 # IAM policy for AWS Load Balancer Controller
-resource "aws_iam_policy" "load_balancer_controller" {
+resource "aws_iam_policy" "this" {
   name        = "${var.project_tag}-${var.environment}-aws-load-balancer-controller"
   description = "IAM policy for AWS Load Balancer Controller"
 
@@ -333,18 +336,18 @@ resource "aws_iam_policy" "load_balancer_controller" {
 }
 
 # Attach policy to role
-resource "aws_iam_role_policy_attachment" "load_balancer_controller" {
-  policy_arn = aws_iam_policy.load_balancer_controller.arn
-  role       = aws_iam_role.load_balancer_controller.name
+resource "aws_iam_role_policy_attachment" "this" {
+  policy_arn = aws_iam_policy.this.arn
+  role       = aws_iam_role.this.name
 }
 
 # Kubernetes service account for AWS Load Balancer Controller
-resource "kubernetes_service_account" "aws_load_balancer_controller" {
+resource "kubernetes_service_account" "this" {
   metadata {
-    name      = "${local.aws_load_balancer_controller}"
-    namespace = "kube-system"
+    name      = "${var.service_account_name}"
+    namespace = "${var.namespace}"
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.load_balancer_controller.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
   }
 }

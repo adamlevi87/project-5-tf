@@ -41,3 +41,18 @@ variable "chart_version" {
   type        = string
   default     = "1.13.1"
 }
+
+variable "service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the Helm chart"
+}
+
+variable "release_name" {
+  type        = string
+  description = "The Helm release name"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The Kubernetes namespace to install the Helm release into"
+}

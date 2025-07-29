@@ -1,6 +1,51 @@
 # modules/cluster-autoscaler/main.tf
 
-resource "aws_iam_role" "cluster_autoscaler" {
+resource "helm_release" "this" {
+  name       = "${release_name}"
+  
+  repository = "https://kubernetes.github.io/autoscaler"
+  chart      = "cluster-autoscaler"
+  
+  namespace  = "${var.namespace}"
+  create_namespace = false
+
+  set {
+    name  = "autoDiscovery.clusterName"
+    value = var.cluster_name
+  }
+
+  set {
+    name  = "rbac.serviceAccount.name"
+    value = var.service_account_name
+  }
+
+  set {
+    name  = "rbac.serviceAccount.create"
+    value = "false"
+  }
+
+  set {
+    name  = "extraArgs.balance-similar-node-groups"
+    value = "true"
+  }
+
+  set {
+    name  = "extraArgs.skip-nodes-with-system-pods"
+    value = "false"
+  }
+
+  set {
+    name  = "extraArgs.skip-nodes-with-local-storage"
+    value = "false"
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.this,
+    kubernetes_service_account.this
+  ]
+}
+
+resource "aws_iam_role" "this" {
   name = "${var.project_tag}-${var.environment}-cluster-autoscaler"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -12,7 +57,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
       Action = "sts:AssumeRoleWithWebIdentity",
       Condition = {
         StringEquals = {
-          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:cluster-autoscaler"
+          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
         }
       }
     }]
@@ -25,7 +70,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
   }
 }
 
-resource "aws_iam_policy" "cluster_autoscaler" {
+resource "aws_iam_policy" "this" {
   name = "${var.project_tag}-${var.environment}-cluster-autoscaler-policy"
   policy = jsonencode({
     Version = "2012-10-17",
@@ -53,59 +98,18 @@ resource "aws_iam_policy" "cluster_autoscaler" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
-  role       = aws_iam_role.cluster_autoscaler.name
-  policy_arn = aws_iam_policy.cluster_autoscaler.arn
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.this.arn
 }
 
-resource "kubernetes_service_account" "cluster_autoscaler" {
+resource "kubernetes_service_account" "this" {
   metadata {
-    name      = "cluster-autoscaler"
-    namespace = "kube-system"
+    name      = "${var.service_account_name}"
+    namespace = "${var.namespace}"
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.cluster_autoscaler.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
   }
 }
 
-resource "helm_release" "cluster_autoscaler" {
-  name       = "cluster-autoscaler"
-  repository = "https://kubernetes.github.io/autoscaler"
-  chart      = "cluster-autoscaler"
-  namespace  = "kube-system"
-
-  set {
-    name  = "autoDiscovery.clusterName"
-    value = var.cluster_name
-  }
-
-  set {
-    name  = "rbac.serviceAccount.name"
-    value = kubernetes_service_account.cluster_autoscaler.metadata[0].name
-  }
-
-  set {
-    name  = "rbac.serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "extraArgs.balance-similar-node-groups"
-    value = "true"
-  }
-
-  set {
-    name  = "extraArgs.skip-nodes-with-system-pods"
-    value = "false"
-  }
-
-  set {
-    name  = "extraArgs.skip-nodes-with-local-storage"
-    value = "false"
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.cluster_autoscaler,
-    kubernetes_service_account.cluster_autoscaler
-  ]
-}

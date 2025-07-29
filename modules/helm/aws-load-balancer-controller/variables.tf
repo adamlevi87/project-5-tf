@@ -19,3 +19,18 @@ variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
 }
+
+variable "service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the Helm chart"
+}
+
+variable "release_name" {
+  type        = string
+  description = "The Helm release name"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The Kubernetes namespace to install the Helm release into"
+}

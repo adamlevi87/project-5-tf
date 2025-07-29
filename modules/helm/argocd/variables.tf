@@ -1,17 +1,5 @@
 # modules/argocd/variables.tf
 
-variable "helm_release_name" {
-  type        = string
-  description = "Name of the Helm release for ArgoCD"
-  default     = "argocd"
-}
-
-variable "namespace" {
-  type        = string
-  default     = "argocd"
-  description = "Namespace to install ArgoCD"
-}
-
 variable "chart_version" {
   type        = string
   default     = "8.2.3" # Latest stable as of July 2025
@@ -42,5 +30,20 @@ variable "ingress_controller_class" {
 variable "node_group_name" {
   type        = string
   description = "Node Group Name"
+}
+
+variable "service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the Helm chart"
+}
+
+variable "release_name" {
+  type        = string
+  description = "The Helm release name"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The Kubernetes namespace to install the Helm release into"
 }
 

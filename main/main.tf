@@ -216,6 +216,9 @@ module "external_dns" {
   project_tag        = var.project_tag
   environment        = var.environment
 
+  service_account_name = "external-dns-service-account"
+  release_name         = "external-dns"
+  namespace            = "kube-system"
   domain_filter      = var.domain_name
   txt_owner_id       = module.route53.zone_id
   oidc_provider_arn  = module.eks.oidc_provider_arn
@@ -228,6 +231,9 @@ module "cluster_autoscaler" {
   project_tag        = var.project_tag
   environment        = var.environment
 
+  service_account_name = "cluster-autoscaler-service-account"
+  release_name         = "cluster-autoscaler"
+  namespace            = "kube-system"
   cluster_name       = module.eks.cluster_name
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
@@ -236,12 +242,12 @@ module "cluster_autoscaler" {
 module "backend_irsa" {
   source       = "../modules/backend_irsa"
 
-  cluster_name = module.eks.cluster_name
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  namespace    = var.backend_service_namespace
-  service_account_name = var.backend_service_account_name
-  s3_bucket_arn = module.s3_app_data.bucket_arn
-  sqs_queue_arn = module.sqs.queue_arn
+  cluster_name              = module.eks.cluster_name
+  oidc_provider_arn         = module.eks.oidc_provider_arn
+  namespace                 = var.backend_service_namespace
+  service_account_name      = var.backend_service_account_name
+  s3_bucket_arn             = module.s3_app_data.bucket_arn
+  sqs_queue_arn             = module.sqs.queue_arn
 }
 
 module "github_oidc" {
@@ -334,6 +340,12 @@ module "external_secrets_operator" {
   namespace     = "external-secrets"
   chart_version = "0.9.17"
 
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+
+  project_tag        = var.project_tag
+  environment        = var.environment
+
   set_values = [
     {
       name  = "webhook.port"
@@ -352,6 +364,9 @@ module "aws_load_balancer_controller" {
   project_tag        = var.project_tag
   environment        = var.environment
 
+  service_account_name = "aws-load-balancer-controller-service-account"
+  release_name         = "aws-load-balancer-controller"
+  namespace            = "kube-system"
   cluster_name       = module.eks.cluster_name
   vpc_id             = module.vpc_network.vpc_id
 

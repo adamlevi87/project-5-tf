@@ -1,54 +1,15 @@
 # modules/external-dns/main.tf
 
-resource "aws_iam_role" "external_dns" {
-  name = "${var.project_tag}-${var.environment}-external-dns"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Federated = var.oidc_provider_arn
-      },
-      Action = "sts:AssumeRoleWithWebIdentity",
-      Condition = {
-        StringEquals = {
-          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:kube-system:external-dns",
-          "${replace(var.oidc_provider_url, "https://", "")}:aud" = "sts.amazonaws.com"
-        }
-      }
-    }]
-  })
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-external-dns"
-    Project     = var.project_tag
-    Environment = var.environment
-    Purpose     = "external-dns"
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "external_dns" {
-  role       = aws_iam_role.external_dns.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
-}
-
-resource "kubernetes_service_account" "external_dns" {
-  metadata {
-    name      = "external-dns"
-    namespace = "kube-system"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.external_dns.arn
-    }
-  }
-}
-
-resource "helm_release" "external_dns" {
-  name       = "external-dns"
+resource "helm_release" "this" {
+  name       = "${release_name}"
+  
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  namespace  = "kube-system"
   version    = var.chart_version
+  
+  namespace  = "${var.namespace}"
+  create_namespace = false
+  
 
   set {
     name  = "provider"
@@ -82,8 +43,55 @@ resource "helm_release" "external_dns" {
 
   set {
     name  = "serviceAccount.name"
-    value = "external-dns"
+    value = "${service_account_name}"
   }
 
-  depends_on = [kubernetes_service_account.external_dns]
+  depends_on = [
+    aws_iam_role_policy_attachment.this,
+    kubernetes_service_account.this
+  ]
 }
+
+resource "aws_iam_role" "this" {
+  name = "${var.project_tag}-${var.environment}-external-dns"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Federated = var.oidc_provider_arn
+      },
+      Action = "sts:AssumeRoleWithWebIdentity",
+      Condition = {
+        StringEquals = {
+          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}",
+          "${replace(var.oidc_provider_url, "https://", "")}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-external-dns"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "external-dns"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
+}
+
+resource "kubernetes_service_account" "this" {
+  metadata {
+    name      = "${service_account_name}"
+    namespace = "${var.namespace}"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
+    }
+  }
+}
+
