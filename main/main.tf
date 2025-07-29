@@ -317,7 +317,7 @@ module "aws_auth_config" {
 
   eks_user_access_map = local.map_users
 
-
+  depends_on = [module.eks]
   eks_dependency = module.eks
 }
 
