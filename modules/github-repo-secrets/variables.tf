@@ -18,3 +18,8 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "github_org" {
+  description = "GitHub organization"
+  type        = string
+}

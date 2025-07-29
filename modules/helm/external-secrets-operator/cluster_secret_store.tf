@@ -1,5 +1,11 @@
 # modules/external-secrets-operator/cluster_secret_store.tf
 
+data "kubernetes_namespace" "kube_system" {
+  metadata {
+    name = "kube-system"
+  }
+}
+
 resource "kubernetes_manifest" "eso_cluster_secret_store" {
   manifest = {
     apiVersion = "external-secrets.io/v1beta1"
@@ -27,6 +33,7 @@ resource "kubernetes_manifest" "eso_cluster_secret_store" {
   }
 
   depends_on = [
-    helm_release.this
+    helm_release.this,
+    data.kubernetes_namespace.kube_system  # This ensures K8s connectivity
   ]
 }
