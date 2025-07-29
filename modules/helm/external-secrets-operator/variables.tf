@@ -54,8 +54,3 @@ variable "namespace" {
   type        = string
   description = "The Kubernetes namespace to install the Helm release into"
 }
-
-variable "eks_dependency" {
-  description = "Dependency to ensure EKS cluster is created first"
-  type        = any
-}

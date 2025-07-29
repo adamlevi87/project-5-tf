@@ -16,6 +16,11 @@ resource "helm_release" "this" {
   namespace  = "${var.namespace}"
   create_namespace = false
 
+  # Wait for all resources to be ready
+  wait                = true
+  wait_for_jobs      = true
+  timeout            = 300  # 5 minutes
+
   set {
     name  = "installCRDs"
     value = "true"
