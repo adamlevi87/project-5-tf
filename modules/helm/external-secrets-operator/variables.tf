@@ -1,10 +1,5 @@
 # modules/external-secrets-operator/variables.tf
 
-variable "aws_region" {
-  description = "AWS region to deploy resources"
-  type        = string
-}
-
 variable "project_tag" {
   description = "Project tag used for naming"
   type        = string
