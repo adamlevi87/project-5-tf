@@ -347,7 +347,6 @@ module "argocd" {
 module "external_secrets_operator" {
   source        = "../modules/helm/external-secrets-operator"
   
-  aws_region = var.aws_region
   chart_version = "0.9.17"
 
   oidc_provider_arn = module.eks.oidc_provider_arn
