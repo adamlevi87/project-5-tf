@@ -372,7 +372,7 @@ module "external_secrets_operator" {
   ]
   
   eks_dependency = module.eks
-  depends_on = [module.eks]
+  depends_on = [module.eks,module.aws_auth_config]
 }
 
 module "aws_load_balancer_controller" {
