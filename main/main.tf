@@ -344,35 +344,35 @@ module "argocd" {
   depends_on = [module.eks]
 }
 
-# module "external_secrets_operator" {
-#   source        = "../modules/helm/external-secrets-operator"
+module "external_secrets_operator" {
+  source        = "../modules/helm/external-secrets-operator"
   
-#   aws_region = var.aws_region
-#   chart_version = "0.9.17"
+  aws_region = var.aws_region
+  chart_version = "0.9.17"
 
-#   oidc_provider_arn = module.eks.oidc_provider_arn
-#   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.cluster_oidc_issuer_url
 
-#   service_account_name = "eso-${var.environment}-service-account"
-#   release_name = "external-secrets-${var.environment}"
-#   namespace = "external-secrets"
+  service_account_name = "eso-${var.environment}-service-account"
+  release_name = "external-secrets-${var.environment}"
+  namespace = "external-secrets"
 
-#   project_tag        = var.project_tag
-#   environment        = var.environment
+  project_tag        = var.project_tag
+  environment        = var.environment
 
-#   set_values = [
-#     {
-#       name  = "webhook.port"
-#       value = "10250"
-#     },
-#     {
-#       name  = "serviceAccount.create"
-#       value = "true"
-#     }
-#   ]
+  set_values = [
+    {
+      name  = "webhook.port"
+      value = "10250"
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "true"
+    }
+  ]
   
-#   depends_on = [module.eks,module.aws_auth_config]
-# }
+  depends_on = [module.eks,module.aws_auth_config]
+}
 
 module "aws_load_balancer_controller" {
   source        = "../modules/helm/aws-load-balancer-controller"
