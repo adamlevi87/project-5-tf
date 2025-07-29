@@ -43,7 +43,7 @@ resource "helm_release" "this" {
 
   set {
     name  = "serviceAccount.name"
-    value = "${service_account_name}"
+    value = "${var.service_account_name}"
   }
 
   depends_on = [
@@ -87,7 +87,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 
 resource "kubernetes_service_account" "this" {
   metadata {
-    name      = "${service_account_name}"
+    name      = "${var.service_account_name}"
     namespace = "${var.namespace}"
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
