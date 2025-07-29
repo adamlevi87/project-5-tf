@@ -262,39 +262,39 @@ module "github_oidc" {
   aws_iam_openid_connect_provider_github_arn = var.aws_iam_openid_connect_provider_github_arn
 }
 
-module "github_repo_secrets" {
-  source = "../modules/github-repo-secrets"
+# module "github_repo_secrets" {
+#   source = "../modules/github-repo-secrets"
   
-  repository_name = "${var.github_application_repo}"
-  environment = var.environment
+#   repository_name = "${var.github_application_repo}"
+#   environment = var.environment
 
-  github_variables = {
-    AWS_REGION = "${var.aws_region}"
-  }
+#   github_variables = {
+#     AWS_REGION = "${var.aws_region}"
+#   }
 
-  github_secrets = {
-    AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
+#   github_secrets = {
+#     AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
 
-    # ECR
-    ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]]}"
-    ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
+#     # ECR
+#     ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]]}"
+#     ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
     
-    # Inject backend-specific values
-    # SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
+#     # Inject backend-specific values
+#     # SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
 
-    # Inject frontend-specific values
-    #ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_urls["frontend"]}"
-    #SERVICE_NAME_FRONTEND   = module.frontend.service_name
+#     # Inject frontend-specific values
+#     #ECR_REPOSITORY_FRONTEND = "${module.ecr.repository_urls["frontend"]}"
+#     #SERVICE_NAME_FRONTEND   = module.frontend.service_name
 
-    # Shared values (if needed in CI workflows)
-    # CLUSTER_NAME    = "${module.eks.cluster_name}"
-    # DB_HOST         = "${module.rds.db_instance_address}"
-    # DB_NAME         = "${var.rds_database_name}"
-    # DB_USER         = "${var.rds_database_username}"
-    # DB_PORT         = "${var.rds_database_port}"
-    # SQS_QUEUE_URL   = "${module.sqs.queue_url}"
-  }
-}
+#     # Shared values (if needed in CI workflows)
+#     # CLUSTER_NAME    = "${module.eks.cluster_name}"
+#     # DB_HOST         = "${module.rds.db_instance_address}"
+#     # DB_NAME         = "${var.rds_database_name}"
+#     # DB_USER         = "${var.rds_database_username}"
+#     # DB_PORT         = "${var.rds_database_port}"
+#     # SQS_QUEUE_URL   = "${module.sqs.queue_url}"
+#   }
+# }
 
 module "aws_auth_config" {
   source = "../modules/aws_auth_config"
