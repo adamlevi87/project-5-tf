@@ -99,6 +99,12 @@ eks_user_access_map = {
 #   }
 }
 
+# ArgoCD
+argocd_namespace         = "argocd"
+argocd_helm_release_base_name = "argocd"
+argocd_chart_version     = "8.2.3"
+argocd_base_domain_name = "argocd"
+
 
 
 

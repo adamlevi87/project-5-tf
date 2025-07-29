@@ -278,6 +278,29 @@ variable "eks_user_access_map" {
   default = {}
 }
 
+variable "argocd_namespace" {
+  type        = string
+  description = "Kubernetes namespace for ArgoCD"
+  default     = "argocd"
+}
+
+variable "argocd_helm_release_base_name" {
+  type        = string
+  description = "Helm release base name for ArgoCD"
+  default     = "argocd"
+}
+
+variable "argocd_chart_version" {
+  type        = string
+  description = "ArgoCD Helm chart version"
+  default     = "8.2.3"
+}
+
+variable "argocd_base_domain_name" {
+  type        = string
+  description = "Base domain name for ArgoCD"
+  default     = "argocd"
+}
 
 
 

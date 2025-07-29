@@ -170,6 +170,9 @@ module "route53" {
   
   domain_name    = var.domain_name
   subdomain_name = var.subdomain_name
+
+  # alb_dns_name = 1
+  # alb_zone_id = 1
 }
 
 module "acm" {
@@ -310,4 +313,19 @@ module "aws_auth_config" {
 
 
   eks_dependency = module.eks
+}
+
+module "argocd" {
+  source         = "../modules/argocd"
+
+  environment = var.environment
+
+  namespace            = var.argocd_namespace
+  helm_release_name    = "${var.argocd_helm_release_base_name}-${var.environment}"
+  chart_version        = var.argocd_chart_version
+
+  ingress_controller_class = "alb"
+  node_group_name = module.eks.node_group_name
+  eks_allowed_cidr_blocks = var.eks_allowed_cidr_blocks
+  domain_name = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
 }
