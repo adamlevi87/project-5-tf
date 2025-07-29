@@ -330,16 +330,16 @@ module "argocd" {
 
   environment = var.environment
 
-  release_name = "argocd-${var.environment}"
-  service_account_name = "argocd-${var.environment}-service-account"
-  namespace            = var.argocd_namespace
+  release_name          = "argocd-${var.environment}"
+  service_account_name  = "argocd-${var.environment}-service-account"
+  namespace             = var.argocd_namespace
   
-  chart_version        = var.argocd_chart_version
+  chart_version         = var.argocd_chart_version
 
-  ingress_controller_class = "alb"
-  node_group_name = module.eks.node_group_name
-  eks_allowed_cidr_blocks = var.eks_allowed_cidr_blocks
-  domain_name = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
+  ingress_controller_class  = "alb"
+  node_group_name           = module.eks.node_group_name
+  eks_allowed_cidr_blocks   = var.eks_allowed_cidr_blocks
+  domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
 
   depends_on = [module.eks]
 }
