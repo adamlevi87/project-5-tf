@@ -45,15 +45,15 @@ resource "aws_iam_role" "this" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Effect = "Allow"
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Effect = "Allow",
         Principal = {
-          Federated = aws_iam_openid_connect_provider.cluster.arn
-        }
+          Federated = var.oidc_provider_arn
+        },
         Condition = {
           StringEquals = {
-            "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
-            "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:aud" = "sts.amazonaws.com"
+            "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
+            "${replace(var.oidc_provider_url, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
       }

@@ -244,6 +244,7 @@ module "backend_irsa" {
 
   cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
+  oidc_provider_url         = module.eks.cluster_oidc_issuer_url
   namespace                 = var.backend_service_namespace
   service_account_name      = var.backend_service_account_name
   s3_bucket_arn             = module.s3_app_data.bucket_arn
@@ -376,6 +377,9 @@ module "aws_load_balancer_controller" {
   namespace            = "kube-system"
   cluster_name       = module.eks.cluster_name
   vpc_id             = module.vpc_network.vpc_id
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.cluster_oidc_issuer_url
+
 
   depends_on = [module.eks]
 }

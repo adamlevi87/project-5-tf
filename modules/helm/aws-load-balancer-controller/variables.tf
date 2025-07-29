@@ -10,6 +10,16 @@ variable "environment" {
   type        = string
 }
 
+variable "oidc_provider_arn" {
+  description = "OIDC provider ARN from the EKS module"
+  type        = string
+}
+
+variable "oidc_provider_url" {
+  type        = string
+  description = "OIDC provider URL (e.g. https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLEDOCID)"
+}
+
 variable "vpc_id" {
   description = "VPC ID where EKS cluster will be deployed"
   type        = string

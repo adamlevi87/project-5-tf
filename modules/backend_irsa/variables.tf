@@ -10,6 +10,11 @@ variable "oidc_provider_arn" {
   type        = string
 }
 
+variable "oidc_provider_url" {
+  type        = string
+  description = "OIDC provider URL (e.g. https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLEDOCID)"
+}
+
 variable "namespace" {
   description = "namespace used"
   type        = string
