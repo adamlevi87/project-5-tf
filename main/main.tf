@@ -197,7 +197,6 @@ module "eks" {
   kubernetes_version  = var.eks_kubernetes_version
   
   # Networking (from VPC module)
-  vpc_id               = module.vpc_network.vpc_id
   private_subnet_ids   = module.vpc_network.private_subnet_ids
   eks_allowed_cidr_blocks  = var.eks_allowed_cidr_blocks
   
@@ -212,7 +211,7 @@ module "eks" {
 }
 
 module "external_dns" {
-  source = "../modules/external-dns"
+  source = "../modules/helm/external-dns"
 
   project_tag        = var.project_tag
   environment        = var.environment
@@ -224,7 +223,7 @@ module "external_dns" {
 }
 
 module "cluster_autoscaler" {
-  source = "../modules/cluster-autoscaler"
+  source = "../modules/helm/cluster-autoscaler"
 
   project_tag        = var.project_tag
   environment        = var.environment
@@ -316,7 +315,7 @@ module "aws_auth_config" {
 }
 
 module "argocd" {
-  source         = "../modules/argocd"
+  source         = "../modules/helm/argocd"
 
   environment = var.environment
 
@@ -328,4 +327,33 @@ module "argocd" {
   node_group_name = module.eks.node_group_name
   eks_allowed_cidr_blocks = var.eks_allowed_cidr_blocks
   domain_name = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
+}
+
+module "external_secrets_operator" {
+  source        = "../modules/helm/external-secrets-operator"
+  namespace     = "external-secrets"
+  chart_version = "0.9.17"
+
+  set_values = [
+    {
+      name  = "webhook.port"
+      value = "10250"
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "true"
+    }
+  ]
+}
+
+module "aws_load_balancer_controller" {
+  source        = "../modules/helm/aws_load_balancer_controller"
+  
+  project_tag        = var.project_tag
+  environment        = var.environment
+
+  cluster_name       = module.eks.cluster_name
+  vpc_id             = module.vpc_network.vpc_id
+
+  depends_on = [module.eks]
 }

@@ -21,12 +21,6 @@ variable "kubernetes_version" {
   default     = "1.28"
 }
 
-# Networking
-variable "vpc_id" {
-  description = "VPC ID where EKS cluster will be deployed"
-  type        = string
-}
-
 variable "private_subnet_ids" {
   description = "List of private subnet IDs for EKS cluster"
   type        = list(string)

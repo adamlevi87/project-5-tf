@@ -1,3 +1,5 @@
+# modules/external-dns/main.tf
+
 resource "aws_iam_role" "external_dns" {
   name = "${var.project_tag}-${var.environment}-external-dns"
 

@@ -1,3 +1,5 @@
+# modules/external-dns/variables.tf
+
 variable "project_tag" {
   description = "Project tag used for naming"
   type        = string
