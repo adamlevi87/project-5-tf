@@ -110,6 +110,11 @@ resource "kubernetes_service_account" "this" {
     namespace = var.namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
+      "meta.helm.sh/release-name"  = var.release_name                # e.g. "external-secrets-dev"
+      "meta.helm.sh/release-namespace" = var.namespace
+    }
+    labels = {
+      "app.kubernetes.io/managed-by" = "Helm"
     }
   }
 }
