@@ -1,0 +1,48 @@
+name: Trigger App Repo Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Environment"
+        required: true
+        default: DEV
+        type: choice
+        options:
+          - DEV
+          - STAGING
+          - PROD
+
+      app_repo:
+        description: "Target application repository"
+        required: true
+        type: choice
+        options:
+          - project-5-app
+
+      workflow_file:
+        description: "Workflow to trigger"
+        required: true
+        type: choice
+        options:
+          - backend-deploy.yml
+          - frontend-deploy.yml
+
+jobs:
+  trigger:
+    name: Trigger ${{ github.event.inputs.workflow_file }} in ${{ github.event.inputs.app_repo }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Workflow Dispatch
+        env:
+          GH_TOKEN: ${{ secrets.APP_REPO_TRIGGER_TOKEN }}
+          OWNER: ${{ github.actor }}
+          REPO: ${{ github.event.inputs.app_repo }}
+          WORKFLOW: ${{ github.event.inputs.workflow_file }}
+          ENV: ${{ github.event.inputs.env }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches \
+            -d "{\"ref\": \"main\", \"inputs\": {\"env\": \"${ENV}\"}}"
