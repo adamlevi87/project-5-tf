@@ -1,7 +1,7 @@
 # modules/cluster-autoscaler/main.tf
 
 resource "helm_release" "this" {
-  name       = "${release_name}"
+  name       = "${var.release_name}"
   
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"

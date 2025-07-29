@@ -1,7 +1,7 @@
 # modules/external-dns/main.tf
 
 resource "helm_release" "this" {
-  name       = "${release_name}"
+  name       = "${var.release_name}"
   
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"

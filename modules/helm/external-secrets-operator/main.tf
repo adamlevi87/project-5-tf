@@ -7,7 +7,7 @@ resource "kubernetes_namespace" "this" {
 }
 
 resource "helm_release" "this" {
-  name       = "${release_name}"
+  name       = "${var.release_name}"
   
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
