@@ -25,4 +25,9 @@ resource "kubernetes_manifest" "eso_cluster_secret_store" {
       }
     }
   }
+
+  depends_on = [
+    helm_release.this, # ← wait until ESO is deployed
+    var.eks_dependency             # ← wire this from root
+  ]
 }

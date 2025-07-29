@@ -370,7 +370,8 @@ module "external_secrets_operator" {
       value = "true"
     }
   ]
-
+  
+  eks_dependency = module.eks
   depends_on = [module.eks]
 }
 
