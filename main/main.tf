@@ -216,8 +216,8 @@ module "external_dns" {
   project_tag        = var.project_tag
   environment        = var.environment
 
-  service_account_name = "external-dns-service-account"
-  release_name         = "external-dns"
+  service_account_name = "external-dns-${var.environment}-service-account"
+  release_name         = "external-dns-${var.environment}"
   namespace            = "kube-system"
   domain_filter      = var.domain_name
   txt_owner_id       = module.route53.zone_id
@@ -231,7 +231,7 @@ module "cluster_autoscaler" {
   project_tag        = var.project_tag
   environment        = var.environment
 
-  service_account_name = "cluster-autoscaler-service-account"
+  service_account_name = "cluster-autoscaler-${var.environment}-service-account"
   release_name         = "cluster-autoscaler"
   namespace            = "kube-system"
   cluster_name       = module.eks.cluster_name
@@ -325,8 +325,10 @@ module "argocd" {
 
   environment = var.environment
 
+  release_name = "argocd-${var.environment}"
+  service_account_name = "argocd-${var.environment}-service-account"
   namespace            = var.argocd_namespace
-  helm_release_name    = "${var.argocd_helm_release_base_name}-${var.environment}"
+  
   chart_version        = var.argocd_chart_version
 
   ingress_controller_class = "alb"
@@ -337,11 +339,16 @@ module "argocd" {
 
 module "external_secrets_operator" {
   source        = "../modules/helm/external-secrets-operator"
-  namespace     = "external-secrets"
+  
+  aws_region = var.aws_region
   chart_version = "0.9.17"
 
   oidc_provider_arn = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+
+  service_account_name = "eso-${var.environment}-service-account"
+  release_name = "external-secrets-${var.environment}"
+  namespace = "external-secrets"
 
   project_tag        = var.project_tag
   environment        = var.environment
@@ -364,8 +371,8 @@ module "aws_load_balancer_controller" {
   project_tag        = var.project_tag
   environment        = var.environment
 
-  service_account_name = "aws-load-balancer-controller-service-account"
-  release_name         = "aws-load-balancer-controller"
+  service_account_name = "aws-load-balancer-controller-${var.environment}-service-account"
+  release_name         = "aws-load-balancer-controller-${var.environment}"
   namespace            = "kube-system"
   cluster_name       = module.eks.cluster_name
   vpc_id             = module.vpc_network.vpc_id

@@ -1,14 +1,8 @@
 # modules/external-secrets-operator/main.tf
 
-locals {
-  service_account_name = "eso-service-account"
-  release_name = "external-secrets"
-  namespace = var.namespace
-}
-
 resource "kubernetes_namespace" "this" {
   metadata {
-    name = local.namespace
+    name = var.namespace
   }
 }
 
@@ -19,7 +13,7 @@ resource "helm_release" "this" {
   chart      = "external-secrets"
   version    = var.chart_version
 
-  namespace  = "${local.namespace}"
+  namespace  = "${var.namespace}"
   create_namespace = false
 
   set {
@@ -34,7 +28,7 @@ resource "helm_release" "this" {
 
   set {
     name  = "serviceAccount.name"
-    value = local.service_account_name
+    value = var.service_account_name
   }
 
   dynamic "set" {
@@ -65,7 +59,7 @@ resource "aws_iam_role" "this" {
       }
       Condition = {
         StringEquals = {
-          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${local.namespace}:${local.service_account_name}"
+          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
           "${replace(var.oidc_provider_url, "https://", "")}:aud" = "sts.amazonaws.com"
         }
       }
@@ -107,7 +101,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 
 resource "kubernetes_service_account" "this" {
   metadata {
-    name      = local.service_account_name
+    name      = var.service_account_name
     namespace = var.namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn

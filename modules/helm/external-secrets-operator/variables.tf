@@ -1,5 +1,10 @@
 # modules/external-secrets-operator/variables.tf
 
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+}
+
 variable "project_tag" {
   description = "Project tag used for naming"
   type        = string
@@ -8,12 +13,6 @@ variable "project_tag" {
 variable "environment" {
   description = "Environment name (dev/stage/prod)"
   type        = string
-}
-
-variable "namespace" {
-  type        = string
-  default     = "external-secrets"
-  description = "Namespace to install ESO into"
 }
 
 variable "chart_version" {
@@ -39,4 +38,19 @@ variable "oidc_provider_arn" {
 variable "oidc_provider_url" {
   type        = string
   description = "OIDC provider URL (e.g. https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLEDOCID)"
+}
+
+variable "service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the Helm chart"
+}
+
+variable "release_name" {
+  type        = string
+  description = "The Helm release name"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The Kubernetes namespace to install the Helm release into"
 }
