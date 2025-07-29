@@ -223,6 +223,8 @@ module "external_dns" {
   txt_owner_id       = module.route53.zone_id
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+
+  depends_on = [module.eks]
 }
 
 module "cluster_autoscaler" {
@@ -237,6 +239,8 @@ module "cluster_autoscaler" {
   cluster_name       = module.eks.cluster_name
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+
+  depends_on = [module.eks]
 }
 
 module "backend_irsa" {
@@ -336,6 +340,8 @@ module "argocd" {
   node_group_name = module.eks.node_group_name
   eks_allowed_cidr_blocks = var.eks_allowed_cidr_blocks
   domain_name = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
+
+  depends_on = [module.eks]
 }
 
 module "external_secrets_operator" {
@@ -364,6 +370,8 @@ module "external_secrets_operator" {
       value = "true"
     }
   ]
+
+  depends_on = [module.eks]
 }
 
 module "aws_load_balancer_controller" {
@@ -379,7 +387,6 @@ module "aws_load_balancer_controller" {
   vpc_id             = module.vpc_network.vpc_id
   oidc_provider_arn = module.eks.oidc_provider_arn
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
-
 
   depends_on = [module.eks]
 }
