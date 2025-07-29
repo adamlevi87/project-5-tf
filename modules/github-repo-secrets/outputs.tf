@@ -1,3 +1,5 @@
+# modules/github-repo-secrets/outputs.tf
+
 output "set_secrets" {
   value = keys(github_actions_secret.secrets)
 }

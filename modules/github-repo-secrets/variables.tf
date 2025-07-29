@@ -1,3 +1,5 @@
+# modules/github-repo-secrets/variables.tf
+
 variable "repository_name" {
   description = "Name of the target GitHub repository"
   type        = string

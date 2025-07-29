@@ -1,4 +1,4 @@
-# modules/iam-github-oidc/main.tf
+# modules/github-repo-secrets/main.tf
 
 terraform {
   required_providers {
