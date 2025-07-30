@@ -275,6 +275,8 @@ module "github_repo_secrets" {
 
   github_variables = {
     AWS_REGION = "${var.aws_region}"
+    #temporary var
+    ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
   }
 
   github_secrets = {
