@@ -220,9 +220,10 @@ module "external_dns" {
   release_name         = "external-dns-${var.environment}"
   namespace            = "kube-system"
   domain_filter      = var.domain_name
-  txt_owner_id       = module.route53.zone_id
+  txt_owner_id       = "externaldns-${project_tag}-${environment}"
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
+  zone_type = "public"
 
   depends_on = [module.eks]
 }

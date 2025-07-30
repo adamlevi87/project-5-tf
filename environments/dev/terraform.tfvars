@@ -92,11 +92,10 @@ eks_user_access_map = {
     username = "adam.local"
     groups   = ["system:masters"]
   }
-#   qa_user = {
-#     userarn  = "arn:aws:iam::593793036161:user/qa.user"
-#     username = "qa.user"
-#     groups   = ["system:masters"]
-#   }
+  adam_login = {
+    username = "adam-login"
+    groups   = ["system:masters"]
+  }
 }
 
 # ArgoCD
