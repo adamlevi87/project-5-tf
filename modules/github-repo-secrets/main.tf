@@ -1,14 +1,13 @@
 # modules/github-repo-secrets/main.tf
 
-# terraform {
-#   required_providers {
-#     github = {
-#       source  = "integrations/github"
-#       version = "~> 6.6.0"
-#     }
-#   }
-# }
-
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.6.0"
+    }
+  }
+}
 
 locals {
   env_suffix = upper(var.environment)
