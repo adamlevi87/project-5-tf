@@ -282,8 +282,8 @@ module "github_repo_secrets" {
 
   # every value which comes from an output requires SHA generation
   github_secrets = {
-    AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}--SPLIT--${sha1(module.github_oidc.github_actions_role_arn)}"
-
+    #AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}--SPLIT--${sha1(module.github_oidc.github_actions_role_arn)}"
+    AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
     # ECR
     ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]]}--SPLIT--${sha1(module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]])}"
     ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}--SPLIT--${sha1(module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]])}"
