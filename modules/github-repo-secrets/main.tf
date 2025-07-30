@@ -12,13 +12,24 @@ terraform {
 locals {
   env_suffix = upper(var.environment)
 
-  secrets_with_env_suffix = {
+  # Remove the SHA suffix from secret values
+  cleaned_github_secrets = {
     for k, v in var.github_secrets :
+    k => split("--SPLIT--", v)[0]
+  }
+
+  cleaned_github_variables = {
+    for k, v in var.github_variables :
+    k => split("--SPLIT--", v)[0]
+  }
+
+  secrets_with_env_suffix = {
+    for k, v in local.cleaned_github_secrets :
     "${k}_TF_${local.env_suffix}" => v
   }
 
   variables_with_env_suffix = {
-    for k, v in var.github_variables :
+    for k, v in local.cleaned_github_variables :
     "${k}_TF_${local.env_suffix}" => v
   }
 }
