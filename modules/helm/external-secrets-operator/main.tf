@@ -20,29 +20,28 @@ resource "helm_release" "this" {
   wait                = true
   wait_for_jobs      = true
   timeout            = 300  # 5 minutes
-
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = var.service_account_name
-  }
-
-  dynamic "set" {
-    for_each = var.set_values
-    content {
-      name  = set.value.name
-      value = set.value.value
+  set = concat([
+    {
+      name  = "installCRDs"
+      value = "true"
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "false"
+    },
+    {
+      name  = "serviceAccount.name"
+      value = var.service_account_name
     }
-  }
+  ], var.set_values)
+
+  # dynamic "set" {
+  #   for_each = var.set_values
+  #   content {
+  #     name  = set.value.name
+  #     value = set.value.value
+  #   }
+  # }
 
   depends_on = [
     aws_iam_role_policy_attachment.this,

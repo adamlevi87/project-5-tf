@@ -10,41 +10,36 @@ resource "helm_release" "this" {
   namespace  = "${var.namespace}"
   create_namespace = false
   
-
-  set {
-    name  = "provider"
-    value = "aws"
-  }
-
-  set {
-    name  = "policy"
-    value = "upsert-only"
-  }
-
-  set {
-    name  = "txtOwnerId"
-    value = var.txt_owner_id
-  }
-
-  set {
-    name  = "domainFilters[0]"
-    value = var.domain_filter
-  }
-
-  set {
-    name  = "aws.zoneType"
-    value = var.zone_type
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "${var.service_account_name}"
-  }
+  set = [
+    {
+      name  = "provider"
+      value = "aws"
+    },
+    {
+      name  = "policy"
+      value = "upsert-only"
+    },
+    {
+      name  = "txtOwnerId"
+      value = var.txt_owner_id
+    },
+    {
+      name  = "domainFilters[0]"
+      value = var.domain_filter
+    },
+    {
+      name  = "aws.zoneType"
+      value = var.zone_type
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "false"
+    },
+    {
+      name  = "serviceAccount.name"
+      value = "${var.service_account_name}"
+    }
+  ]
 
   depends_on = [
     aws_iam_role_policy_attachment.this,

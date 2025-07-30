@@ -9,35 +9,32 @@ resource "helm_release" "this" {
   namespace  = "${var.namespace}"
   create_namespace = false
 
-  set {
-    name  = "autoDiscovery.clusterName"
-    value = var.cluster_name
-  }
-
-  set {
-    name  = "rbac.serviceAccount.name"
-    value = var.service_account_name
-  }
-
-  set {
-    name  = "rbac.serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "extraArgs.balance-similar-node-groups"
-    value = "true"
-  }
-
-  set {
-    name  = "extraArgs.skip-nodes-with-system-pods"
-    value = "false"
-  }
-
-  set {
-    name  = "extraArgs.skip-nodes-with-local-storage"
-    value = "false"
-  }
+  set = [
+    {
+      name  = "autoDiscovery.clusterName"
+      value = var.cluster_name
+    },
+    {
+      name  = "rbac.serviceAccount.name"
+      value = var.service_account_name
+    },
+    {
+      name  = "rbac.serviceAccount.create"
+      value = "false"
+    },
+    {
+      name  = "extraArgs.balance-similar-node-groups"
+      value = "true"
+    },
+    {
+      name  = "extraArgs.skip-nodes-with-system-pods"
+      value = "false"
+    },
+    {
+      name  = "extraArgs.skip-nodes-with-local-storage"
+      value = "false"
+    }
+  ]
 
   depends_on = [
     aws_iam_role_policy_attachment.this,

@@ -16,15 +16,16 @@ resource "helm_release" "this" {
     namespace  = var.namespace
     create_namespace = false
 
-    set {
+    set = [
+      {
         name  = "serviceAccount.create"
         value = "false"  # We create it manually above
-    }
-
-    set {
+      },
+      {
         name  = "serviceAccount.name"
         value = "${var.service_account_name}"
-    }
+      }
+    ]
 
     values = [
         templatefile("${path.module}/values.yaml.tpl", {

@@ -11,25 +11,24 @@ resource "helm_release" "this" {
   namespace  = "${var.namespace}"
   create_namespace = false
   
-  set {
-    name  = "clusterName"
-    value = var.cluster_name
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"  # We create it manually above
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "${var.service_account_name}"
-  }
-
-  set {
-    name  = "vpcId"
-    value = var.vpc_id
-  }
+  set = [
+    {
+        name  = "clusterName"
+        value = var.cluster_name
+    },
+    {
+        name  = "serviceAccount.create"
+        value = "false"  # We create it manually above
+    },
+    {
+        name  = "serviceAccount.name"
+        value = "${var.service_account_name}"
+    },
+    {
+        name  = "vpcId"
+        value = var.vpc_id
+    }
+  ]
 
   depends_on = [
     aws_iam_role_policy_attachment.this,
