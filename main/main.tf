@@ -305,7 +305,7 @@ module "github_repo_secrets" {
 
   depends_on = [
     module.github_oidc,
-    module.module.ecr
+    module.ecr
   ]
 }
 
