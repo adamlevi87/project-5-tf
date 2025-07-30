@@ -1,6 +1,10 @@
 # modules/iam-github-oidc/main.tf
 
 resource "aws_iam_role" "github_actions" {
+  # the name will be project-5-dev-APP_REPO-github-actions-role
+  # as APP_REPO = project-5-app , final name will be:
+  # project-5-dev-project-5-app-github-actions-role
+  # might look like a duplication but its fine
   name = "${var.project_tag}-${var.environment}-${var.github_repo}-github-actions-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
