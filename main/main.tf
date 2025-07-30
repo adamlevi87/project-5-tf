@@ -302,6 +302,11 @@ module "github_repo_secrets" {
     # DB_PORT         = "${var.rds_database_port}"
     # SQS_QUEUE_URL   = "${module.sqs.queue_url}"
   }
+
+  depends_on = [
+    module.github_oidc,
+    module.module.ecr
+  ]
 }
 
 module "aws_auth_config" {
