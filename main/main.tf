@@ -220,7 +220,7 @@ module "external_dns" {
   release_name         = "external-dns-${var.environment}"
   namespace            = "kube-system"
   domain_filter      = var.domain_name
-  txt_owner_id       = "externaldns-${project_tag}-${environment}"
+  txt_owner_id       = "externaldns-${var.project_tag}-${var.environment}"
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
   zone_type = "public"
