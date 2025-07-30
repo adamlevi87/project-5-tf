@@ -1,5 +1,15 @@
 # modules/aws_auth_config/main.tf
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.6.0"
+    }
+  }
+}
+
+
 locals {
   github_actions_role_arn = [
     for role in var.map_roles : role.rolearn
