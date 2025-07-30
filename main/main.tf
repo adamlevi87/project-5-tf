@@ -277,6 +277,7 @@ module "github_repo_secrets" {
     AWS_REGION = "${var.aws_region}"
     #temporary var
     ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
+    AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
   }
 
   github_secrets = {
