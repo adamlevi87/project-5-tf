@@ -5,7 +5,7 @@ resource "aws_iam_role" "github_actions" {
   # as APP_REPO = project-5-app , final name will be:
   # project-5-dev-project-5-app-github-actions-role
   # might look like a duplication but its fine
-  name = "1-${var.project_tag}-${var.environment}-${var.github_repo}-github-actions-role"
+  name = "${var.project_tag}-${var.environment}-${var.github_repo}-github-actions-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
