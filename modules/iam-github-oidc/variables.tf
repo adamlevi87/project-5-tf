@@ -10,6 +10,11 @@ variable "github_repo" {
   description = "GitHub repository name"
 }
 
+variable "environment" {
+  description = "Environment name (dev/stage/prod)"
+  type        = string
+}
+
 # Move creation to the .requirements folder
 # variable "oidc_provider_url" {
 #   type        = string

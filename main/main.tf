@@ -260,6 +260,7 @@ module "github_oidc" {
   source = "../modules/iam-github-oidc"
   github_org         = var.github_org
   github_repo        = var.github_application_repo
+  environment        = var.environment
   aws_iam_openid_connect_provider_github_arn = var.aws_iam_openid_connect_provider_github_arn
 }
 
