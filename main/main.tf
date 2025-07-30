@@ -363,11 +363,11 @@ module "external_secrets_operator" {
     {
       name  = "webhook.port"
       value = "10250"
-    },
-    {
-      name  = "serviceAccount.create"
-      value = "true"
-    }
+    }#,
+    # {
+    #   name  = "serviceAccount.create"
+    #   value = "true"
+    # }
   ]
   
   depends_on = [module.eks,module.aws_auth_config]
