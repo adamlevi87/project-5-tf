@@ -1,3 +1,5 @@
+global:
+  domain: ""
 server:
   service:
     type: ClusterIP
