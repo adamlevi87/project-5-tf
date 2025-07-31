@@ -9,7 +9,7 @@ server:
   ingress:
     enabled: true
     hosts:
-      - "argocd.${environment}.${domain_name}"
+      - "${domain_name}"
     ingressControllerClassResourceName: "${ingress_controller_class}"
     ingressPath: "/"
 

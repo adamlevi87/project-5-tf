@@ -338,7 +338,7 @@ module "aws_auth_config" {
 module "argocd" {
   source         = "../modules/helm/argocd"
 
-  environment = var.environment
+  #environment = var.environment
 
   release_name          = "argocd-${var.environment}"
   service_account_name  = "argocd-${var.environment}-service-account"

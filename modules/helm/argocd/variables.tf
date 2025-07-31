@@ -10,11 +10,11 @@ variable "domain_name" {
   description = "Domain name (e.g., dev.example.com)"
 }
 
-variable "environment" {
-  description = "Environment tag (dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
+# variable "environment" {
+#   description = "Environment tag (dev, staging, prod)"
+#   type        = string
+#   default     = "dev"
+# }
 
 variable "eks_allowed_cidr_blocks" {
   type        = list(string)
