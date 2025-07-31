@@ -25,8 +25,10 @@ server:
       alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=60
       # CIDR restrictions
       alb.ingress.kubernetes.io/inbound-cidrs: "${allowed_cidrs}"
+      alb.ingress.kubernetes.io/certificate-arn: "${acm_cert_arn}"
       # External DNS annotation (optional - helps external-dns identify the record)
       external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
+      
   
   # ArgoCD server configuration
   config:

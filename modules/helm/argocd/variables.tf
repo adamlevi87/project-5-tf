@@ -47,3 +47,8 @@ variable "namespace" {
   description = "The Kubernetes namespace to install the Helm release into"
 }
 
+variable "acm_cert_arn" {
+  description = "ARN of the ACM certificate to use for ALB HTTPS listener"
+  type        = string
+}
+
