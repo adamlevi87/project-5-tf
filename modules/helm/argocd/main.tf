@@ -52,6 +52,7 @@ resource "local_file" "rendered_argo_values" {
     ingress_controller_class  = var.ingress_controller_class
     node_group_name           = var.node_group_name
     allowed_cidrs            = join(",", var.eks_allowed_cidr_blocks)
+    acm_cert_arn              = module.acm.aws_acm_certificate.this.arn
   })
 
   filename = "${path.module}/rendered-values-debug.yaml"
