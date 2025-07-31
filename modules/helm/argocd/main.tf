@@ -16,19 +16,20 @@ resource "helm_release" "this" {
     namespace  = var.namespace
     create_namespace = false
 
-    set = [
-      {
-        name  = "serviceAccount.create"
-        value = "false"  # We create it manually above
-      },
-      {
-        name  = "serviceAccount.name"
-        value = "${var.service_account_name}"
-      }
-    ]
+    # set = [
+    #   {
+    #     name  = "serviceAccount.create"
+    #     value = "false"  # We create it manually above
+    #   },
+    #   {
+    #     name  = "serviceAccount.name"
+    #     value = "${var.service_account_name}"
+    #   }
+    # ]
 
     values = [
         templatefile("${path.module}/values.yaml.tpl", {
+            service_account_name = var.service_account_name
             environment         = var.environment
             domain_name         = var.domain_name
             ingress_controller_class  = var.ingress_controller_class
