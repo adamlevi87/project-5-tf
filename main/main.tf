@@ -349,7 +349,7 @@ module "argocd" {
   ingress_controller_class  = "alb"
   node_group_name           = module.eks.node_group_name
   eks_allowed_cidr_blocks   = var.eks_allowed_cidr_blocks
-  domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
+  domain_name               = "${var.argocd_base_domain_name}-${var.environment}-${var.subdomain_name}.${var.domain_name}"
 
   depends_on = [module.eks]
 }
