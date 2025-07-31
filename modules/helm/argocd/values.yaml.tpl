@@ -22,5 +22,5 @@ server:
       alb.ingress.kubernetes.io/inbound-cidrs: "${allowed_cidrs}"
 
   config:
-    url: "https://argocd.${environment}.${domain_name}"
+    url: "https://${domain_name}"
 

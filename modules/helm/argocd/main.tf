@@ -30,6 +30,7 @@ resource "helm_release" "this" {
     values = [
         templatefile("${path.module}/values.yaml.tpl", {
             service_account_name = var.service_account_name
+            #environment         = var.environment
             domain_name         = var.domain_name
             ingress_controller_class  = var.ingress_controller_class
             node_group_name           = var.node_group_name
