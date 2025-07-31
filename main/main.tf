@@ -181,7 +181,7 @@ module "acm" {
   project_tag      = var.project_tag
   environment      = var.environment
 
-  cert_domain_name  = "${var.subdomain_name}.${var.domain_name}"
+  cert_domain_name  = "*.${var.subdomain_name}.${var.domain_name}"
   route53_zone_id  = module.route53.zone_id
   route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
 }
@@ -349,7 +349,7 @@ module "argocd" {
   ingress_controller_class  = "alb"
   node_group_name           = module.eks.node_group_name
   eks_allowed_cidr_blocks   = var.eks_allowed_cidr_blocks
-  domain_name               = "${var.argocd_base_domain_name}-${var.environment}-${var.subdomain_name}.${var.domain_name}"
+  domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
 
   depends_on = [module.eks]
 }
