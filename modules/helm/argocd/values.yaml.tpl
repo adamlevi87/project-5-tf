@@ -10,8 +10,8 @@ server:
     enabled: true
     hosts:
       - "${domain_name}"
-    ingressControllerClassResourceName: "${ingress_controller_class}"
-    ingressPath: "/"
+    ingressClassName: "${ingress_controller_class}"
+    path: "/"
 
     annotations:
       alb.ingress.kubernetes.io/scheme: "internet-facing"

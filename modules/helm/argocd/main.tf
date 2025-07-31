@@ -43,6 +43,20 @@ resource "helm_release" "this" {
   ]
 }
 
+resource "local_file" "rendered_argo_values" {
+  content  = templatefile("${path.module}/values.yaml.tpl", {
+    service_account_name = var.service_account_name
+    #environment         = var.environment
+    domain_name         = var.domain_name
+    ingress_controller_class  = var.ingress_controller_class
+    node_group_name           = var.node_group_name
+    allowed_cidrs            = join(",", var.eks_allowed_cidr_blocks)
+  })
+
+  filename = "${path.module}/rendered-values-debug.yaml"
+}
+
+
 # Kubernetes service account
 resource "kubernetes_service_account" "this" {
   metadata {
