@@ -12,7 +12,7 @@ server:
   ingress:
     enabled: true
     ingressClassName: alb
-    hostname: "${domain}"
+    hostname: "${domain_name}"
     path: /
     pathType: Prefix
     annotations:
@@ -26,17 +26,17 @@ server:
       # CIDR restrictions
       alb.ingress.kubernetes.io/inbound-cidrs: "${allowed_cidrs}"
       # External DNS annotation (optional - helps external-dns identify the record)
-      external-dns.alpha.kubernetes.io/hostname: "${domain}"
+      external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
   
   # ArgoCD server configuration
   config:
     # This tells ArgoCD what its external URL is
-    url: "https://${domain}"
+    url: "https://${domain_name}"
 
 # Global configuration
 global:
   # Ensure ArgoCD knows its domain
-  domain: "${domain}"
+  domain: "${domain_name}"
 
 # Optional: Configure RBAC if needed
 configs:
