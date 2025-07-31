@@ -350,9 +350,9 @@ module "argocd" {
   node_group_name           = module.eks.node_group_name
   eks_allowed_cidr_blocks   = var.eks_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
-  acm_cert_arn              = module.acm.aws_acm_certificate.this.arn
+  acm_cert_arn              = module.acm.this_certificate_arn
   
-  depends_on = [module.eks]
+  depends_on = [module.eks,module.acm]
 }
 
 module "external_secrets_operator" {
