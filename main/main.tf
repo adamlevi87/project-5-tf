@@ -352,7 +352,9 @@ module "argocd" {
   argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn
-  
+  node_group_default_security_group = module.eks.node_group_default_security_group
+
+
   depends_on = [module.eks,module.acm]
 }
 

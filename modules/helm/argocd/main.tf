@@ -113,30 +113,13 @@ resource "aws_security_group" "argocd" {
   }
 }
 
-data "aws_instances" "nodegroup_instances" {
-  filter {
-    name   = "tag:eks:nodegroup-name"
-    values = [var.node_group_name]
-  }
-}
-
-data "aws_instance" "first_node" {
-  instance_id = data.aws_instances.nodegroup_instances.ids[0]
-}
-
-# output "node_group_security_groups" {
-#   value = data.aws_instance.first_node.security_groups
-# }
-
-
 resource "aws_security_group_rule" "allow_alb_to_argocd_pods" {
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
   #security_group_id        = tolist(data.aws_instance.first_node.security_groups)[0]  # or manually "sg-0a9d986ac63a06d9f"
-  security_group_id        = "sg-0a9d986ac63a06d9f"
+  security_group_id        = var.node_group_default_security_group
   source_security_group_id = aws_security_group.argocd.id
   description              = "Allow ALB to access ArgoCD pods on port 8080"
 }
-

@@ -36,6 +36,11 @@ variable "node_group_name" {
   description = "Node Group Name"
 }
 
+variable "node_group_default_security_group" {
+  type        = string
+  description = "Security group ID attached to the node group"
+}
+
 variable "service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the Helm chart"

@@ -164,3 +164,16 @@ resource "aws_iam_openid_connect_provider" "cluster" {
     Purpose     = "eks-oidc-provider"
   }
 }
+
+# Get the default node security group created by EKS
+data "aws_security_group" "node_group_sg" {
+  filter {
+    name   = "group-name"
+    values = ["eks-cluster-sg-${aws_eks_cluster.main.name}-*"]
+  }
+  
+  filter {
+    name   = "tag:aws:eks:cluster-name"
+    values = [aws_eks_cluster.main.name]
+  }
+}
