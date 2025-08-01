@@ -219,7 +219,7 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy_attachment.node_group_worker_policy,
     aws_iam_role_policy_attachment.node_group_cni_policy,
     aws_iam_role_policy_attachment.node_group_registry_policy,
-    aws_launch_template.main,
+    aws_launch_template.nodes,
   ]
 
   tags = {
