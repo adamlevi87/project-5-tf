@@ -31,8 +31,13 @@ output "cluster_security_group_id" {
 }
 
 output "node_group_default_security_group" {
-  description = "Security group ID attached to the node group"
+  description = "Default Security group ID attached to the node group"
   value       = data.aws_security_group.node_group_sg.id
+}
+
+output "node_group_security_group_id" {
+  description = "Security group ID attached to the node group"
+  value       = aws_security_group.nodes.id
 }
 
 output "node_group_name" {

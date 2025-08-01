@@ -113,39 +113,6 @@ resource "aws_eks_cluster" "main" {
   }
 }
 
-# EKS Node Group
-resource "aws_eks_node_group" "main" {
-  cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "${var.project_tag}-${var.environment}-node-group"
-  node_role_arn   = aws_iam_role.node_group_role.arn
-  subnet_ids      = var.private_subnet_ids
-  instance_types  = var.node_group_instance_types
-
-  scaling_config {
-    desired_size = var.node_group_desired_capacity
-    max_size     = var.node_group_max_capacity
-    min_size     = var.node_group_min_capacity
-  }
-
-  update_config {
-    max_unavailable = 1
-  }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  depends_on = [
-    aws_iam_role_policy_attachment.node_group_worker_policy,
-    aws_iam_role_policy_attachment.node_group_cni_policy,
-    aws_iam_role_policy_attachment.node_group_registry_policy,
-  ]
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-node-group"
-    Project     = var.project_tag
-    Environment = var.environment
-    Purpose     = "kubernetes-nodes"
-  }
-}
-
 # Get OIDC issuer certificate
 data "tls_certificate" "cluster" {
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
@@ -182,3 +149,96 @@ data "aws_security_group" "node_group_sg" {
     values = [var.vpc_id]
   }
 }
+
+# Node group SG
+resource "aws_security_group" "nodes" {
+  name        = "${var.project_tag}-${var.environment}-eks-node-group-sg"
+  description = "EKS worker node SG"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-eks-node-group-sg"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "eks-worker-nodes"
+  }
+}
+
+data "aws_ami" "eks_default" {
+  most_recent = true
+  owners      = ["602401143452"]  # Amazon EKS AMI owner (official)
+  
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-*-x86_64-*"]
+  }
+}
+
+
+resource "aws_launch_template" "nodes" {
+  name_prefix   = "${var.project_tag}-${var.environment}-eks-nodes-lt-"
+  image_id      = data.aws_ami.eks_default.image_id
+  instance_type = var.node_group_instance_types[0]
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups              = [aws_security_group.nodes.id]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# EKS Node Group
+resource "aws_eks_node_group" "main" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "${var.project_tag}-${var.environment}-node-group"
+  node_role_arn   = aws_iam_role.node_group_role.arn
+  subnet_ids      = var.private_subnet_ids
+
+  #instance_types  = var.node_group_instance_types
+
+  launch_template {
+    id      = aws_launch_template.nodes.id
+    version = "$Latest"
+  }
+
+  scaling_config {
+    desired_size = var.node_group_desired_capacity
+    max_size     = var.node_group_max_capacity
+    min_size     = var.node_group_min_capacity
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
+  depends_on = [
+    aws_iam_role_policy_attachment.node_group_worker_policy,
+    aws_iam_role_policy_attachment.node_group_cni_policy,
+    aws_iam_role_policy_attachment.node_group_registry_policy,
+    aws_launch_template.main,
+  ]
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-node-group"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "kubernetes-nodes"
+  }
+}
+
+# Control Plane access to the nodes
+resource "aws_security_group_rule" "allow_cluster_to_nodes" {
+  type                     = "ingress"
+  from_port                = 10250
+  to_port                  = 10250
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.nodes.id
+  source_security_group_id = "sg-0a9d986ac63a06d9f"
+  description              = "Allow control plane to reach kubelet"
+}
+
+

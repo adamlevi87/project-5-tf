@@ -36,7 +36,7 @@ variable "node_group_name" {
   description = "Node Group Name"
 }
 
-variable "node_group_default_security_group" {
+variable "node_group_security_group" {
   type        = string
   description = "Security group ID attached to the node group"
 }
