@@ -1,17 +1,17 @@
 # modules/cluster-autoscaler/main.tf
 
-terraform {
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.38"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 3.0.2"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     kubernetes = {
+#       source  = "hashicorp/kubernetes"
+#       version = "~> 2.38"
+#     }
+#     helm = {
+#       source  = "hashicorp/helm"
+#       version = "~> 3.0.2"
+#     }
+#   }
+# }
 
 resource "helm_release" "this" {
   name       = "${var.release_name}"

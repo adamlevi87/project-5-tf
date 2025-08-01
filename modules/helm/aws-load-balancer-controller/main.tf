@@ -1,17 +1,17 @@
 # modules/aws_load_balancer_controller/main.tf
 
-terraform {
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.38"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 3.0.2"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     kubernetes = {
+#       source  = "hashicorp/kubernetes"
+#       version = "~> 2.38"
+#     }
+#     helm = {
+#       source  = "hashicorp/helm"
+#       version = "~> 3.0.2"
+#     }
+#   }
+# }
 
 # Install AWS Load Balancer Controller via Helm
 resource "helm_release" "this" {
