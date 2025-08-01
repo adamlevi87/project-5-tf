@@ -1,5 +1,14 @@
 # modules/backend_irsa/main.tf
 
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.38"
+    }
+  }
+}
+
 # locals {
 #   # arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/ABCDEF1234567890
 #   # ["arn:aws:iam::123456789012:", "oidc.eks.us-east-1.amazonaws.com/id/ABCDEF1234567890"]
