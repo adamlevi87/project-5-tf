@@ -179,7 +179,13 @@ variable "eks_kubernetes_version" {
   type        = string
 }
 
-variable "eks_allowed_cidr_blocks" {
+variable "eks_api_allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to access the cluster endpoint"
+  type        = list(string)
+  default     = []
+}
+
+variable "argocd_allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access the cluster endpoint"
   type        = list(string)
   default     = []

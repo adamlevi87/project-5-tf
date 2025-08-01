@@ -16,9 +16,9 @@ variable "domain_name" {
 #   default     = "dev"
 # }
 
-variable "eks_allowed_cidr_blocks" {
+variable "argocd_allowed_cidr_blocks" {
   type        = list(string)
-  description = "List of CIDR blocks allowed to access the ALB"
+  description = "List of CIDR blocks allowed to access the ALB-argoCD"
 }
 
 variable "ingress_controller_class" {

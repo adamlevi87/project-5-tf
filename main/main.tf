@@ -198,7 +198,7 @@ module "eks" {
   
   # Networking (from VPC module)
   private_subnet_ids   = module.vpc_network.private_subnet_ids
-  eks_allowed_cidr_blocks  = var.eks_allowed_cidr_blocks
+  eks_api_allowed_cidr_blocks  = var.eks_api_allowed_cidr_blocks
   
   # Node group configuration
   node_group_instance_types   = var.eks_node_instance_types
@@ -348,7 +348,7 @@ module "argocd" {
 
   ingress_controller_class  = "alb"
   node_group_name           = module.eks.node_group_name
-  eks_allowed_cidr_blocks   = var.eks_allowed_cidr_blocks
+  argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn
   

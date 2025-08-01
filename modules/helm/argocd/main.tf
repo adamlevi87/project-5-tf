@@ -34,7 +34,7 @@ resource "helm_release" "this" {
             domain_name         = var.domain_name
             ingress_controller_class  = var.ingress_controller_class
             node_group_name           = var.node_group_name
-            allowed_cidrs            = join(",", var.eks_allowed_cidr_blocks)
+            allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
             acm_cert_arn             = var.acm_cert_arn
         })
     ]
@@ -51,7 +51,7 @@ resource "local_file" "rendered_argo_values" {
     domain_name         = var.domain_name
     ingress_controller_class  = var.ingress_controller_class
     node_group_name           = var.node_group_name
-    allowed_cidrs            = join(",", var.eks_allowed_cidr_blocks)
+    allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
     acm_cert_arn              = var.acm_cert_arn
   })
 
