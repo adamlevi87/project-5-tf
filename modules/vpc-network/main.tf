@@ -46,6 +46,7 @@ resource "aws_subnet" "public_primary" {
     Project     = var.project_tag
     Environment = var.environment
     Type        = "primary"
+    "kubernetes.io/role/elb" = "1"
   }
 }
 
@@ -61,6 +62,7 @@ resource "aws_subnet" "public_additional" {
     Project     = var.project_tag
     Environment = var.environment
     Type        = "additional"
+    "kubernetes.io/role/elb" = "1"
   }
 }
 
@@ -76,6 +78,7 @@ resource "aws_subnet" "private" {
     Name        = "${var.project_tag}-private-subnet-${each.key}"
     Project     = var.project_tag
     Environment = var.environment
+    "kubernetes.io/role/internal-elb" = "1"
   }
 }
 
