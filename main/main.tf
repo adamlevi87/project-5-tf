@@ -199,6 +199,7 @@ module "eks" {
   # Networking (from VPC module)
   private_subnet_ids   = module.vpc_network.private_subnet_ids
   eks_api_allowed_cidr_blocks  = var.eks_api_allowed_cidr_blocks
+  vpc_id = module.vpc_network.vpc_id
   
   # Node group configuration
   node_group_instance_types   = var.eks_node_instance_types

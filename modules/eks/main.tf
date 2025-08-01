@@ -176,4 +176,9 @@ data "aws_security_group" "node_group_sg" {
     name   = "tag:aws:eks:cluster-name"
     values = [aws_eks_cluster.main.name]
   }
+
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
 }
