@@ -45,7 +45,7 @@ resource "helm_release" "this" {
       aws_security_group.argocd
   ]
 }
-security_group_id         = aws_security_group.argocd.id
+
 resource "local_file" "rendered_argo_values" {
   content  = templatefile("${path.module}/values.yaml.tpl", {
     service_account_name = var.service_account_name
