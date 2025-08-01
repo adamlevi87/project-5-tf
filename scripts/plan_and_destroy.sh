@@ -160,7 +160,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.acm.aws_acm_certificate.this'
     'module.acm.aws_route53_record.cert_validation\[[^]]+\]'
   )
-
+  #echo -e "${CYAN}after building base...${RESET}"
   # Additional patterns for real mode only
   REAL_MODE_ADDITIONAL_PATTERNS=(
     'module.vpc_network.aws_subnet.public_additional\[[^]]+\]'
@@ -169,14 +169,14 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.vpc_network.aws_eip.nat_additional\[[^]]+\]'
     'module.vpc_network.aws_nat_gateway.nat_additional\[[^]]+\]'
   )
-
+  #echo -e "${CYAN}after building additional...${RESET}"
   # Check if VPC NAT gateways exist before applying mode-specific logic
-  NAT_GATEWAYS=$(terraform -chdir="$TF_WORK_DIR" state list | grep 'module.vpc_network.aws_nat_gateway')
-  if [[ -z "$NAT_GATEWAYS" ]]; then
-    echo -e "${RED}ERROR:${RESET} No NAT Gateway found in state."
-    exit 1
-  fi
-
+  # NAT_GATEWAYS=$(terraform -chdir="$TF_WORK_DIR" state list 2>/dev/null | grep 'module.vpc_network.aws_nat_gateway' || true)
+  # if [[ -z "$NAT_GATEWAYS" ]]; then
+  #   echo -e "${RED}ERROR:${RESET} No NAT Gateway found in state."
+  #   exit 1
+  # fi
+  #echo -e "${CYAN}echo 1${RESET}"
   if [[ "$NAT_MODE" == "real" ]]; then
     # Exclude ALL NATs + ALL public subnets + their route table associations
     EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}" "${REAL_MODE_ADDITIONAL_PATTERNS[@]}")
@@ -186,7 +186,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
 
     EXCLUDE_PATTERNS=("${BASE_EXCLUDE_PATTERNS[@]}")
   fi
-
+  echo -e "${CYAN}Exclude Patterns: ${EXCLUDE_PATTERNS}...${RESET}"
   # Build grep pattern
   GREP_EXCLUDE=$(IFS="|"; echo "${EXCLUDE_PATTERNS[*]}")
 

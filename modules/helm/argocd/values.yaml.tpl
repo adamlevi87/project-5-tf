@@ -28,7 +28,13 @@ server:
       alb.ingress.kubernetes.io/certificate-arn: "${acm_cert_arn}"
       # External DNS annotation (optional - helps external-dns identify the record)
       external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
-      
+    extraAnnotations:
+      # This ensures the ALB controller finishes cleaning up before Ingress is deleted
+      "kubectl.kubernetes.io/last-applied-configuration": ""  # optional workaround
+
+  extraMetadata:
+    finalizers:
+      - ingress.k8s.aws/resources  
   
   # ArgoCD server configuration
   config:
