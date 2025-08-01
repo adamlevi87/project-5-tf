@@ -7,43 +7,45 @@ resource "kubernetes_namespace" "this" {
 }
 
 resource "helm_release" "this" {
-    name       = var.release_name
-    
-    repository = "https://argoproj.github.io/argo-helm"
-    chart      = "argo-cd"
-    version    = var.chart_version
-    
-    namespace  = var.namespace
-    create_namespace = false
+  name       = var.release_name
+  
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+  version    = var.chart_version
+  
+  namespace  = var.namespace
+  create_namespace = false
 
-    # set = [
-    #   {
-    #     name  = "serviceAccount.create"
-    #     value = "false"  # We create it manually above
-    #   },
-    #   {
-    #     name  = "serviceAccount.name"
-    #     value = "${var.service_account_name}"
-    #   }
-    # ]
+  # set = [
+  #   {
+  #     name  = "serviceAccount.create"
+  #     value = "false"  # We create it manually above
+  #   },
+  #   {
+  #     name  = "serviceAccount.name"
+  #     value = "${var.service_account_name}"
+  #   }
+  # ]
 
-    values = [
-        templatefile("${path.module}/values.yaml.tpl", {
-            service_account_name = var.service_account_name
-            #environment         = var.environment
-            domain_name         = var.domain_name
-            ingress_controller_class  = var.ingress_controller_class
-            node_group_name           = var.node_group_name
-            allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-            acm_cert_arn             = var.acm_cert_arn
-        })
-    ]
+  values = [
+      templatefile("${path.module}/values.yaml.tpl", {
+          service_account_name = var.service_account_name
+          #environment         = var.environment
+          domain_name         = var.domain_name
+          ingress_controller_class  = var.ingress_controller_class
+          node_group_name           = var.node_group_name
+          #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
+          security_group_id         = aws_security_group.argocd.id
+          acm_cert_arn             = var.acm_cert_arn
+      })
+  ]
 
-    depends_on = [
-        kubernetes_service_account.this
+  depends_on = [
+      kubernetes_service_account.this,
+      aws_security_group.argocd
   ]
 }
-
+security_group_id         = aws_security_group.argocd.id
 resource "local_file" "rendered_argo_values" {
   content  = templatefile("${path.module}/values.yaml.tpl", {
     service_account_name = var.service_account_name
@@ -51,11 +53,17 @@ resource "local_file" "rendered_argo_values" {
     domain_name         = var.domain_name
     ingress_controller_class  = var.ingress_controller_class
     node_group_name           = var.node_group_name
-    allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
+    #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
+    security_group_id         = aws_security_group.argocd.id
     acm_cert_arn              = var.acm_cert_arn
   })
 
   filename = "${path.module}/rendered-values-debug.yaml"
+
+  depends_on = [
+      kubernetes_service_account.this,
+      aws_security_group.argocd
+  ]
 }
 
 
@@ -67,6 +75,38 @@ resource "kubernetes_service_account" "this" {
     # annotations = {
     #   "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     # }
+  }
+}
+
+# Security Group for ArgoCD
+resource "aws_security_group" "argocd" {
+  name        = "${var.project_tag}-${var.environment}-argocd-sg"
+  description = "Security group for argocd"
+  vpc_id      = var.vpc_id
+
+  # Allow ArgoCD access from the outside
+  ingress {
+    from_port   = [80,443]
+    to_port     = [80,443]
+    protocol    = "tcp"
+    cidr_blocks = var.argocd_allowed_cidr_blocks
+    description = "ArgoCD access from the outside"
+  }
+
+  # Outbound rules (usually not needed but good practice)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
+  }
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-argocd-sg"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "argocd-security"
   }
 }
 
