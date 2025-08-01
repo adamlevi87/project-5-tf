@@ -338,14 +338,15 @@ module "aws_auth_config" {
 module "argocd" {
   source         = "../modules/helm/argocd"
 
-  #environment = var.environment
+  project_tag        = var.project_tag
+  environment        = var.environment
 
   release_name          = "argocd-${var.environment}"
   service_account_name  = "argocd-${var.environment}-service-account"
-  namespace             = var.argocd_namespace
-  
+  namespace             = var.argocd_namespace  
   chart_version         = var.argocd_chart_version
 
+  vpc_id = module.vpc_network.vpc_id
   ingress_controller_class  = "alb"
   node_group_name           = module.eks.node_group_name
   argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks

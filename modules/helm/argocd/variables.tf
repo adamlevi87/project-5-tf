@@ -1,5 +1,15 @@
 # modules/argocd/variables.tf
 
+variable "project_tag" {
+  description = "Project tag for resource naming"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment tag (dev, staging, prod)"
+  type        = string
+}
+
 variable "chart_version" {
   type        = string
   default     = "8.2.3" # Latest stable as of July 2025
@@ -9,12 +19,6 @@ variable "domain_name" {
   type        = string
   description = "Domain name (e.g., dev.example.com)"
 }
-
-# variable "environment" {
-#   description = "Environment tag (dev, staging, prod)"
-#   type        = string
-#   default     = "dev"
-# }
 
 variable "argocd_allowed_cidr_blocks" {
   type        = list(string)
@@ -52,3 +56,7 @@ variable "acm_cert_arn" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "VPC ID where RDS will be deployed"
+  type        = string
+}
