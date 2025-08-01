@@ -134,7 +134,7 @@ resource "aws_security_group_rule" "allow_alb_to_argocd_pods" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  security_group_id        = data.aws_instance.first_node.security_groups[0]  # or manually "sg-0a9d986ac63a06d9f"
+  security_group_id        = tolist(data.aws_instance.first_node.security_groups)[0]  # or manually "sg-0a9d986ac63a06d9f"
   source_security_group_id = aws_security_group.argocd.id
   description              = "Allow ALB to access ArgoCD pods on port 8080"
 }
