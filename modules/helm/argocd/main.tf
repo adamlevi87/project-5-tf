@@ -85,12 +85,15 @@ resource "aws_security_group" "argocd" {
   vpc_id      = var.vpc_id
 
   # Allow ArgoCD access from the outside
-  ingress {
-    from_port   = [80,443]
-    to_port     = [80,443]
-    protocol    = "tcp"
-    cidr_blocks = var.argocd_allowed_cidr_blocks
-    description = "ArgoCD access from the outside"
+  dynamic "ingress" {
+    for_each = [80, 443]
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = var.argocd_allowed_cidr_blocks
+      description = "ArgoCD access on port ${ingress.value}"
+    }
   }
 
   # Outbound rules (usually not needed but good practice)
