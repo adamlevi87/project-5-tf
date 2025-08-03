@@ -49,3 +49,8 @@ variable "namespace" {
   type        = string
   description = "The Kubernetes namespace to install the Helm release into"
 }
+
+variable "lbc_webhook_ready" {
+  description = "AWS LBC webhook readiness signal"
+  type        = string
+}

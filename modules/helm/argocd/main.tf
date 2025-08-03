@@ -55,7 +55,8 @@ resource "helm_release" "this" {
 
   depends_on = [
       kubernetes_service_account.this,
-      aws_security_group.argocd
+      aws_security_group.argocd,
+      var.lbc_webhook_ready
   ]
 }
 

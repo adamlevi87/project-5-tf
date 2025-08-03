@@ -65,3 +65,8 @@ variable "vpc_id" {
   description = "VPC ID where RDS will be deployed"
   type        = string
 }
+
+variable "lbc_webhook_ready" {
+  description = "AWS LBC webhook readiness signal"
+  type        = string
+}

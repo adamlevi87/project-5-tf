@@ -51,7 +51,8 @@ resource "helm_release" "this" {
 
   depends_on = [
     aws_iam_role_policy_attachment.this,
-    kubernetes_service_account.this
+    kubernetes_service_account.this,
+    var.lbc_webhook_ready
   ]
 }
 

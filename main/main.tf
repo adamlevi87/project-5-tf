@@ -226,6 +226,7 @@ module "external_dns" {
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
   zone_type = "public"
 
+  lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [module.eks]
 }
 
@@ -241,7 +242,7 @@ module "cluster_autoscaler" {
   cluster_name       = module.eks.cluster_name
   oidc_provider_arn  = module.eks.oidc_provider_arn
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
-
+  lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [module.eks]
 }
 
@@ -355,7 +356,7 @@ module "argocd" {
   acm_cert_arn              = module.acm.this_certificate_arn
   node_group_security_group = module.eks.node_group_security_group_id
 
-
+  lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [module.eks,module.acm]
 }
 
@@ -385,6 +386,7 @@ module "external_secrets_operator" {
     # }
   ]
   
+  lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [module.eks,module.aws_auth_config]
 }
 
