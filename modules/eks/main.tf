@@ -209,6 +209,13 @@ resource "aws_launch_template" "nodes" {
   #   name = aws_iam_instance_profile.nodes.name
   # }
 
+  # Simple bootstrap script - let EKS handle most of the configuration
+  user_data = base64encode(<<-EOF
+#!/bin/bash
+/etc/eks/bootstrap.sh ${aws_eks_cluster.main.name}
+EOF
+  )
+
   network_interfaces {
     associate_public_ip_address = false
     security_groups              = [aws_security_group.nodes.id]
