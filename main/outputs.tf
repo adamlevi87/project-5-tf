@@ -134,3 +134,7 @@ output "rds_password_secret_arn" {
   description = "ARN of RDS password secret in Secrets Manager"
   value       = module.secrets.secret_arns["rds-password"]
 }
+
+output "debug_nodeadm_config" {
+  value = module.eks.debug_nodeadm_config
+}
