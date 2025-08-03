@@ -1,0 +1,16 @@
+---
+apiVersion: node.eks.aws/v1alpha1
+kind: NodeConfig
+spec:
+  cluster:
+    name: ${cluster_name}
+    endpoint: ${cluster_endpoint}
+    certificateAuthority: ${cluster_ca}
+  kubelet:
+    config:
+      clusterDNS:
+        - ${cidrhost(cluster_cidr, 10)}
+      clusterDomain: cluster.local
+    flags:
+      - --node-labels=nodegroup-type=custom
+  containerd: {}
