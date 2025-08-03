@@ -214,7 +214,7 @@ resource "aws_launch_template" "nodes" {
     cluster_name        = aws_eks_cluster.main.name
     cluster_endpoint    = aws_eks_cluster.main.endpoint
     cluster_ca          = aws_eks_cluster.main.certificate_authority[0].data
-    cluster_cidr     = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
+    cluster_cidr        = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
   }))
 
   network_interfaces {
