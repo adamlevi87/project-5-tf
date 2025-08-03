@@ -434,11 +434,48 @@ resource "aws_vpc_security_group_egress_rule" "nodes_ntp" {
   cidr_ipv4   = "0.0.0.0/0"
 }
 
-# Temporary rule for troubleshooting - allows all outbound
+# Option 1: Full outbound internet access (simplest approach)
 resource "aws_vpc_security_group_egress_rule" "nodes_all_outbound" {
   security_group_id = aws_security_group.nodes.id
-  description       = "Allow all outbound traffic (troubleshooting)"
+  description       = "Allow all outbound traffic"
   
-  ip_protocol = "-1"
+  ip_protocol = "-1"  # All protocols
   cidr_ipv4   = "0.0.0.0/0"
+  
+  tags = {
+    Name = "${var.project_tag}-${var.environment}-nodes-all-outbound"
+  }
+}
+
+# Option 2: If you prefer more restrictive (covers most EKS needs)
+# Use the individual rules I provided earlier PLUS these additional ones:
+
+# Ephemeral ports for outbound connections
+resource "aws_vpc_security_group_egress_rule" "nodes_ephemeral_tcp" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow outbound TCP ephemeral ports"
+  
+  ip_protocol = "tcp"
+  from_port   = 1024
+  to_port     = 65535
+  cidr_ipv4   = "0.0.0.0/0"
+  
+  tags = {
+    Name = "${var.project_tag}-${var.environment}-nodes-ephemeral-tcp"
+  }
+}
+
+# Custom ports that some services might use
+resource "aws_vpc_security_group_egress_rule" "nodes_custom_ports" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow outbound for custom application ports"
+  
+  ip_protocol = "tcp"
+  from_port   = 8000
+  to_port     = 8999
+  cidr_ipv4   = "0.0.0.0/0"
+  
+  tags = {
+    Name = "${var.project_tag}-${var.environment}-nodes-custom-ports"
+  }
 }
