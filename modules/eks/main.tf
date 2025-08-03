@@ -249,7 +249,7 @@ resource "aws_launch_template" "nodes" {
 }
 
 # EKS Node Group
-resource "aws_eks_node_group" "main" {
+resource "aws_eks_node_group" "main_v2" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.project_tag}-${var.environment}-node-group"
   node_role_arn   = aws_iam_role.node_group_role.arn
