@@ -190,15 +190,34 @@ data "aws_ami" "eks_default" {
   }
 }
 
+# Create IAM instance profile for the node group
+resource "aws_iam_instance_profile" "nodes" {
+  name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+  role = aws_iam_role.node_group_role.name
+  
+  tags = {
+    Name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+  }
+}
 
 resource "aws_launch_template" "nodes" {
   name_prefix   = "${var.project_tag}-${var.environment}-eks-nodes-lt-"
   image_id      = data.aws_ami.eks_default.image_id
   instance_type = var.node_group_instance_types[0]
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.nodes.name
+  }
+
   network_interfaces {
     associate_public_ip_address = false
     security_groups              = [aws_security_group.nodes.id]
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"  # Forces IMDSv2
+    http_put_response_hop_limit = 2
   }
 
   lifecycle {
@@ -360,4 +379,66 @@ resource "aws_vpc_security_group_ingress_rule" "eks_api_from_cidrs" {
   ip_protocol       = "tcp"
   cidr_ipv4         = each.value
   description       = "Allow access to EKS API from CIDR ${each.value}"
+}
+
+# DNS resolution (UDP)
+resource "aws_vpc_security_group_egress_rule" "nodes_dns_udp" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow DNS resolution (UDP)"
+  
+  ip_protocol = "udp"
+  from_port   = 53
+  to_port     = 53
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+# DNS resolution (TCP) - some DNS queries use TCP
+resource "aws_vpc_security_group_egress_rule" "nodes_dns_tcp" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow DNS resolution (TCP)"
+  
+  ip_protocol = "tcp"
+  from_port   = 53
+  to_port     = 53
+  cidr_ipv4   = "0.0.0.0/0"
+
+}
+
+resource "aws_vpc_security_group_egress_rule" "nodes_https_outbound" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow HTTPS outbound for AWS APIs"
+  
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "nodes_http_outbound" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow HTTP outbound for package updates"
+  
+  ip_protocol = "tcp"
+  from_port   = 80
+  to_port     = 80
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "nodes_ntp" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow NTP for time synchronization"
+  
+  ip_protocol = "udp"
+  from_port   = 123
+  to_port     = 123
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+# Temporary rule for troubleshooting - allows all outbound
+resource "aws_vpc_security_group_egress_rule" "nodes_all_outbound" {
+  security_group_id = aws_security_group.nodes.id
+  description       = "Allow all outbound traffic (troubleshooting)"
+  
+  ip_protocol = "-1"
+  cidr_ipv4   = "0.0.0.0/0"
 }
