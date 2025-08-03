@@ -190,24 +190,24 @@ data "aws_ami" "eks_default" {
   }
 }
 
-# Create IAM instance profile for the node group
-resource "aws_iam_instance_profile" "nodes" {
-  name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
-  role = aws_iam_role.node_group_role.name
+# # Create IAM instance profile for the node group
+# resource "aws_iam_instance_profile" "nodes" {
+#   name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+#   role = aws_iam_role.node_group_role.name
   
-  tags = {
-    Name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
-  }
-}
+#   tags = {
+#     Name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+#   }
+# }
 
 resource "aws_launch_template" "nodes" {
   name_prefix   = "${var.project_tag}-${var.environment}-eks-nodes-lt-"
   image_id      = data.aws_ami.eks_default.image_id
   instance_type = var.node_group_instance_types[0]
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.nodes.name
-  }
+  # iam_instance_profile {
+  #   name = aws_iam_instance_profile.nodes.name
+  # }
 
   network_interfaces {
     associate_public_ip_address = false
