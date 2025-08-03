@@ -93,7 +93,7 @@ resource "aws_eks_cluster" "main" {
 
   vpc_config {
     #security_group_ids = [aws_security_group.eks_cluster.id]
-    security_group_ids = [aws_eks_cluster.main.vpc_config[0].cluster_security_group_id]
+    #security_group_ids = [aws_eks_cluster.main.vpc_config[0].cluster_security_group_id]
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -153,18 +153,18 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 # }
 
 # Cluster SG
-resource "aws_security_group" "eks_cluster" {
-  name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
-  description = "Custom EKS cluster security group"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "eks_cluster" {
+#   name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
+#   description = "Custom EKS cluster security group"
+#   vpc_id      = var.vpc_id
 
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
-    Project     = var.project_tag
-    Environment = var.environment
-    Purpose     = "eks-cluster-api"
-  }
-}
+#   tags = {
+#     Name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
+#     Project     = var.project_tag
+#     Environment = var.environment
+#     Purpose     = "eks-cluster-api"
+#   }
+# }
 
 # Node group SG
 resource "aws_security_group" "nodes" {
