@@ -92,6 +92,7 @@ resource "aws_eks_cluster" "main" {
   version  = var.kubernetes_version
 
   vpc_config {
+    security_group_ids = [aws_security_group.eks_cluster.id]
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -132,21 +133,35 @@ resource "aws_iam_openid_connect_provider" "cluster" {
   }
 }
 
-# Get the default node security group created by EKS
-data "aws_security_group" "node_group_sg" {
-  filter {
-    name   = "group-name"
-    values = ["eks-cluster-sg-${aws_eks_cluster.main.name}-*"]
-  }
+# # Get the default node security group created by EKS
+# data "aws_security_group" "node_group_sg" {
+#   filter {
+#     name   = "group-name"
+#     values = ["eks-cluster-sg-${aws_eks_cluster.main.name}-*"]
+#   }
   
-  filter {
-    name   = "tag:aws:eks:cluster-name"
-    values = [aws_eks_cluster.main.name]
-  }
+#   filter {
+#     name   = "tag:aws:eks:cluster-name"
+#     values = [aws_eks_cluster.main.name]
+#   }
 
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
+#   filter {
+#     name   = "vpc-id"
+#     values = [var.vpc_id]
+#   }
+# }
+
+# Cluster SG
+resource "aws_security_group" "eks_cluster" {
+  name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
+  description = "Custom EKS cluster security group"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-eks-cluster-sg"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "eks-cluster-api"
   }
 }
 
@@ -230,15 +245,118 @@ resource "aws_eks_node_group" "main" {
   }
 }
 
-# Control Plane access to the nodes
-resource "aws_security_group_rule" "allow_cluster_to_nodes" {
-  type                     = "ingress"
-  from_port                = 10250
-  to_port                  = 10250
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.nodes.id
-  source_security_group_id = "sg-0a9d986ac63a06d9f"
-  description              = "Allow control plane to reach kubelet"
+# # Control Plane access to the nodes
+# resource "aws_security_group_rule" "allow_cluster_to_nodes" {
+#   type                     = "ingress"
+#   from_port                = 1025
+#   to_port                  = 65535
+#   protocol                 = "tcp"
+#   security_group_id        = aws_security_group.nodes.id
+#   source_security_group_id = "sg-0a9d986ac63a06d9f"
+#   description              = "Allow control plane to reach kubelet"
+# }
+
+
+
+# Cluster SG -> Node Group SG (Egress rules on Cluster SG)
+resource "aws_vpc_security_group_egress_rule" "cluster_to_node_kubelet" {
+  security_group_id            = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  from_port                    = 10250
+  to_port                      = 10250
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster to communicate with kubelet on nodes"
 }
 
+resource "aws_vpc_security_group_egress_rule" "cluster_to_node_ephemeral" {
+  security_group_id            = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  from_port                    = 1025
+  to_port                      = 65535
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster to communicate with nodes on ephemeral ports"
+}
 
+resource "aws_vpc_security_group_egress_rule" "cluster_to_node_https" {
+  security_group_id            = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster HTTPS communication to nodes"
+}
+
+# Node Group SG -> Cluster SG (Egress rules on Node Group SG)
+resource "aws_vpc_security_group_egress_rule" "node_to_cluster_api" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.eks_cluster.id
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  description                  = "Allow nodes to communicate with cluster API"
+}
+
+# Corresponding Ingress rules on Node Group SG
+resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_kubelet" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.eks_cluster.id
+  from_port                    = 10250
+  to_port                      = 10250
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster to access kubelet on nodes"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_ephemeral" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.eks_cluster.id
+  from_port                    = 1025
+  to_port                      = 65535
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster to access nodes on ephemeral ports"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_https" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.eks_cluster.id
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  description                  = "Allow cluster HTTPS access to nodes"
+}
+
+# Corresponding Ingress rules on Cluster SG
+resource "aws_vpc_security_group_ingress_rule" "cluster_allow_node_api" {
+  security_group_id            = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  description                  = "Allow nodes to access cluster API"
+}
+
+# Node Group to Node Group allow all
+resource "aws_vpc_security_group_ingress_rule" "node_to_node_all" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  ip_protocol                  = "-1"  # All protocols
+  description                  = "Allow all communication between nodes in the same group"
+}
+
+resource "aws_vpc_security_group_egress_rule" "node_to_node_all" {
+  security_group_id            = aws_security_group.nodes.id
+  referenced_security_group_id = aws_security_group.nodes.id
+  ip_protocol                  = "-1"  # All protocols
+  description                  = "Allow all communication between nodes in the same group"
+}
+
+# External access to cluster API
+resource "aws_vpc_security_group_ingress_rule" "eks_api_from_cidrs" {
+  for_each = toset(var.eks_api_allowed_cidr_blocks)
+
+  security_group_id = aws_security_group.eks_cluster.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.value
+  description       = "Allow access to EKS API from CIDR ${each.value}"
+}
