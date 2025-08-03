@@ -92,7 +92,8 @@ resource "aws_eks_cluster" "main" {
   version  = var.kubernetes_version
 
   vpc_config {
-    security_group_ids = [aws_security_group.eks_cluster.id]
+    #security_group_ids = [aws_security_group.eks_cluster.id]
+    security_group_ids = [aws_eks_cluster.main.vpc_config[0].cluster_security_group_id]
     subnet_ids              = var.private_subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -260,7 +261,7 @@ resource "aws_eks_node_group" "main" {
 
 # Cluster SG -> Node Group SG (Egress rules on Cluster SG)
 resource "aws_vpc_security_group_egress_rule" "cluster_to_node_kubelet" {
-  security_group_id            = aws_security_group.eks_cluster.id
+  security_group_id            = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   referenced_security_group_id = aws_security_group.nodes.id
   from_port                    = 10250
   to_port                      = 10250
@@ -269,7 +270,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_kubelet" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "cluster_to_node_ephemeral" {
-  security_group_id            = aws_security_group.eks_cluster.id
+  security_group_id            = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   referenced_security_group_id = aws_security_group.nodes.id
   from_port                    = 1025
   to_port                      = 65535
@@ -278,7 +279,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_ephemeral" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "cluster_to_node_https" {
-  security_group_id            = aws_security_group.eks_cluster.id
+  security_group_id            = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   referenced_security_group_id = aws_security_group.nodes.id
   from_port                    = 443
   to_port                      = 443
@@ -289,7 +290,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_https" {
 # Node Group SG -> Cluster SG (Egress rules on Node Group SG)
 resource "aws_vpc_security_group_egress_rule" "node_to_cluster_api" {
   security_group_id            = aws_security_group.nodes.id
-  referenced_security_group_id = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
@@ -299,7 +300,7 @@ resource "aws_vpc_security_group_egress_rule" "node_to_cluster_api" {
 # Corresponding Ingress rules on Node Group SG
 resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_kubelet" {
   security_group_id            = aws_security_group.nodes.id
-  referenced_security_group_id = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   from_port                    = 10250
   to_port                      = 10250
   ip_protocol                  = "tcp"
@@ -308,7 +309,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_kubelet" {
 
 resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_ephemeral" {
   security_group_id            = aws_security_group.nodes.id
-  referenced_security_group_id = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   from_port                    = 1025
   to_port                      = 65535
   ip_protocol                  = "tcp"
@@ -317,7 +318,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_ephemeral" {
 
 resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_https" {
   security_group_id            = aws_security_group.nodes.id
-  referenced_security_group_id = aws_security_group.eks_cluster.id
+  referenced_security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
@@ -326,7 +327,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_https" {
 
 # Corresponding Ingress rules on Cluster SG
 resource "aws_vpc_security_group_ingress_rule" "cluster_allow_node_api" {
-  security_group_id            = aws_security_group.eks_cluster.id
+  security_group_id            = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   referenced_security_group_id = aws_security_group.nodes.id
   from_port                    = 443
   to_port                      = 443
@@ -353,7 +354,7 @@ resource "aws_vpc_security_group_egress_rule" "node_to_node_all" {
 resource "aws_vpc_security_group_ingress_rule" "eks_api_from_cidrs" {
   for_each = toset(var.eks_api_allowed_cidr_blocks)
 
-  security_group_id = aws_security_group.eks_cluster.id
+  security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
   from_port         = 443
   to_port           = 443
   ip_protocol       = "tcp"
