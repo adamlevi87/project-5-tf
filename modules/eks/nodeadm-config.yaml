@@ -4,7 +4,7 @@ kind: NodeConfig
 spec:
   cluster:
     name: ${cluster_name}
-    endpoint: ${cluster_endpoint}
+    apiServerEndpoint: ${cluster_endpoint}
     certificateAuthority: ${cluster_ca}
   kubelet:
     config:

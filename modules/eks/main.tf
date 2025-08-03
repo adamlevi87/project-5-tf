@@ -1,5 +1,25 @@
 # modules/eks/main.tf
 
+locals {
+  nodeadm_config = templatefile("${path.module}/nodeadm-config.yaml", {
+    cluster_name        = aws_eks_cluster.main.name
+    cluster_endpoint    = aws_eks_cluster.main.endpoint
+    cluster_ca          = aws_eks_cluster.main.certificate_authority[0].data
+    cluster_cidr        = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
+  })
+  
+  user_data = <<-EOF
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+
+    --==MYBOUNDARY==
+    Content-Type: application/node.eks.aws
+
+    ${local.nodeadm_config}
+    --==MYBOUNDARY==--
+  EOF
+}
+
 # EKS Cluster IAM Role
 resource "aws_iam_role" "cluster_role" {
   name = "${var.project_tag}-${var.environment}-eks-cluster-role"
@@ -210,12 +230,7 @@ resource "aws_launch_template" "nodes" {
   # }
 
   # Add the required user data for EKS bootstrap
-  user_data = base64encode(templatefile("${path.module}/nodeadm-config.yaml", {
-    cluster_name        = aws_eks_cluster.main.name
-    cluster_endpoint    = aws_eks_cluster.main.endpoint
-    cluster_ca          = aws_eks_cluster.main.certificate_authority[0].data
-    cluster_cidr        = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
-  }))
+  user_data = base64encode(local.user_data)
 
   network_interfaces {
     associate_public_ip_address = false
