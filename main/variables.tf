@@ -240,6 +240,18 @@ variable "backend_service_account_name" {
   default     = "backend-sa"
 }
 
+variable "frontend_service_namespace" {
+  description = "Namespace where the frontend service account is deployed"
+  type        = string
+  default     = "default"
+}
+
+variable "frontend_service_account_name" {
+  description = "Name of the frontend service account"
+  type        = string
+  default     = "frontend-sa"
+}
+
 variable "github_application_repo" {
   description = "GitHub repository name"
   type        = string
