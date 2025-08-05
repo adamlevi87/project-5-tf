@@ -104,6 +104,11 @@ resource "aws_iam_role_policy" "ecr_pull" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "node_group_ssm" {
+  role       = aws_iam_role.node_group_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_role_policy_attachment" "node_group_worker_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.node_group_role.name
