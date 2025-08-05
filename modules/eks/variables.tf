@@ -78,3 +78,8 @@ variable "vpc_id" {
   description = "VPC ID where RDS will be deployed"
   type        = string
 }
+
+variable "ecr_repository_arns" {
+  description = "Map of app name to ECR repository ARNs"
+  type = map(string)
+}

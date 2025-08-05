@@ -26,7 +26,10 @@ output "ecr_repository_names" {
   }
 }
 
-# output "repository_arn" {
-#   value       = aws_ecr_repository.this.arn
-#   description = "The ARN of the ECR repository"
-# }
+output "ecr_repository_arns" {
+  description = "Map of app name to ECR repository ARNs"
+  value = {
+    for app, repo in aws_ecr_repository.this :
+    app => repo.arn
+  }
+}

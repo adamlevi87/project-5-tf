@@ -202,6 +202,9 @@ module "eks" {
   
   # Logging
   cluster_log_retention_days = var.eks_log_retention_days
+
+  # ECR for nodegroup permissions
+  ecr_repository_arns = module.ecr.ecr_repository_arns
 }
 
 module "external_dns" {

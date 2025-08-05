@@ -1,6 +1,7 @@
 # modules/eks/main.tf
 
 locals {
+  ecr_arn_list = values(var.ecr_repository_arns)
   nodeadm_config = templatefile("${path.module}/nodeadm-config.yaml", {
     cluster_name        = aws_eks_cluster.main.name
     cluster_endpoint    = aws_eks_cluster.main.endpoint
@@ -76,7 +77,33 @@ resource "aws_iam_role" "node_group_role" {
   }
 }
 
-# Attach required policies to node group role
+resource "aws_iam_role_policy" "ecr_pull" {
+  name = "ecr-pull"
+  role = aws_iam_role.node_group_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ],
+        Resource = local.ecr_arn_list
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "node_group_worker_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.node_group_role.name
