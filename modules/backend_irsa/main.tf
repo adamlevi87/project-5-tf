@@ -77,10 +77,20 @@ resource "aws_iam_role_policy" "this" {
   })
 }
 
+resource "kubernetes_namespace" "this" {
+  metadata {
+    name = var.namespace
+
+    labels = {
+      name = var.namespace
+    }
+  }
+}
+
 resource "kubernetes_service_account" "this" {
   metadata {
     name      = var.service_account_name
-    namespace = var.namespace
+    namespace = kubernetes_namespace.this.metadata[0].name
 
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
