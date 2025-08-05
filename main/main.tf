@@ -252,7 +252,7 @@ module "backend_irsa" {
 }
 
 module "frontend_irsa" {
-  source       = "../modules/backend_irsa"
+  source       = "../modules/frontend_irsa"
 
   #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
