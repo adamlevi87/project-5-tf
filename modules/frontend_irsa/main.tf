@@ -1,25 +1,4 @@
-# modules/backend_irsa/main.tf
-
-# terraform {
-#   required_providers {
-#     kubernetes = {
-#       source  = "hashicorp/kubernetes"
-#       version = "~> 2.38"
-#     }
-#   }
-# }
-
-# locals {
-#   # arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/ABCDEF1234567890
-#   # ["arn:aws:iam::123456789012:", "oidc.eks.us-east-1.amazonaws.com/id/ABCDEF1234567890"]
-#   # element[1] means the 2nd part of the variable
-#   oidc_provider_host = element(
-#     split("oidc-provider/", var.oidc_provider_arn),
-#     1
-#   )
-
-#   sa_subject = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
-# }
+# modules/frontend_irsa/main.tf
 
 resource "aws_iam_role" "this" {
   name = "${var.service_account_name}-irsa-role"
@@ -54,24 +33,9 @@ resource "aws_iam_role_policy" "this" {
       {
         Effect = "Allow"
         Action = [
-          "s3:PutObject",
-          "s3:GetObject"
-        ]
-        Resource = "${var.s3_bucket_arn}/*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "sqs:SendMessage"
-        ]
-        Resource = var.sqs_queue_arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = "arn:aws:secretsmanager:us-east-1:593793036161:secret:project-5-backend-envs-r5u0GA"
+        Resource = "arn:aws:secretsmanager:us-east-1:593793036161:secret:project-5-frontend-envs-erAYyZ"
       }
     ]
   })

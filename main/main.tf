@@ -1,11 +1,4 @@
 # main/main.tf
-# 0002
-
-data "aws_availability_zones" "available" {
-    state = "available"
-}
-
-data "aws_caller_identity" "current" {}
 
 module "vpc_network" {
     source = "../modules/vpc-network"
@@ -249,13 +242,23 @@ module "cluster_autoscaler" {
 module "backend_irsa" {
   source       = "../modules/backend_irsa"
 
-  cluster_name              = module.eks.cluster_name
+  #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
   oidc_provider_url         = module.eks.cluster_oidc_issuer_url
   namespace                 = var.backend_service_namespace
   service_account_name      = var.backend_service_account_name
   s3_bucket_arn             = module.s3_app_data.bucket_arn
   sqs_queue_arn             = module.sqs.queue_arn
+}
+
+module "frontend_irsa" {
+  source       = "../modules/backend_irsa"
+
+  #cluster_name              = module.eks.cluster_name
+  oidc_provider_arn         = module.eks.oidc_provider_arn
+  oidc_provider_url         = module.eks.cluster_oidc_issuer_url
+  namespace                 = var.frontend_service_namespace
+  service_account_name      = var.frontend_service_account_name
 }
 
 module "github_oidc" {

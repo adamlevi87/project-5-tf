@@ -88,9 +88,13 @@ eks_log_retention_days = 7  # 1 week retention for dev environment
 # ALB Configuration
 alb_deletion_protection = false  # Allow easy deletion in dev environment
 
-# backed service details
-backend_service_namespace    = "default"
+# backend service details
+backend_service_namespace    = "backend"
 backend_service_account_name = "backend-sa"
+
+# frontend service details
+frontend_service_namespace    = "frontend"
+frontend_service_account_name = "frontend-sa"
 
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
