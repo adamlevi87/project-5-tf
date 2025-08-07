@@ -320,6 +320,8 @@ variable "argocd_base_domain_name" {
   default     = "argocd"
 }
 
-
-
-
+variable "apps_base_domain_name" {
+  type        = string
+  description = "Base domain name for the apps [frontend/backend]"
+  default     = "apps"
+}

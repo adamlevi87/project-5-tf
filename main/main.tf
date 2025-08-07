@@ -242,8 +242,8 @@ module "cluster_autoscaler" {
   depends_on = [module.eks]
 }
 
-module "backend_irsa" {
-  source       = "../modules/backend_irsa"
+module "backend" {
+  source       = "../modules/apps/backend"
 
   #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
@@ -252,16 +252,22 @@ module "backend_irsa" {
   service_account_name      = var.backend_service_account_name
   s3_bucket_arn             = module.s3_app_data.bucket_arn
   sqs_queue_arn             = module.sqs.queue_arn
+  node_group_security_group = module.eks.node_group_security_group_id
+
+  depends_on = [module.eks]
 }
 
-module "frontend_irsa" {
-  source       = "../modules/frontend_irsa"
+module "frontend" {
+  source       = "../modules/apps/frontend"
 
   #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
   oidc_provider_url         = module.eks.cluster_oidc_issuer_url
   namespace                 = var.frontend_service_namespace
   service_account_name      = var.frontend_service_account_name
+  node_group_security_group = module.eks.node_group_security_group_id
+
+  depends_on = [module.eks]
 }
 
 module "github_oidc" {
@@ -356,7 +362,7 @@ module "argocd" {
 
   vpc_id = module.vpc_network.vpc_id
   ingress_controller_class  = "alb"
-  node_group_name           = module.eks.node_group_name
+  alb_group_name           = "${var.project_tag}-${environment}-alb-shared-group"
   argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn

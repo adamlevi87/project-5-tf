@@ -1,4 +1,4 @@
-# modules/backend_irsa/variables.tf
+# modules/backend/variables.tf
 
 # variable "cluster_name" {
 #   description = "Name of the EKS cluster"
@@ -33,4 +33,9 @@ variable "s3_bucket_arn" {
 variable "sqs_queue_arn" {
   description = "ARN of the SQS queue"
   type        = string
+}
+
+variable "node_group_security_group" {
+  type        = string
+  description = "Security group ID attached to the node group"
 }

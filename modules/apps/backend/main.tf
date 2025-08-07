@@ -1,4 +1,4 @@
-# modules/backend_irsa/main.tf
+# modules/backend/main.tf
 
 # terraform {
 #   required_providers {
@@ -96,4 +96,49 @@ resource "kubernetes_service_account" "this" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
   }
+}
+
+# Security Group for Backend
+resource "aws_security_group" "backend" {
+  name        = "${var.project_tag}-${var.environment}-backend-sg"
+  description = "Security group for backend"
+  vpc_id      = var.vpc_id
+
+  # Allow Backend access from the outside
+  dynamic "ingress" {
+    for_each = [80, 443]
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Backend access on port ${ingress.value}"
+    }
+  }
+
+  # Outbound rules (usually not needed but good practice)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
+  }
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-backend-sg"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "backend-security"
+  }
+}
+
+resource "aws_security_group_rule" "allow_alb_to_backend_pods" {
+  type                     = "ingress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  security_group_id        = var.node_group_security_group
+  source_security_group_id = aws_security_group.backend.id
+  description              = "Allow ALB to access Backend pods on port 3000"
 }

@@ -31,11 +31,6 @@ variable "ingress_controller_class" {
   default     = "alb"
 }
 
-variable "node_group_name" {
-  type        = string
-  description = "Node Group Name"
-}
-
 variable "node_group_security_group" {
   type        = string
   description = "Security group ID attached to the node group"
@@ -69,4 +64,10 @@ variable "vpc_id" {
 variable "lbc_webhook_ready" {
   description = "AWS LBC webhook readiness signal"
   type        = string
+}
+
+variable "alb_group_name" {
+  description = "Group name for ALB to allow sharing across multiple Ingress resources"
+  type        = string
+  default     = "alb_shared_group"  # Optional: override in dev/main.tf if needed
 }

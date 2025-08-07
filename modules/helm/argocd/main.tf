@@ -46,7 +46,7 @@ resource "helm_release" "this" {
           #environment         = var.environment
           domain_name         = var.domain_name
           ingress_controller_class  = var.ingress_controller_class
-          node_group_name           = var.node_group_name
+          alb_group_name           = var.alb_group_name
           #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
           security_group_id         = aws_security_group.argocd.id
           acm_cert_arn             = var.acm_cert_arn
@@ -54,6 +54,7 @@ resource "helm_release" "this" {
   ]
 
   depends_on = [
+      kubernetes_namespace.this,
       kubernetes_service_account.this,
       aws_security_group.argocd,
       var.lbc_webhook_ready
@@ -61,12 +62,12 @@ resource "helm_release" "this" {
 }
 
 resource "local_file" "rendered_argo_values" {
-  content  = templatefile("${path.module}/values.yaml.tpl", {
+  content  = templatefile("${path.module}/values.yaml", {
     service_account_name = var.service_account_name
     #environment         = var.environment
     domain_name         = var.domain_name
     ingress_controller_class  = var.ingress_controller_class
-    node_group_name           = var.node_group_name
+    alb_group_name           = var.alb_group_name
     #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
     security_group_id         = aws_security_group.argocd.id
     acm_cert_arn              = var.acm_cert_arn

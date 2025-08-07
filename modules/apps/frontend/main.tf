@@ -1,4 +1,4 @@
-# modules/frontend_irsa/main.tf
+# modules/frontend/main.tf
 
 resource "aws_iam_role" "this" {
   name = "${var.service_account_name}-irsa-role"
@@ -60,4 +60,49 @@ resource "kubernetes_service_account" "this" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
   }
+}
+
+# Security Group for Frontend
+resource "aws_security_group" "frontend" {
+  name        = "${var.project_tag}-${var.environment}-frontend-sg"
+  description = "Security group for frontend"
+  vpc_id      = var.vpc_id
+
+  # Allow Frontend access from the outside
+  dynamic "ingress" {
+    for_each = [80, 443]
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Frontend access on port ${ingress.value}"
+    }
+  }
+
+  # Outbound rules (usually not needed but good practice)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "All outbound traffic"
+  }
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-frontend-sg"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "frontend-security"
+  }
+}
+
+resource "aws_security_group_rule" "allow_alb_to_frontend_pods" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = var.node_group_security_group
+  source_security_group_id = aws_security_group.frontend.id
+  description              = "Allow ALB to access Frontend pods on port 3000"
 }

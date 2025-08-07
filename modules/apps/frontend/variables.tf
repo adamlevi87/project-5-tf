@@ -1,4 +1,4 @@
-# modules/frontend_irsa/variables.tf
+# modules/frontend/variables.tf
 
 # variable "cluster_name" {
 #   description = "Name of the EKS cluster"
@@ -23,4 +23,9 @@ variable "namespace" {
 variable "service_account_name" {
   description = "service_account_name name"
   type        = string
+}
+
+variable "node_group_security_group" {
+  type        = string
+  description = "Security group ID attached to the node group"
 }
