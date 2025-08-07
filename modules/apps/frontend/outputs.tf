@@ -9,5 +9,5 @@ output "iam_role_arn" {
 }
 
 output "security_group_id" {
-  value = aws_security_group.frontend
+  value = aws_security_group.frontend.id
 }
