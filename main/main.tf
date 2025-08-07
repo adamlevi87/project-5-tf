@@ -1,5 +1,22 @@
 # main/main.tf
 
+# Generate passwords
+resource "random_password" "generated_passwords" {
+    for_each = {
+        for name, config in var.secrets_config : name => config
+        if config.generate_password == true
+    }
+    
+    length  = each.value.password_length
+    special = each.value.password_special
+
+    override_special = each.value.password_override_special != "" ? each.value.password_override_special : null
+    
+    # lifecycle {
+    #   ignore_changes = [result]
+    # }
+}
+
 module "vpc_network" {
     source = "../modules/vpc-network"
    
@@ -100,7 +117,8 @@ module "secrets" {
   project_tag = var.project_tag
   environment = var.environment
   
-  secrets_config = var.secrets_config
+  secrets_config_with_passwords = local.secrets_config_with_passwords
+  app_secrets_config            = local.app_secrets_config
 }
 
 module "rds" {

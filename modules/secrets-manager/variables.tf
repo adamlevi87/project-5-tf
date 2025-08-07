@@ -10,7 +10,7 @@ variable "environment" {
   type        = string
 }
 
-variable "secrets_config" {
+variable "secrets_config_with_passwords" {
   description = "Map of Configurations of secrets to create"
   type = map(object({
     description        = string
@@ -20,12 +20,13 @@ variable "secrets_config" {
     secret_value       = optional(string, "")
     password_override_special = optional(string, "")
   }))
-  
-  validation {
-    condition = alltrue([
-      for name, config in var.secrets_config : 
-      config.generate_password == true || config.secret_value != ""
-    ])
-    error_message = "Each secret must either have generate_password=true or provide a secret_value."
-  }
+}
+
+variable "app_secrets_config" {
+  description = "Map of application secrets (key → JSON string of env vars)"
+  type = map(object({
+    description   = string
+    secret_value  = string
+  }))
+  default = {}
 }

@@ -63,4 +63,37 @@ locals {
         groups   = user.groups
         }
     }
+    
+    # Merge generated passwords into the configuration
+    secrets_config_with_passwords  = {
+      for name, config in var.secrets_config :
+        name => merge(config, {
+            secret_value = config.generate_password ? random_password.generated_passwords[name].result : config.secret_value
+        })
+    }
+
+    app_secrets_config = {
+        "frontend-envs" = {
+            description  = "Frontend env vars"
+            secret_value = jsonencode({
+                REACT_APP_BACKEND_URL = "https://backend-app.project-5.projects-devops.cfd"
+            })
+        }
+
+        "backend-envs" = {
+            description  = "Backend env vars"
+            secret_value = jsonencode({
+                DB_HOST                = module.rds.db_instance_address,
+                DB_PORT                = var.rds_database_port,
+                DB_NAME                = var.rds_database_name,
+                DB_USER                = var.rds_database_username,
+                DB_PASSWORD            = local.secrets_config_with_passwords["rds-password"].secret_value,
+                POSTGRES_TABLE         = var.postgres_table_name,
+                NODE_ENV               = "production",
+                SQS_QUEUE_URL          = module.sqs.queue_url
+                BACKEND_HOST_ADDRESS   = "backend-app.project-5.projects-devops.cfd",
+                FRONTEND_HOST_ADDRESS  = "frontend-app.project-5.projects-devops.cfd"
+            })
+        }
+    }
 }
