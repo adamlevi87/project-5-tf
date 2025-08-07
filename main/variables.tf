@@ -329,3 +329,14 @@ variable "backend_base_domain_name" {
   type        = string
   description = "Base domain name for the backend"
 }
+
+variable "frontend_aws_secret_key" {
+  description = "Key used to name the frontend application's AWS secret (appended to project/environment)"
+  type        = string
+}
+
+variable "backend_aws_secret_key" {
+  description = "Key used to name the backend application's AWS secret (appended to project/environment)"
+  type        = string
+}
+

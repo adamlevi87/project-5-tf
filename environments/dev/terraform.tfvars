@@ -100,6 +100,12 @@ backend_service_account_name = "backend-sa"
 frontend_service_namespace    = "frontend"
 frontend_service_account_name = "frontend-sa"
 
+# Apps (frontend/backend) AWS secret names
+# later be used to pull from using ESO
+frontend_aws_secret_key = "frontend-envs"
+backend_aws_secret_key = "backend-envs"
+
+
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
 

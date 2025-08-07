@@ -73,14 +73,14 @@ locals {
     }
 
     app_secrets_config = {
-        "frontend-envs" = {
+        (var.frontend_aws_secret_key) = {
             description  = "Frontend env vars"
             secret_value = jsonencode({
                 REACT_APP_BACKEND_URL = "https://${var.backend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
             })
         }
 
-        "backend-envs" = {
+        (var.backend_aws_secret_key) = {
             description  = "Backend env vars"
             secret_value = jsonencode({
                 DB_HOST                = module.rds.db_instance_address,
