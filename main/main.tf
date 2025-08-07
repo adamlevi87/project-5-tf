@@ -110,15 +110,26 @@ module "lambda" {
   }
 }
 
-# Creates secrets by generating a password or inserting a value
-module "secrets" {
+module "secrets_rds_password" {
   source = "../modules/secrets-manager"
 
   project_tag = var.project_tag
   environment = var.environment
   
   secrets_config_with_passwords = local.secrets_config_with_passwords
+  app_secrets_config            = {}
+}
+
+module "secrets_app_envs" {
+  source = "../modules/secrets-manager"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  secrets_config_with_passwords = {}
   app_secrets_config            = local.app_secrets_config
+  
+  depends_on = [module.secrets_rds_password]
 }
 
 module "rds" {
@@ -128,7 +139,7 @@ module "rds" {
   environment = var.environment
   
   # Secrets Manager integration
-  db_password_secret_arn = module.secrets.secret_arns["rds-password"]
+  db_password_secret_arn = module.secrets_rds_password.secret_arns["rds-password"]
   
   # Networking (from VPC module)
   vpc_id             = module.vpc_network.vpc_id
@@ -160,7 +171,7 @@ module "rds" {
   monitoring_interval         = var.rds_monitoring_interval
 
   # Add this line at the end
-  depends_on = [module.secrets]
+  depends_on = [module.secrets_rds_password]
 }
 
 module "ecr" {
