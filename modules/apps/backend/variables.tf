@@ -54,3 +54,8 @@ variable "vpc_id" {
   description = "VPC ID where RDS will be deployed"
   type        = string
 }
+
+variable "secret_arn" {
+  description = "ARN of the AWS Secrets Manager secret used by the application"
+  type        = string
+}

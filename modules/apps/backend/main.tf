@@ -71,7 +71,7 @@ resource "aws_iam_role_policy" "this" {
         Action = [
           "secretsmanager:GetSecretValue"
         ]
-        Resource = "arn:aws:secretsmanager:us-east-1:593793036161:secret:project-5-backend-envs-r5u0GA"
+        Resource = "${var.secret_arn}"
       }
     ]
   })
