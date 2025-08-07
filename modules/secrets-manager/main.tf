@@ -23,7 +23,7 @@ resource "aws_secretsmanager_secret_version" "secrets" {
 
   secret_id = aws_secretsmanager_secret.secrets[each.key].id
   
-  secret_string = each.value.generate_password ? random_password.generated_passwords[each.key].result : each.value.secret_value
+  secret_string = each.value.secret_value
 }
 
 resource "aws_secretsmanager_secret" "app_secrets" {

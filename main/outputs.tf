@@ -132,7 +132,7 @@ output "aws_region" {
 # Secrets Manager (for database password)
 output "rds_password_secret_arn" {
   description = "ARN of RDS password secret in Secrets Manager"
-  value       = module.secrets.secret_arns["rds-password"]
+  value       = module.secrets_rds_password.secret_arns["rds-password"]
 }
 
 output "debug_nodeadm_config" {
