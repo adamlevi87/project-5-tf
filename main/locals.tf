@@ -87,7 +87,7 @@ locals {
                 DB_PORT                = var.rds_database_port,
                 DB_NAME                = var.rds_database_name,
                 DB_USER                = var.rds_database_username,
-                DB_PASSWORD            = module.secrets_rds_password.secret_arns["rds-password"],
+                DB_PASSWORD            = local.secrets_config_with_passwords["rds-password"].secret_value,
                 POSTGRES_TABLE         = var.rds_postgres_table_name,
                 NODE_ENV               = "production",
                 SQS_QUEUE_URL          = module.sqs.queue_url
