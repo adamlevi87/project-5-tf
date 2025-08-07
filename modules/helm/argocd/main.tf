@@ -13,6 +13,10 @@
 #   }
 # }
 
+locals {
+  argo_security_group_list = "${aws_security_group.argocd.id},frontend,backend"
+}
+
 resource "kubernetes_namespace" "this" {
   metadata {
     name = var.namespace

@@ -7,3 +7,7 @@ output "service_account_name" {
 output "iam_role_arn" {
   value = aws_iam_role.this.arn
 }
+
+output "security_group_id" {
+  value = aws_security_group.frontend
+}

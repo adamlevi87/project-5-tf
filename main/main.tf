@@ -377,9 +377,11 @@ module "argocd" {
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn
   node_group_security_group = module.eks.node_group_security_group_id
+  backend_security_group_id = module.backend.security_group_id
+  frontend_security_group_id = module.frontend.security_group_id
 
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
-  depends_on = [module.eks,module.acm]
+  depends_on = [module.eks,module.acm,module.backend,module.frontend]
 }
 
 module "external_secrets_operator" {

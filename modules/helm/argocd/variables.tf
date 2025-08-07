@@ -71,3 +71,13 @@ variable "alb_group_name" {
   type        = string
   default     = "alb_shared_group"  # Optional: override in dev/main.tf if needed
 }
+
+variable "backend_security_group_id" {
+  description = "ID of the security group for the backend"
+  type        = string
+}
+
+variable "frontend_security_group_id" {
+  description = "ID of the security group for the frontend"
+  type        = string
+}
