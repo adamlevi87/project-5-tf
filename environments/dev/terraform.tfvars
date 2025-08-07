@@ -61,8 +61,10 @@ ecr_repositories_applications = ["backend","frontend"]
 
 domain_name = "projects-devops.cfd"
 subdomain_name = "project-5"
-# will be used in the future
-apps_base_domain_name = "apps"
+# Frontend and Backend base domain names
+frontend_base_domain_name = "frontend-app"
+backend_base_domain_name = "backend-app"
+
 
 # EKS Cluster Configuration
 eks_kubernetes_version = "1.33"

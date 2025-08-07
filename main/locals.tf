@@ -76,7 +76,7 @@ locals {
         "frontend-envs" = {
             description  = "Frontend env vars"
             secret_value = jsonencode({
-                REACT_APP_BACKEND_URL = "https://backend-app.project-5.projects-devops.cfd"
+                REACT_APP_BACKEND_URL = "https://${var.backend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
             })
         }
 
@@ -91,8 +91,8 @@ locals {
                 POSTGRES_TABLE         = var.postgres_table_name,
                 NODE_ENV               = "production",
                 SQS_QUEUE_URL          = module.sqs.queue_url
-                BACKEND_HOST_ADDRESS   = "backend-app.project-5.projects-devops.cfd",
-                FRONTEND_HOST_ADDRESS  = "frontend-app.project-5.projects-devops.cfd"
+                BACKEND_HOST_ADDRESS   = "${var.backend_base_domain_name}.${var.subdomain_name}.${var.domain_name}",
+                FRONTEND_HOST_ADDRESS  = "${var.frontend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
             })
         }
     }
