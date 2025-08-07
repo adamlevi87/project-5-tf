@@ -14,7 +14,7 @@
 # }
 
 locals {
-  argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${backend_security_group_id}"
+  argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${var.backend_security_group_id}"
 }
 
 resource "kubernetes_namespace" "this" {
