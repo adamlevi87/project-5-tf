@@ -288,7 +288,7 @@ module "backend" {
   sqs_queue_arn             = module.sqs.queue_arn
   node_group_security_group = module.eks.node_group_security_group_id
 
-  secret_arn = module.secrets_app_envs.app_secrets_arns["${var.project_tag}-${var.environment}-${var.backend_aws_secret_key}"]
+  secret_arn = module.secrets_app_envs.app_secrets_arns["${var.backend_aws_secret_key}"]
 
   depends_on = [module.eks,module.secrets_app_envs]
 }
@@ -308,7 +308,7 @@ module "frontend" {
   service_account_name      = var.frontend_service_account_name
   node_group_security_group = module.eks.node_group_security_group_id
 
-  secret_arn = module.secrets_app_envs.app_secrets_arns["${var.project_tag}-${var.environment}-${var.frontend_aws_secret_key}"]
+  secret_arn = module.secrets_app_envs.app_secrets_arns["${var.frontend_aws_secret_key}"]
 
   depends_on = [module.eks, module.secrets_app_envs]
 }
