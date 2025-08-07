@@ -159,6 +159,8 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     # ACM
     'module.acm.aws_acm_certificate.this'
     'module.acm.aws_route53_record.cert_validation\[[^]]+\]'
+    'module.ecr.aws_ecr_lifecycle_policy.this\[[^]]+\]'
+    'module.ecr.aws_ecr_repository.this\[[^]]+\]'
   )
   #echo -e "${CYAN}after building base...${RESET}"
   # Additional patterns for real mode only
