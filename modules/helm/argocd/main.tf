@@ -41,7 +41,7 @@ resource "helm_release" "this" {
   # ]
 
   values = [
-      templatefile("${path.module}/values.yaml.tpl", {
+      templatefile("${path.module}/values.yaml", {
           service_account_name = var.service_account_name
           #environment         = var.environment
           domain_name         = var.domain_name
