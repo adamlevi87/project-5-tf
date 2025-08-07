@@ -245,6 +245,11 @@ module "cluster_autoscaler" {
 module "backend" {
   source       = "../modules/apps/backend"
 
+  project_tag        = var.project_tag
+  environment        = var.environment
+
+  vpc_id = module.vpc_network.vpc_id
+
   #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
   oidc_provider_url         = module.eks.cluster_oidc_issuer_url
@@ -259,6 +264,11 @@ module "backend" {
 
 module "frontend" {
   source       = "../modules/apps/frontend"
+
+  project_tag        = var.project_tag
+  environment        = var.environment
+
+  vpc_id = module.vpc_network.vpc_id
 
   #cluster_name              = module.eks.cluster_name
   oidc_provider_arn         = module.eks.oidc_provider_arn
@@ -362,7 +372,7 @@ module "argocd" {
 
   vpc_id = module.vpc_network.vpc_id
   ingress_controller_class  = "alb"
-  alb_group_name           = "${var.project_tag}-${environment}-alb-shared-group"
+  alb_group_name           = "${var.project_tag}-${var.environment}-alb-shared-group"
   argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn

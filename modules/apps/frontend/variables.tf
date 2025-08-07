@@ -29,3 +29,18 @@ variable "node_group_security_group" {
   type        = string
   description = "Security group ID attached to the node group"
 }
+
+variable "project_tag" {
+  description = "Project tag for resource naming"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment tag (dev, staging, prod)"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC ID where RDS will be deployed"
+  type        = string
+}
