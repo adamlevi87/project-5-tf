@@ -14,7 +14,7 @@
 # }
 
 locals {
-  argo_security_group_list = "${aws_security_group.argocd.id},frontend,backend"
+  argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${backend_security_group_id}"
 }
 
 resource "kubernetes_namespace" "this" {
@@ -52,7 +52,7 @@ resource "helm_release" "this" {
           ingress_controller_class  = var.ingress_controller_class
           alb_group_name           = var.alb_group_name
           #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-          security_group_id         = aws_security_group.argocd.id
+          security_group_id         = local.argo_security_group_list
           acm_cert_arn             = var.acm_cert_arn
       })
   ]
@@ -73,7 +73,7 @@ resource "local_file" "rendered_argo_values" {
     ingress_controller_class  = var.ingress_controller_class
     alb_group_name           = var.alb_group_name
     #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-    security_group_id         = aws_security_group.argocd.id
+    security_group_id         = local.argo_security_group_list
     acm_cert_arn              = var.acm_cert_arn
   })
 
