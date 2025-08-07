@@ -79,6 +79,11 @@ variable "rds_database_port" {
   default     = 5432
 }
 
+variable "rds_postgres_table_name" {
+  description = "Table name of the RDS-postgres table"
+  type        = string
+}
+
 # RDS Storage Configuration
 variable "rds_allocated_storage" {
   description = "Initial storage allocation in GB"

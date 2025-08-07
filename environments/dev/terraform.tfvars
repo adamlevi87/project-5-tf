@@ -22,6 +22,8 @@ rds_instance_class      = "db.t3.micro"        # Smallest/cheapest option
 rds_database_name       = "myapp_db"           # Match your local postgres
 rds_database_username   = "myapp"              # Match your local postgres
 rds_database_port       = 5432
+# this table name gets create on app initialization (backend)
+rds_postgres_table_name = "messages"
 
 # Storage (minimal cost)
 rds_allocated_storage     = 20      # AWS minimum for PostgreSQL
