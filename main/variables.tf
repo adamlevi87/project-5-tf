@@ -218,10 +218,16 @@ variable "eks_node_min_capacity" {
 }
 
 # EKS Logging Configuration
+variable "cluster_enabled_log_types" {
+  description = "List of cluster log types to enable. Available options: api, audit, authenticator, controllerManager, scheduler"
+  type        = list(string)
+}
+
 variable "eks_log_retention_days" {
   description = "CloudWatch log retention period in days for EKS cluster"
   type        = number
 }
+
 
 variable "alb_deletion_protection" {
   description = "Enable deletion protection for the Application Load Balancer"

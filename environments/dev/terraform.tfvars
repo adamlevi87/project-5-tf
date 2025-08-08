@@ -90,6 +90,10 @@ eks_node_min_capacity     = 1             # Keep at least one node
 
 # EKS Logging Configuration (minimal retention for cost)
 eks_log_retention_days = 7  # 1 week retention for dev environment
+# List of cluster log types to enable. Available options: api, audit, authenticator, controllerManager, scheduler
+cluster_enabled_log_types = "" # For dev we dont want this at all for now
+  
+  
 
 # ALB Configuration
 alb_deletion_protection = false  # Allow easy deletion in dev environment

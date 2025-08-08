@@ -230,6 +230,7 @@ module "eks" {
   node_group_min_capacity     = var.eks_node_min_capacity
   
   # Logging
+  cluster_enabled_log_types = var.cluster_enabled_log_types
   cluster_log_retention_days = var.eks_log_retention_days
 
   # ECR for nodegroup permissions

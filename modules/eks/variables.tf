@@ -69,9 +69,8 @@ variable "cluster_log_retention_days" {
 }
 
 variable "cluster_enabled_log_types" {
-  description = "List of cluster log types to enable"
+  description = "List of cluster log types to enable. Available options: api, audit, authenticator, controllerManager, scheduler"
   type        = list(string)
-  default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 }
 
 variable "vpc_id" {
