@@ -106,7 +106,7 @@ locals {
         {
           apiGroups = [""]
           resources = ["serviceaccounts", "serviceaccounts/token"]
-          verbs     = ["Get", "create"]
+          verbs     = ["get", "create"]
         }
       ]
     },
