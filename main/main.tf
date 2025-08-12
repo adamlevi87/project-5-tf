@@ -400,9 +400,12 @@ module "argocd" {
   environment        = var.environment
 
   release_name          = "argocd-${var.environment}"
-  service_account_name  = "argocd-${var.environment}-service-account"
+  service_account_name  = "argocd-${var.environment}-sa"
   namespace             = var.argocd_namespace  
   chart_version         = var.argocd_chart_version
+
+  oidc_provider_arn     = module.eks.oidc_provider_arn
+  oidc_provider_url     = module.eks.cluster_oidc_issuer_url
 
   vpc_id = module.vpc_network.vpc_id
   ingress_controller_class  = "alb"
@@ -414,6 +417,8 @@ module "argocd" {
   backend_security_group_id = module.backend.security_group_id
   frontend_security_group_id = module.frontend.security_group_id
 
+  secret_arn = module.secrets_app_envs.app_secrets_arns["${var.argocd_aws_secret_key}"]
+
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [
     module.eks,
@@ -422,7 +427,7 @@ module "argocd" {
     module.frontend
   ]
 }
-
+ 
 module "external_secrets_operator" {
   source        = "../modules/helm/external-secrets-operator"
   

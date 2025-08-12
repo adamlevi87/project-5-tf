@@ -81,3 +81,18 @@ variable "frontend_security_group_id" {
   description = "ID of the security group for the frontend"
   type        = string
 }
+
+variable "oidc_provider_arn" {
+  description = "OIDC provider ARN from the EKS module"
+  type        = string
+}
+
+variable "oidc_provider_url" {
+  type        = string
+  description = "OIDC provider URL (e.g. https://oidc.eks.us-east-1.amazonaws.com/id/EXAMPLEDOCID)"
+}
+
+variable "secret_arn" {
+  description = "ARN of the AWS Secrets Manager secret used by the application"
+  type        = string
+}

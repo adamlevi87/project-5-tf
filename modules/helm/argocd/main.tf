@@ -65,25 +65,25 @@ resource "helm_release" "this" {
   ]
 }
 
-resource "local_file" "rendered_argo_values" {
-  content  = templatefile("${path.module}/values.yaml", {
-    service_account_name = var.service_account_name
-    #environment         = var.environment
-    domain_name         = var.domain_name
-    ingress_controller_class  = var.ingress_controller_class
-    alb_group_name           = var.alb_group_name
-    #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-    security_group_id         = local.argo_security_group_list
-    acm_cert_arn              = var.acm_cert_arn
-  })
+# resource "local_file" "rendered_argo_values" {
+#   content  = templatefile("${path.module}/values.yaml", {
+#     service_account_name = var.service_account_name
+#     #environment         = var.environment
+#     domain_name         = var.domain_name
+#     ingress_controller_class  = var.ingress_controller_class
+#     alb_group_name           = var.alb_group_name
+#     #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
+#     security_group_id         = local.argo_security_group_list
+#     acm_cert_arn              = var.acm_cert_arn
+#   })
 
-  filename = "${path.module}/rendered-values-debug.yaml"
+#   filename = "${path.module}/rendered-values-debug.yaml"
 
-  depends_on = [
-      kubernetes_service_account.this,
-      aws_security_group.argocd
-  ]
-}
+#   depends_on = [
+#       kubernetes_service_account.this,
+#       aws_security_group.argocd
+#   ]
+# }
 
 
 # Kubernetes service account
@@ -95,6 +95,47 @@ resource "kubernetes_service_account" "this" {
     #   "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     # }
   }
+}
+
+resource "aws_iam_role" "this" {
+  name = "${var.service_account_name}-irsa-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Effect = "Allow",
+        Principal = {
+          Federated = var.oidc_provider_arn
+        },
+        Condition = {
+        StringEquals = {
+          "${replace(var.oidc_provider_url, "https://", "")}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}",
+          "${replace(var.oidc_provider_url, "https://", "")}:aud" = "sts.amazonaws.com"
+        }
+      }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "this" {
+  name = "${var.service_account_name}-policy"
+  role = aws_iam_role.this.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = "${var.secret_arn}"
+      }
+    ]
+  })
 }
 
 # Security Group for ArgoCD
@@ -142,3 +183,4 @@ resource "aws_security_group_rule" "allow_alb_to_argocd_pods" {
   source_security_group_id = aws_security_group.argocd.id
   description              = "Allow ALB to access ArgoCD pods on port 8080"
 }
+
