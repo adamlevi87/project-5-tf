@@ -441,6 +441,7 @@ module "external_secrets_operator" {
   release_name       = "external-secrets-${var.environment}"
   namespace          = "external-secrets"
   argocd_namespace   = var.argocd_namespace
+  argocd_service_account_name  = "argocd-${var.environment}-service-account"
   project_tag        = var.project_tag
   environment        = var.environment
   aws_region         = var.aws_region

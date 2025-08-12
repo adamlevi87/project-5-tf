@@ -69,3 +69,8 @@ variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
 }
+
+variable "argocd_service_account_name" {
+  type        = string
+  description = "The name of the Kubernetes service account to use for the Helm chart"
+}

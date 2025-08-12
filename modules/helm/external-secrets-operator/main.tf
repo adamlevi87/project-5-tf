@@ -36,7 +36,7 @@ locals {
             region  = "${var.aws_region}"
             auth    = {
               serviceAccountRef = {
-                name      = "argocd"      # the SA you IRSA-bound
+                name      = "${var.argocd_service_account_name}"      # the SA you IRSA-bound
                 namespace = "${var.argocd_namespace}"
               }
             }
