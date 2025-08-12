@@ -64,3 +64,8 @@ variable "argocd_secret_name" {
   description = "Name of ArgoCD's secret in AWS Secrets Manager"
   type        = string
 }
+
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+}
