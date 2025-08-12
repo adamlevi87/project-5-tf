@@ -99,9 +99,9 @@ locals {
         (var.argocd_aws_secret_key) = {
             description  = "ArgoCD's Github credentials"
             secret_value = jsonencode({
-                "appId" = "${var.argocd_app_id}"
-                "installationId" = "${var.argocd_installation_id}"
-                "privateKey" = "${var.argocd_private_key}"
+                appId = "${var.argocd_app_id}"
+                installationId = "${var.argocd_installation_id}"
+                privateKey = "${var.argocd_private_key}"
             })
         }
     }
