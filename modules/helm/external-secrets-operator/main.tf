@@ -104,11 +104,18 @@ locals {
       }
       rules = [
         {
-          apiGroups = [""]
-          resources = ["serviceaccounts", "serviceaccounts/token"]
-          verbs     = ["get", "create"]
+          apiGroups: [""]
+          resources = ["serviceaccounts"]
+          verbs     = ["get"]
+          resourceNames: ["${var.argocd_service_account_name}"]
+        },
+        {
+          apiGroups: [""]
+          resources = ["serviceaccounts/token"]
+          verbs     = ["create"]
+          resourceNames: ["${var.argocd_service_account_name}"] 
         }
-      ]
+      ]        
     },
     {
       apiVersion = "rbac.authorization.k8s.io/v1"
