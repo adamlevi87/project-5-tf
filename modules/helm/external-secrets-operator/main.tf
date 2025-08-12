@@ -34,7 +34,7 @@ locals {
           aws = {
             service = "SecretsManager"
             region  = "${var.aws_region}"
-            role = "${var.argocd_service_account_role_arn}"
+            #role = "${var.argocd_service_account_role_arn}"
             auth    = {
               jwt = {
                 serviceAccountRef = {
