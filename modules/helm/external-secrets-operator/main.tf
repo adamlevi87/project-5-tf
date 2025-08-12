@@ -84,54 +84,54 @@ locals {
           }
         ]
       }
-    }#,
+    },
     
-    # # --- RBAC: allow ESO controller SA to create TokenRequest in argocd ns ---
-    # {
-    #   apiVersion = "rbac.authorization.k8s.io/v1"
-    #   kind       = "Role"
-    #   metadata = {
-    #     name      = "eso-allow-tokenrequest"
-    #     namespace = "${var.argocd_namespace}"
-    #     annotations = {
-    #       "helm.sh/hook"            = "post-install,post-upgrade"
-    #       "helm.sh/hook-weight"     = "3"
-    #       "helm.sh/hook-delete-policy" = "before-hook-creation"
-    #     }
-    #   }
-    #   rules = [
-    #     {
-    #       apiGroups = [""]
-    #       resources = ["serviceaccounts/token"]
-    #       verbs     = ["create"]
-    #     }
-    #   ]
-    # },
-    # {
-    #   apiVersion = "rbac.authorization.k8s.io/v1"
-    #   kind       = "RoleBinding"
-    #   metadata = {
-    #     name      = "eso-allow-tokenrequest"
-    #     namespace = "${var.argocd_namespace}"
-    #     annotations = {
-    #       "helm.sh/hook"            = "post-install,post-upgrade"
-    #       "helm.sh/hook-weight"     = "4"
-    #       "helm.sh/hook-delete-policy" = "before-hook-creation"
-    #     }
-    #   }
-    #   subjects = [
-    #     {
-    #       kind      = "ServiceAccount"
-    #       name      = var.service_account_name         # ESO controller SA name
-    #       namespace = var.namespace                    # ESO release namespace
-    #     }
-    #   ]
-    #   roleRef = {
-    #     apiGroup = "rbac.authorization.k8s.io"
-    #     kind     = "Role"
-    #     name     = "eso-allow-tokenrequest"
-    #   }
-    # }
+    # --- RBAC: allow ESO controller SA to create TokenRequest in argocd ns ---
+    {
+      apiVersion = "rbac.authorization.k8s.io/v1"
+      kind       = "Role"
+      metadata = {
+        name      = "eso-allow-tokenrequest"
+        namespace = "${var.argocd_namespace}"
+        annotations = {
+          "helm.sh/hook"            = "post-install,post-upgrade"
+          "helm.sh/hook-weight"     = "3"
+          "helm.sh/hook-delete-policy" = "before-hook-creation"
+        }
+      }
+      rules = [
+        {
+          apiGroups = [""]
+          resources = ["serviceaccounts/token"]
+          verbs     = ["create"]
+        }
+      ]
+    },
+    {
+      apiVersion = "rbac.authorization.k8s.io/v1"
+      kind       = "RoleBinding"
+      metadata = {
+        name      = "eso-allow-tokenrequest"
+        namespace = "${var.argocd_namespace}"
+        annotations = {
+          "helm.sh/hook"            = "post-install,post-upgrade"
+          "helm.sh/hook-weight"     = "4"
+          "helm.sh/hook-delete-policy" = "before-hook-creation"
+        }
+      }
+      subjects = [
+        {
+          kind      = "ServiceAccount"
+          name      = var.service_account_name         # ESO controller SA name
+          namespace = var.namespace                    # ESO release namespace
+        }
+      ]
+      roleRef = {
+        apiGroup = "rbac.authorization.k8s.io"
+        kind     = "Role"
+        name     = "eso-allow-tokenrequest"
+      }
+    }
   ]
 }
 
