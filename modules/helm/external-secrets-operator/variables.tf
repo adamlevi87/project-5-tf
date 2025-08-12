@@ -74,3 +74,8 @@ variable "argocd_service_account_name" {
   type        = string
   description = "The name of the Kubernetes service account to use for the Helm chart"
 }
+
+variable "argocd_service_account_role_arn" {
+  type        = string
+  description = "The ARN of the IAM role of the service account of argocd"
+}

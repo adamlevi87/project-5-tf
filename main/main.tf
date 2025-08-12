@@ -445,7 +445,7 @@ module "external_secrets_operator" {
   project_tag        = var.project_tag
   environment        = var.environment
   aws_region         = var.aws_region
-
+  argocd_service_account_role_arn = module.argocd.service_account_role_arn
   argocd_secret_name = module.secrets_app_envs.app_secrets_names["${var.argocd_aws_secret_key}"]
 
   set_values = [

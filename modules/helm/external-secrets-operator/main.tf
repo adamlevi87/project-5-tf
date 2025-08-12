@@ -34,10 +34,13 @@ locals {
           aws = {
             service = "SecretsManager"
             region  = "${var.aws_region}"
+            role = "${var.argocd_service_account_role_arn}"
             auth    = {
-              serviceAccountRef = {
-                name      = "${var.argocd_service_account_name}"      # the SA you IRSA-bound
-                namespace = "${var.argocd_namespace}"
+              jwt = {
+                serviceAccountRef = {
+                  name      = "${var.argocd_service_account_name}"      # the SA you IRSA-bound
+                  namespace = "${var.argocd_namespace}"
+                }
               }
             }
           }
