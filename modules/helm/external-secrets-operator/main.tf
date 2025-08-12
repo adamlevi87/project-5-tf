@@ -16,13 +16,13 @@
 # locals (keeps the helm_release tidy)
 locals {
   eso_extra_objects = [
-    # 1) SecretStore in argocd ns, using the argocd SA (Model B)
+    # SecretStore in argocd ns, using the argocd SA
     {
       apiVersion = "external-secrets.io/v1beta1"
       kind       = "SecretStore"
       metadata   = {
         name      = "aws-sm-argocd"       # name it however you like
-        namespace = "${var.namespace}"
+        namespace = "${var.argocd_namespace}"
       }
       spec = {
         provider = {
@@ -32,7 +32,7 @@ locals {
             auth    = {
               serviceAccountRef = {
                 name      = "argocd"      # the SA you IRSA-bound
-                namespace = "${var.namespace}"
+                namespace = "${var.argocd_namespace}"
               }
             }
           }
@@ -46,7 +46,7 @@ locals {
       kind       = "ExternalSecret"
       metadata   = {
         name      = "argocd-repo-github-app"
-        namespace = "${var.namespace}"
+        namespace = "${var.argocd_namespace}"
       }
       spec = {
         refreshInterval = "1h"
@@ -55,7 +55,7 @@ locals {
           kind = "SecretStore"
         }
         target = {
-          name           = "repo-github-app-project5"   # K8s Secret name
+          name           = "${var.project_tag}-${var.environment}-argocd-secrets"   # K8s Secret name
           creationPolicy = "Owner"
           template       = {
             metadata = {
@@ -69,7 +69,7 @@ locals {
         dataFrom = [
           { 
             extract = {
-              key = "project-5-dev-argocd-credentials" 
+              key = "${var.argocd_secret_name}" 
             }
           }
         ]

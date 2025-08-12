@@ -401,7 +401,7 @@ module "argocd" {
 
   release_name          = "argocd-${var.environment}"
   service_account_name  = "argocd-${var.environment}-service-account"
-  namespace             = var.argocd_namespace  
+  namespace             = var.argocd_namespace
   chart_version         = var.argocd_chart_version
 
   oidc_provider_arn     = module.eks.oidc_provider_arn
@@ -438,11 +438,13 @@ module "external_secrets_operator" {
   oidc_provider_url  = module.eks.cluster_oidc_issuer_url
 
   service_account_name = "eso-${var.environment}-service-account"
-  release_name = "external-secrets-${var.environment}"
-  namespace = "external-secrets"
-
+  release_name       = "external-secrets-${var.environment}"
+  namespace          = "external-secrets"
+  argocd_namespace   = var.argocd_namespace
   project_tag        = var.project_tag
   environment        = var.environment
+
+  argocd_secret_name = module.secrets_app_envs.app_secrets_names["${var.argocd_aws_secret_key}"]
 
   set_values = [
     # {

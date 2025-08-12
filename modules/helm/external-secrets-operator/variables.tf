@@ -54,3 +54,13 @@ variable "lbc_webhook_ready" {
   description = "AWS LBC webhook readiness signal"
   type        = string
 }
+
+variable "argocd_namespace" {
+  type        = string
+  description = "The Kubernetes namespace of ArgoCD - used for SecretConfig & ExternalSecret crds"
+}
+
+variable "argocd_secret_name" {
+  description = "Name of ArgoCD's secret in AWS Secrets Manager"
+  type        = string
+}
