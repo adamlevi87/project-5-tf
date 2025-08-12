@@ -28,6 +28,7 @@ AWS_GITHUB_OIDC_ROLE="${8:-}"
 [[ "$DEBUG" == "-" ]] && DEBUG="normal"
 
 VAR_FILE="../environments/${ENV}/terraform.tfvars"
+VAR_FILE_2="../../sensitive_variables.tfvars"
 TF_WORK_DIR="../main"
 
 show_help() {
@@ -112,6 +113,12 @@ if [[ ! -f "$VAR_FILE" ]]; then
   exit 1
 fi
 
+# Validate variable file
+if [[ ! -f "$VAR_FILE_2" ]]; then
+  echo -e "${RED}ERROR:${RESET} Variable file '${VAR_FILE_2}' not found!"
+  exit 1
+fi
+
 # Validate RUN_MODE
 if [[ "$RUN_MODE" == "plan" ]]; then
   COMMAND_RUN_MODE=(plan -destroy)
@@ -129,7 +136,7 @@ COMMAND_RUN_MODE+=(
 ################ Script starts here ################
 
 if [[ "$SELECTION_METHOD" == "all" ]]; then
-  terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" 
+  terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" -var-file="$VAR_FILE_2" 
 
 elif [[ "$SELECTION_METHOD" == "filter" ]]; then
 
@@ -211,7 +218,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
   if [[ "$DEBUG" == "normal" ]]; then
     echo -e "\n${GREEN}======== ${COMMAND_RUN_MODE[*]} (all targets together) ========${RESET}"
     # shellcheck disable=SC2086
-    terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" $TARGETS
+    terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" -var-file="$VAR_FILE_2"  $TARGETS
   elif [[ "$DEBUG" == "debug" && "$RUN_MODE" == "plan" ]]; then
     LOG_FILE="dependency_warnings_${ENV}_$(date +%Y%m%d_%H%M%S).log"
     echo -e "${CYAN}Running dependency analysis mode...${RESET}"
@@ -225,7 +232,7 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
         echo -e "\n${GREEN}======== Analyzing: ${TARGET} ========${RESET}"
         
         # Capture terraform plan output
-        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" "$TARGET" 2>&1)
+        PLAN_OUTPUT=$(terraform -chdir="$TF_WORK_DIR" "${COMMAND_RUN_MODE[@]}" -var-file="$VAR_FILE" -var-file="$VAR_FILE_2" "$TARGET" 2>&1)
         
         # Log full output
         echo "=== Analysis for $TARGET ===" >> "$LOG_FILE"

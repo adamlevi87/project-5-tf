@@ -415,7 +415,12 @@ module "argocd" {
   frontend_security_group_id = module.frontend.security_group_id
 
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
-  depends_on = [module.eks,module.acm,module.backend,module.frontend]
+  depends_on = [
+    module.eks,
+    module.acm,
+    module.backend,
+    module.frontend
+  ]
 }
 
 module "external_secrets_operator" {
@@ -445,7 +450,12 @@ module "external_secrets_operator" {
   ]
   
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
-  depends_on = [module.eks,module.aws_auth_config]
+  depends_on = [
+    module.eks,
+    module.aws_auth_config,
+    module.argocd,
+    module.secrets_app_envs
+  ]
 }
 
 module "aws_load_balancer_controller" {
