@@ -39,7 +39,7 @@ locals {
               jwt = {
                 serviceAccountRef = {
                   name      = "${var.argocd_service_account_name}"      # the SA you IRSA-bound
-                  namespace = "${var.argocd_namespace}"
+                  #namespace = "${var.argocd_namespace}"
                 }
               }
             }
