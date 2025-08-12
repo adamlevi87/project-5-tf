@@ -302,6 +302,7 @@ variable "aws_iam_openid_connect_provider_github_arn" {
 variable "github_oidc_role_arn" {
   description = "ARN of the GitHub OIDC role used to deploy from GitHub Actions"
   type        = string
+  sensitive = true
 }
 
 #ArgoCD github App credentials
@@ -311,6 +312,7 @@ variable "github_oidc_role_arn" {
 variable "argocd_app_id" {
   description = "ArgoCD github application ID"
   type        = string
+  sensitive = true
 }
 
 # This is the installed ArgoCD Github Application: Installation ID 
@@ -319,6 +321,7 @@ variable "argocd_app_id" {
 variable "argocd_installation_id" {
   description = "ArgoCD github installation ID"
   type        = string
+  sensitive = true
 }
 
 # This is the installed ArgoCD Github Application: Private Key 
@@ -327,6 +330,7 @@ variable "argocd_installation_id" {
 variable "argocd_private_key" {
   description = "ArgoCD github private key"
   type        = string
+  sensitive = true
 }
 
 variable "argocd_aws_secret_key" {
