@@ -23,6 +23,11 @@ locals {
       metadata   = {
         name      = "aws-sm-argocd"       # name it however you like
         namespace = "${var.argocd_namespace}"
+        annotations = {
+          "helm.sh/hook"            = "post-install,post-upgrade"
+          "helm.sh/hook-weight"     = "5"
+          "helm.sh/hook-delete-policy" = "before-hook-creation,hook-succeeded"
+        }
       }
       spec = {
         provider = {
@@ -47,6 +52,11 @@ locals {
       metadata   = {
         name      = "argocd-repo-github-app"
         namespace = "${var.argocd_namespace}"
+        annotations = {
+          "helm.sh/hook"            = "post-install,post-upgrade"
+          "helm.sh/hook-weight"     = "5"
+          "helm.sh/hook-delete-policy" = "before-hook-creation,hook-succeeded"
+        }
       }
       spec = {
         refreshInterval = "1h"
