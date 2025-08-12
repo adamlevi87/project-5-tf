@@ -54,7 +54,7 @@ locals {
         namespace = "${var.argocd_namespace}"
         annotations = {
           "helm.sh/hook"            = "post-install,post-upgrade"
-          "helm.sh/hook-weight"     = "5"
+          "helm.sh/hook-weight"     = "10"
           "helm.sh/hook-delete-policy" = "before-hook-creation"
         }
       }
@@ -96,14 +96,14 @@ locals {
         annotations = {
           "helm.sh/hook"            = "post-install,post-upgrade"
           "helm.sh/hook-weight"     = "3"
-          "helm.sh/hook-delete-policy" = "before-hook-creation"
+          #"helm.sh/hook-delete-policy" = "before-hook-creation"
         }
       }
       rules = [
         {
           apiGroups = [""]
-          resources = ["serviceaccounts/token"]
-          verbs     = ["create"]
+          resources = ["serviceaccounts", "serviceaccounts/token"]
+          verbs     = ["Get", "create"]
         }
       ]
     },
@@ -116,7 +116,7 @@ locals {
         annotations = {
           "helm.sh/hook"            = "post-install,post-upgrade"
           "helm.sh/hook-weight"     = "4"
-          "helm.sh/hook-delete-policy" = "before-hook-creation"
+          #"helm.sh/hook-delete-policy" = "before-hook-creation"
         }
       }
       subjects = [
