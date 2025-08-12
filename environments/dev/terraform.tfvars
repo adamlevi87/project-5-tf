@@ -111,6 +111,7 @@ frontend_service_account_name = "frontend-sa"
 # later be used to pull from using ESO
 frontend_aws_secret_key = "frontend-envs"
 backend_aws_secret_key = "backend-envs"
+argocd_aws_secret_key = "argocd-credentials"
 
 
 github_org = "adamlevi87"

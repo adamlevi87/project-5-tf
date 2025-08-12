@@ -304,6 +304,36 @@ variable "github_oidc_role_arn" {
   type        = string
 }
 
+#ArgoCD github App credentials
+# This is the installed ArgoCD Github Application: Application ID 
+# This is created prior to running TF (manually) and set as a secret in the TF repository
+# This is then used to create an AWS secret which will give ArgoCD access to the Github Repository
+variable "argocd_app_id" {
+  description = "ArgoCD github application ID"
+  type        = string
+}
+
+# This is the installed ArgoCD Github Application: Installation ID 
+# This is created prior to running TF (manually) and set as a secret in the TF repository
+# This is then used to create an AWS secret which will give ArgoCD access to the Github Repository
+variable "argocd_installation_id" {
+  description = "ArgoCD github installation ID"
+  type        = string
+}
+
+# This is the installed ArgoCD Github Application: Private Key 
+# This is created prior to running TF (manually) and set as a secret in the TF repository
+# This is then used to create an AWS secret which will give ArgoCD access to the Github Repository
+variable "argocd_private_key" {
+  description = "ArgoCD github private key"
+  type        = string
+}
+
+variable "argocd_aws_secret_key" {
+  description = "Key used to name the argocd application's AWS secret (holds argocd's credentials for the gitops repo"
+  type        = string
+}
+
 variable "eks_user_access_map" {
   description = "Map of IAM users to be added to aws-auth with their usernames and groups"
   type = map(object({
