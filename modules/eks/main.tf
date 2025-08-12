@@ -152,7 +152,7 @@ resource "aws_eks_cluster" "main" {
     public_access_cidrs     = var.eks_api_allowed_cidr_blocks
   }
 
-  enabled_cluster_log_types = var.cluster_enabled_log_types
+    enabled_cluster_log_types = var.cluster_enabled_log_types != null ? var.cluster_enabled_log_types : []
 
   depends_on = [
     aws_iam_role_policy_attachment.cluster_policy,

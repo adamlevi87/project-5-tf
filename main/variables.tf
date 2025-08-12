@@ -219,9 +219,15 @@ variable "eks_node_min_capacity" {
 
 # EKS Logging Configuration
 variable "cluster_enabled_log_types" {
-  description = "List of cluster log types to enable. Available options: api, audit, authenticator, controllerManager, scheduler"
-  type        = list(string)
+  description = <<EOT
+List of cluster log types to enable.
+Available: api, audit, authenticator, controllerManager, scheduler.
+Set to null to disable logging entirely.
+EOT
+  type    = list(string)
+  default = null
 }
+
 
 variable "eks_log_retention_days" {
   description = "CloudWatch log retention period in days for EKS cluster"
