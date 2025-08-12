@@ -400,7 +400,7 @@ module "argocd" {
   environment        = var.environment
 
   release_name          = "argocd-${var.environment}"
-  service_account_name  = "argocd-${var.environment}-sa"
+  service_account_name  = "argocd-${var.environment}-service-account"
   namespace             = var.argocd_namespace  
   chart_version         = var.argocd_chart_version
 
@@ -424,7 +424,8 @@ module "argocd" {
     module.eks,
     module.acm,
     module.backend,
-    module.frontend
+    module.frontend,
+    module.secrets_app_envs
   ]
 }
  
@@ -444,10 +445,10 @@ module "external_secrets_operator" {
   environment        = var.environment
 
   set_values = [
-    {
-      name  = "webhook.port"
-      value = "10250"
-    }#,
+    # {
+    #   name  = "webhook.port"
+    #   value = "10250"
+    # },
     # {
     #   name  = "serviceAccount.create"
     #   value = "true"

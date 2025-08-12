@@ -274,6 +274,11 @@ variable "github_application_repo" {
   type        = string
 }
 
+variable "github_gitops_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+
 variable "github_org" {
   description = "GitHub organization"
   type        = string

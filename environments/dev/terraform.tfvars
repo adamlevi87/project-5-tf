@@ -116,6 +116,7 @@ argocd_aws_secret_key = "argocd-credentials"
 
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
+github_gitops_repo  = "project-5-gitops"
 
 eks_user_access_map = {
   adam_local = {
