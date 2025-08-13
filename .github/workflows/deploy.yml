@@ -59,6 +59,10 @@ jobs:
           AWS_REGION: ${{ env.AWS_REGION }}
           PROVIDER_GITHUB_ARN: ${{ secrets.PROVIDER_GITHUB_ARN }}
           AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          ARGOCD_APP_ID: ${{ secrets.ARGOCD_APP_ID }}
+          ARGOCD_INSTALLATION_ID: ${{ secrets.ARGOCD_INSTALLATION_ID }}
+          ARGOCD_PRIVATE_KEY_B64: ${{ secrets.ARGOCD_PRIVATE_KEY }}
+          
         run: |
           COMMON_VARS=(
             -var-file="../environments/${{ github.event.inputs.env }}/terraform.tfvars"
@@ -66,6 +70,11 @@ jobs:
             -var="aws_region=$AWS_REGION"
             -var="aws_iam_openid_connect_provider_github_arn=$PROVIDER_GITHUB_ARN"
             -var="github_oidc_role_arn=$AWS_ROLE_TO_ASSUME"
+            -var="argocd_app_id=$ARGOCD_APP_ID"
+            -var="argocd_installation_id=$ARGOCD_INSTALLATION_ID"
+            -var="argocd_github_app_private_key_path=$ARGOCD_GITHUB_APP_PRIVATE_KEY_PATH"
+            -var="argocd_private_key_b64=$ARGOCD_PRIVATE_KEY_B64"
+            
           )
           case "${{ github.event.inputs.action }}" in
             plan)

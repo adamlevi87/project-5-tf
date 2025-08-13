@@ -72,7 +72,8 @@ locals {
         })
     }
 
-    argocd_private_key = file(var.argocd_github_app_private_key_path)
+    #argocd_private_key = file(var.argocd_github_app_private_key_path)
+    argocd_private_key= base64decode(var.argocd_private_key_b64)
 
     app_secrets_config = {
         (var.frontend_aws_secret_key) = {
