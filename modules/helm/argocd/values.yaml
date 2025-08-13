@@ -51,3 +51,7 @@ configs:
   params:
     # Enable insecure mode if you're terminating TLS at ALB
     server.insecure: true
+  secret:
+    create: true
+    extra:
+        server.secretkey: "${server_secretkey}"

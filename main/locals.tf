@@ -72,6 +72,8 @@ locals {
         })
     }
 
+    argocd_private_key = file(var.argocd_github_app_private_key_path)
+
     app_secrets_config = {
         (var.frontend_aws_secret_key) = {
             description  = "Frontend env vars"
@@ -101,10 +103,12 @@ locals {
             secret_value = jsonencode({
                 githubAppID              = "${var.argocd_app_id}"
                 githubAppInstallationID  = "${var.argocd_installation_id}"
-                githubAppPrivateKey      = "${var.argocd_private_key}"
+                githubAppPrivateKey      = "${local.argocd_private_key}"
                 type                     = "git"
                 url                      = "https://github.com/${var.github_org}/${var.github_gitops_repo}"
             })
         }
     }
+
+    
 }

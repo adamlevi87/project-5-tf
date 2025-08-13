@@ -17,6 +17,11 @@ locals {
   argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${var.backend_security_group_id}"
 }
 
+resource "random_password" "argocd_server_secretkey" {
+  length  = 48
+  special = false
+}
+
 resource "kubernetes_namespace" "this" {
   metadata {
     name = var.namespace
@@ -54,6 +59,7 @@ resource "helm_release" "this" {
           #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
           security_group_id         = local.argo_security_group_list
           acm_cert_arn             = var.acm_cert_arn
+          server_secretkey         = random_password.argocd_server_secretkey.result
       })
   ]
 

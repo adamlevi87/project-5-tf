@@ -332,10 +332,19 @@ variable "argocd_installation_id" {
 # This is the installed ArgoCD Github Application: Private Key 
 # This is created prior to running TF (manually) and set as a secret in the TF repository
 # This is then used to create an AWS secret which will give ArgoCD access to the Github Repository
-variable "argocd_private_key" {
-  description = "ArgoCD github private key"
-  type        = string
+# variable "argocd_private_key" {
+#   description = "ArgoCD github private key"
+#   type        = string
+#   sensitive = true
+# }
+
+# This is the installed ArgoCD Github Application: Private Key - the local path to it
+# This is created prior to running TF (manually) and saved as a file when working locally
+# This is then used to create an AWS secret which will give ArgoCD access to the Github Repository
+variable "argocd_github_app_private_key_path" {
+  type      = string
   sensitive = true
+  # no default
 }
 
 variable "argocd_aws_secret_key" {
