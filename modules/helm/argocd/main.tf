@@ -208,7 +208,7 @@ resource "kubernetes_manifest" "argocd_smoke_app" {
       project = "default"
       source = {
         repoURL        = "https://github.com/adamlevi87/project-5-gitops"     # must match the repo used in your repository-type Secret
-        targetRevision = "HEAD"
+        targetRevision = "main"
         path           = "smoke"    # a folder in that repo with a simple manifest (e.g., a ConfigMap)
       }
       destination = {
@@ -228,5 +228,5 @@ resource "kubernetes_manifest" "argocd_smoke_app" {
     }
   }
 
-  depends_on = helm_release.this
+  depends_on = [helm_release.this]
 }
