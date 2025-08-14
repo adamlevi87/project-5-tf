@@ -106,7 +106,8 @@ locals {
                 githubAppInstallationID  = "${var.argocd_installation_id}"
                 githubAppPrivateKey      = "${local.argocd_private_key}"
                 type                     = "git"
-                url                      = "https://github.com/${var.github_org}/${var.github_gitops_repo}"
+                REPO_URL_GITOPS          = "https://github.com/${var.github_org}/${var.github_gitops_repo}"
+                REPO_URL_APP             = "https://github.com/${var.github_org}/${var.github_application_repo}"
             })
         }
     }
