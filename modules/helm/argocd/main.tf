@@ -191,42 +191,42 @@ resource "aws_security_group_rule" "allow_alb_to_argocd_pods" {
 }
 
 
-# temporary initial app
+# # temporary initial app
 
-resource "kubernetes_manifest" "argocd_smoke_app" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "repo-smoke"
-      namespace = "argocd"
-      annotations = {
-        "argocd.argoproj.io/sync-wave" = "0"
-      }
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://github.com/adamlevi87/project-5-gitops"     # must match the repo used in your repository-type Secret
-        targetRevision = "main"
-        path           = "smoke"    # a folder in that repo with a simple manifest (e.g., a ConfigMap)
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "argocd-smoke"
-      }
-      syncPolicy = {
-        automated = {
-          prune    = false
-          selfHeal = false
-        }
-        syncOptions = [
-          "CreateNamespace=true",
-          "PrunePropagationPolicy=foreground"
-        ]
-      }
-    }
-  }
+# resource "kubernetes_manifest" "argocd_smoke_app" {
+#   manifest = {
+#     apiVersion = "argoproj.io/v1alpha1"
+#     kind       = "Application"
+#     metadata = {
+#       name      = "repo-smoke"
+#       namespace = "argocd"
+#       annotations = {
+#         "argocd.argoproj.io/sync-wave" = "0"
+#       }
+#     }
+#     spec = {
+#       project = "default"
+#       source = {
+#         repoURL        = "https://github.com/adamlevi87/project-5-gitops"     # must match the repo used in your repository-type Secret
+#         targetRevision = "main"
+#         path           = "smoke"    # a folder in that repo with a simple manifest (e.g., a ConfigMap)
+#       }
+#       destination = {
+#         server    = "https://kubernetes.default.svc"
+#         namespace = "argocd-smoke"
+#       }
+#       syncPolicy = {
+#         automated = {
+#           prune    = false
+#           selfHeal = false
+#         }
+#         syncOptions = [
+#           "CreateNamespace=true",
+#           "PrunePropagationPolicy=foreground"
+#         ]
+#       }
+#     }
+#   }
 
-  depends_on = [helm_release.this]
-}
+#   depends_on = [helm_release.this]
+# }
