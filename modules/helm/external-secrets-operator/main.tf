@@ -49,11 +49,12 @@ locals {
     },
 
     # 2) ExternalSecret that pass-through copies all keys from AWS -> K8s Secret
+    # (access to the gitops repo)
     {
       apiVersion = "external-secrets.io/v1beta1"
       kind       = "ExternalSecret"
       metadata   = {
-        name      = "argocd-repo-github-app"
+        name      = "argocd-repo-github-gitops-repo"
         namespace = "${var.argocd_namespace}"
         annotations = {
           "helm.sh/hook"            = "post-install,post-upgrade"
@@ -68,13 +69,18 @@ locals {
           kind = "SecretStore"
         }
         target = {
-          name           = "${var.project_tag}-${var.environment}-argocd-secrets"   # K8s Secret name
+          name           = "${var.project_tag}-${var.environment}-argocd-secrets-gitops-repo"   # K8s Secret name
           creationPolicy = "Owner"
           template       = {
             metadata = {
               labels = {
                 "argocd.argoproj.io/secret-type" = "repository"
               }
+            }
+            data = {
+              url = "{{ .REPO_URL_GITOPS }}"
+              # rest of the variables will be auto injected (including the extra repo urls
+              # but ArgoCD only cares about the URL variable)
             }
           }
         }
@@ -89,6 +95,53 @@ locals {
       }
     },
     
+    # 3) ExternalSecret that pass-through copies all keys from AWS -> K8s Secret
+    # (access to the application repo)
+    {
+      apiVersion = "external-secrets.io/v1beta1"
+      kind       = "ExternalSecret"
+      metadata   = {
+        name      = "argocd-repo-github-app-repo"
+        namespace = "${var.argocd_namespace}"
+        annotations = {
+          "helm.sh/hook"            = "post-install,post-upgrade"
+          "helm.sh/hook-weight"     = "10"
+          "helm.sh/hook-delete-policy" = "before-hook-creation"
+        }
+      }
+      spec = {
+        refreshInterval = "1h"
+        secretStoreRef  = {
+          name = "aws-sm-argocd"
+          kind = "SecretStore"
+        }
+        target = {
+          name           = "${var.project_tag}-${var.environment}-argocd-secrets-app-repo"   # K8s Secret name
+          creationPolicy = "Owner"
+          template       = {
+            metadata = {
+              labels = {
+                "argocd.argoproj.io/secret-type" = "repository"
+              }
+            }
+            data = {
+              url = "{{ .REPO_URL_APP }}"
+              # rest of the variables will be auto injected (including the extra repo urls
+              # but ArgoCD only cares about the URL variable)
+            }
+          }
+        }
+        # Pass-through: copies ALL JSON properties from the AWS secret
+        dataFrom = [
+          { 
+            extract = {
+              key = "${var.argocd_secret_name}" 
+            }
+          }
+        ]
+      }
+    },
+
     # --- RBAC: allow ESO controller SA to create TokenRequest in argocd ns ---
     {
       apiVersion = "rbac.authorization.k8s.io/v1"
@@ -104,16 +157,16 @@ locals {
       }
       rules = [
         {
-          apiGroups: [""]
-          resources = ["serviceaccounts"]
-          verbs     = ["get"]
-          resourceNames: ["${var.argocd_service_account_name}"]
+          apiGroups     = [""]
+          resources     = ["serviceaccounts"]
+          verbs         = ["get"]
+          resourceNames = ["${var.argocd_service_account_name}"]
         },
         {
-          apiGroups: [""]
-          resources = ["serviceaccounts/token"]
-          verbs     = ["create"]
-          resourceNames: ["${var.argocd_service_account_name}"] 
+          apiGroups     = ["authentication.k8s.io"]
+          resources     = ["serviceaccounts/token"]
+          verbs         = ["create"]
+          resourceNames = ["${var.argocd_service_account_name}"] 
         }
       ]        
     },
