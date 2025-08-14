@@ -77,13 +77,17 @@ locals {
                 "argocd.argoproj.io/secret-type" = "repository"
               }
             }
-            data = {
-              url = "{{ .REPO_URL_GITOPS }}"
-              # rest of the variables will be auto injected (including the extra repo urls
-              # but ArgoCD only cares about the URL variable)
-            }
           }
         }
+        data = [
+          {
+            secretKey = "url"
+            remoteRef = {
+              key      = "${var.argocd_secret_name}"
+              property = "REPO_URL_GITOPS"
+            } 
+          }
+        ]
         # Pass-through: copies ALL JSON properties from the AWS secret
         dataFrom = [
           { 
@@ -124,13 +128,18 @@ locals {
                 "argocd.argoproj.io/secret-type" = "repository"
               }
             }
-            data = {
-              url = "{{ .REPO_URL_APP }}"
-              # rest of the variables will be auto injected (including the extra repo urls
-              # but ArgoCD only cares about the URL variable)
-            }
           }
         }
+        data = [
+          {
+            secretKey = "url"
+            remoteRef = {
+              key      = "${var.argocd_secret_name}"
+              property = "REPO_URL_APP"
+            } 
+          }
+        ]
+        
         # Pass-through: copies ALL JSON properties from the AWS secret
         dataFrom = [
           { 
