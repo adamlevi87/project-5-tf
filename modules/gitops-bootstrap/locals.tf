@@ -53,7 +53,7 @@ locals {
     app_repo_url              = local.app_repo_url
     helm_release_name         = "frontend"
     github_org                = var.github_org
-    github_gitops_repo        = var.gitops_repo_url
+    github_gitops_repo        = var.github_gitops_repo
     github_application_repo   = var.github_application_repo
   }
 
@@ -82,7 +82,7 @@ locals {
     app_repo_url              = local.app_repo_url
     helm_release_name         = "backend"
     github_org                = var.github_org
-    github_gitops_repo        = var.gitops_repo_url
+    github_gitops_repo        = var.github_gitops_repo
     github_application_repo   = var.github_application_repo
   }
   
