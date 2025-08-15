@@ -177,13 +177,10 @@ resource "helm_release" "this" {
           security_group_id         = local.argo_security_group_list
           acm_cert_arn             = var.acm_cert_arn
           server_secretkey         = random_password.argocd_server_secretkey.result
+        }),
+        yamlencode({
+          additionalObjects = local.argocd_additionalObjects
         })
-  ]
-  set = [
-    {
-      name  = "additionalObjects"
-      value = yamlencode(local.argocd_additionalObjects)
-    } 
   ]
   
   depends_on = [
