@@ -90,7 +90,7 @@ argocd_allowed_cidr_blocks = ["85.64.225.89/32"]
 
 
 # EKS Node Group Configuration (minimal for dev)
-eks_node_instance_types   = ["t3.micro"]  # Bare minimum instance type
+eks_node_instance_types   = ["t3.small"]  # Bare minimum instance type
 eks_node_desired_capacity = 1             # Single node for dev
 eks_node_max_capacity     = 3             # Allow scaling if needed
 eks_node_min_capacity     = 1             # Keep at least one node
