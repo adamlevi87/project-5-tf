@@ -339,8 +339,8 @@ module "github_repo_secrets" {
   github_secrets = {
     AWS_ROLE_TO_ASSUME = "${module.github_oidc.github_actions_role_arn}"
     # ECR
-    ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[0]]}"
-    ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls[var.ecr_repositories_applications[1]]}"
+    ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls["backend"]}"
+    ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls["frontend"]}"
     
     # Inject backend-specific values
     # SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
@@ -489,4 +489,65 @@ module "aws_load_balancer_controller" {
   oidc_provider_url = module.eks.cluster_oidc_issuer_url
 
   depends_on = [module.eks]
+}
+
+# Call to gitops-bootstrap module
+module "gitops_bootstrap" {
+  source = "./modules/gitops-bootstrap"
+  
+  # GitHub Configuration
+  gitops_repo_owner       = var.github_org
+  github_gitops_repo      = var.github_gitops_repo
+  github_org              = var.github_org  
+  github_application_repo = var.github_application_repo
+  
+  # Project Configuration
+  project_tag   = var.project_tag
+  app_name      = var.project_tag
+  environment   = var.environment
+  aws_region    = var.aws_region
+  
+  # ECR Repository URLs
+  ecr_frontend_repo_url = module.ecr.ecr_repository_urls["frontend"]
+  ecr_backend_repo_url  = module.ecr.ecr_repository_urls["backend"]
+  
+  # Frontend Configuration
+  frontend_namespace              = var.frontend_service_namespace
+  frontend_service_account_name   = var.frontend_service_account_name
+  frontend_container_port         = 80
+  frontend_ingress_host           = "${var.frontend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
+  frontend_external_dns_hostname  = "${var.frontend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
+  frontend_external_secret_name   = "frontend-app-secrets"
+  frontend_aws_secret_key         = var.frontend_aws_secret_key
+  
+  # Backend Configuration  
+  backend_namespace               = var.backend_service_namespace
+  backend_service_account_name    = var.backend_service_account_name
+  backend_container_port          = 3000
+  backend_ingress_host            = "${var.backend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
+  backend_external_dns_hostname   = "${var.backend_base_domain_name}.${var.subdomain_name}.${var.domain_name}"
+  backend_external_secret_name    = "backend-app-secrets"
+  backend_aws_secret_key          = var.backend_aws_secret_key
+  
+  # Shared ALB Configuration
+  alb_group_name         = "${var.project_tag}-${var.environment}-alb-shared-group"
+  alb_security_groups    = module.argocd.joined_security_group_ids
+  acm_certificate_arn    = module.acm.this_certificate_arn
+  
+  # ArgoCD Configuration
+  argocd_namespace = var.argocd_namespace
+  
+  # Control Variables
+  bootstrap_mode = var.bootstrap_mode
+  update_apps    = var.update_apps
+  
+  # Optional Configuration (using defaults)
+  branch_name_prefix  = var.branch_name_prefix
+  target_branch       = var.gitops_target_branch
+  
+  depends_on = [
+    module.ecr,
+    module.acm,
+    module.argocd
+  ]
 }

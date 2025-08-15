@@ -444,3 +444,26 @@ variable "backend_aws_secret_key" {
   type        = string
 }
 
+variable "bootstrap_mode" {
+  description = "Whether to create all GitOps files (project + applications + values) - bootstrap mode"
+  type        = bool
+  default     = false
+}
+
+variable "update_apps" {
+  description = "Whether to update infrastructure values for both frontend and backend"
+  type        = bool
+  default     = false
+}
+
+variable "branch_name_prefix" {
+  description = "Prefix for auto-generated branch names"
+  type        = string
+  default     = "terraform-updates"
+}
+
+variable "gitops_target_branch" {
+  description = "Target branch for pull requests"
+  type        = string
+  default     = "main"
+}

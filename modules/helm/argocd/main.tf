@@ -14,7 +14,8 @@
 # }
 
 locals {
-  argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${var.backend_security_group_id}"
+  joined_security_group_ids = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${var.backend_security_group_id}"
+  
   argocd_additionalObjects = [
     # 1) setting up the Project
     {
@@ -174,7 +175,7 @@ resource "helm_release" "this" {
           ingress_controller_class  = var.ingress_controller_class
           alb_group_name           = var.alb_group_name
           #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-          security_group_id         = local.argo_security_group_list
+          security_group_id         = local.joined_security_group_ids
           acm_cert_arn             = var.acm_cert_arn
           server_secretkey         = random_password.argocd_server_secretkey.result
         }),
@@ -199,7 +200,7 @@ resource "helm_release" "this" {
 #     ingress_controller_class  = var.ingress_controller_class
 #     alb_group_name           = var.alb_group_name
 #     #allowed_cidrs            = join(",", var.argocd_allowed_cidr_blocks)
-#     security_group_id         = local.argo_security_group_list
+#     security_group_id         = local.joined_security_group_ids
 #     acm_cert_arn              = var.acm_cert_arn
 #   })
 

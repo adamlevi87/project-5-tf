@@ -125,6 +125,14 @@ github_org = "adamlevi87"
 github_application_repo = "project-5-app"
 github_gitops_repo  = "project-5-gitops"
 
+# Gitops related settings
+update_apps = false
+bootstrap_mode = false
+branch_name_prefix  = "terraform-updates"
+# From which branch to create a new branch and where to merge back to
+# when creating initial yamls in the gitops repo
+gitops_target_branch = "main"
+
 eks_user_access_map = {
   adam_local = {
     username = "adam.local"

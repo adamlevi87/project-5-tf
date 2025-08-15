@@ -156,18 +156,18 @@ variable "argocd_namespace" {
   default     = "argocd"
 }
 
-variable "argocd_project_name" {
-  description = "ArgoCD project name (defaults to project_tag)"
-  type        = string
-  default     = ""
-}
+# variable "argocd_project_name" {
+#   description = "ArgoCD project name (defaults to project_tag)"
+#   type        = string
+#   default     = ""
+# }
 
-# Optional Configuration
-variable "create_pr" {
-  description = "Whether to create a pull request automatically"
-  type        = bool
-  default     = true
-}
+# # Optional Configuration
+# variable "create_pr" {
+#   description = "Whether to create a pull request automatically"
+#   type        = bool
+#   default     = true
+# }
 
 variable "branch_name_prefix" {
   description = "Prefix for auto-generated branch names"
@@ -182,25 +182,31 @@ variable "target_branch" {
 }
 
 # Enable/disable which applications to update
-variable "update_frontend" {
-  description = "Whether to update frontend configuration"
-  type        = bool
-  default     = true
-}
+# variable "update_frontend" {
+#   description = "Whether to update frontend configuration"
+#   type        = bool
+#   default     = true
+# }
 
-variable "update_backend" {
-  description = "Whether to update backend configuration"
-  type        = bool
-  default     = true
-}
+# variable "update_backend" {
+#   description = "Whether to update backend configuration"
+#   type        = bool
+#   default     = true
+# }
 
 variable "bootstrap_mode" {
-  description = "Whether to create ArgoCD project and application files (bootstrap)"
+  description = "Whether to create all GitOps files (project + applications + values) - bootstrap mode"
   type        = bool
   default     = false
 }
 
-variable "applications" {
-  description = "List of applications to create (for bootstrap mode)"
-  type        = list(string)
+# variable "applications" {
+#   description = "List of applications to create (for bootstrap mode)"
+#   type        = list(string)
+# }
+
+variable "update_apps" {
+  description = "Whether to update infrastructure values for both frontend and backend"
+  type        = bool
+  default     = false
 }
