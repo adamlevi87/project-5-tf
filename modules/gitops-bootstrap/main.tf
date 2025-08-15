@@ -31,10 +31,6 @@ data "github_repository_file" "current_files" {
   repository = data.github_repository.gitops_repo.name
   file       = each.value
   branch     = var.target_branch
-  
-  lifecycle {
-    ignore_changes = all
-  }
 }
 
 # CHANGED: Added local.has_changes condition to branch creation
