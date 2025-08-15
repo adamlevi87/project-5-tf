@@ -419,6 +419,12 @@ module "argocd" {
 
   secret_arn = module.secrets_app_envs.app_secrets_arns["${var.argocd_aws_secret_key}"]
 
+  github_application_repo       = var.github_application_repo
+  github_gitops_repo            = var.github_gitops_repo
+  github_org                    = var.github_org
+  app_of_apps_path              = var.argocd_app_of_apps_path
+  app_of_apps_target_revision   = var.argocd_app_of_apps_target_revision
+
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [
     module.eks,

@@ -21,8 +21,8 @@ locals {
       apiVersion = "argoproj.io/v1alpha1"
       kind       = "AppProject"
       metadata = {
-        name      = "project-5"
-        namespace = "argocd"
+        name      = "${var.project_tag}"
+        namespace = "${var.namespace}"
         annotations = {
           "helm.sh/hook"                = "post-install,post-upgrade"
           "helm.sh/hook-weight"         = "1"
@@ -30,10 +30,10 @@ locals {
         }
       }
       spec = {
-        description = "Project-5 apps and infra"
+        description = "${var.project_tag} apps and infra"
         sourceRepos = [
-          "https://github.com/adamlevi87/project-5-gitops.git",
-          "https://github.com/adamlevi87/project-5-app.git"
+          "https://github.com/${var.github_org}/${github_gitops_repo}.git",
+          "https://github.com/${var.github_org}/${github_application_repo}.git"
         ]
         destinations = [
           {
@@ -91,7 +91,7 @@ locals {
       kind       = "Application"
       metadata = {
         name      = "app-of-apps"
-        namespace = "argocd"
+        namespace = "${var.namespace}"
         annotations = {
           "helm.sh/hook"                = "post-install,post-upgrade"
           "helm.sh/hook-weight"         = "5"
@@ -99,11 +99,11 @@ locals {
         }
       }
       spec = {
-        project = "project-5"
+        project = "${var.project_tag}"
         source = {
-          repoURL        = "https://github.com/adamlevi87/project-5-gitops.git"
-          path           = "apps"
-          targetRevision = "main"
+          repoURL        = "https://github.com/${var.github_org}/${github_gitops_repo}.git"
+          path           = "${var.app_of_apps_path}"
+          targetRevision = "${var.app_of_apps_target_revision}"
           directory = {
             recurse = true
           }

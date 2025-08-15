@@ -96,3 +96,30 @@ variable "secret_arn" {
   description = "ARN of the AWS Secrets Manager secret used by the application"
   type        = string
 }
+
+variable "github_application_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+
+variable "github_gitops_repo" {
+  description = "GitHub repository name"
+  type        = string
+}
+
+variable "github_org" {
+  description = "GitHub organization"
+  type        = string
+}
+
+variable "app_of_apps_path" {
+  description = "Path within the GitOps repository where ArgoCD should look for Application manifests."
+  type        = string
+  default     = "apps"
+}
+
+variable "app_of_apps_target_revision" {
+  description = "Branch or Git reference in the GitOps repository that ArgoCD should track."
+  type        = string
+  default     = "main"
+}

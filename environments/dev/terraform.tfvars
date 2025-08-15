@@ -130,12 +130,12 @@ eks_user_access_map = {
 }
 
 # ArgoCD
-argocd_namespace         = "argocd"
-argocd_helm_release_base_name = "argocd"
-argocd_chart_version     = "8.2.3"
-argocd_base_domain_name = "argocd"
-
-
+argocd_namespace                    = "argocd"
+argocd_helm_release_base_name       = "argocd"
+argocd_chart_version                = "8.2.3"
+argocd_app_of_apps_path             = "apps"
+argocd_app_of_apps_target_revision  = "main"
+argocd_base_domain_name             = "argocd"
 
 
 # container_port = 3000

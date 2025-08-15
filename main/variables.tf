@@ -394,6 +394,18 @@ variable "argocd_base_domain_name" {
   default     = "argocd"
 }
 
+variable "argocd_app_of_apps_path" {
+  description = "Path within the GitOps repository where ArgoCD should look for Application manifests."
+  type        = string
+  default     = "apps"
+}
+
+variable "argocd_app_of_apps_target_revision" {
+  description = "Branch or Git reference in the GitOps repository that ArgoCD should track."
+  type        = string
+  default     = "main"
+}
+
 variable "frontend_base_domain_name" {
   type        = string
   description = "Base domain name for the frontend"
