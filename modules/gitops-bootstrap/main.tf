@@ -62,8 +62,6 @@ resource "github_repository_file" "bootstrap_files" {
   commit_email   = "terraform@gitops.local"
   
   overwrite_on_create = true
-
-  depends_on = [ terraform_data.gitops_trigger ]
 }
 
 # Infrastructure files (bootstrap OR update mode)
@@ -84,7 +82,6 @@ resource "github_repository_file" "infra_files" {
   
   overwrite_on_create = true
   depends_on = [
-    terraform_data.gitops_trigger,
     github_repository_file.bootstrap_files
   ]
 }
@@ -100,7 +97,6 @@ resource "github_repository_pull_request" "gitops_pr" {
   base_ref          = var.target_branch
   
   depends_on = [
-      terraform_data.gitops_trigger,
       github_repository_file.infra_files
     ]
 }
