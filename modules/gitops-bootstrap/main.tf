@@ -77,6 +77,7 @@ resource "github_repository_file" "bootstrap_files" {
   
   overwrite_on_create = true
 
+  depends_on = [ terraform_data.gitops_trigger ]
 }
 
 # Infrastructure files (bootstrap OR update mode)
@@ -96,7 +97,10 @@ resource "github_repository_file" "infra_files" {
   commit_email   = "terraform@gitops.local"
   
   overwrite_on_create = true
-  depends_on = [github_repository_file.bootstrap_files]
+  depends_on = [
+    github_repository_file.bootstrap_files,
+    terraform_data.gitops_trigger
+  ]
 }
 
 # Always create PR
