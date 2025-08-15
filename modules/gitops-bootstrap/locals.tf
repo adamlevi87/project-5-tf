@@ -116,14 +116,17 @@ locals {
     } : {}
   )
 
-  # Check which files have changed
-  changed_files = {
-    for file_path, file_data in data.github_repository_file.current_files :
-    file_path => try(
-      file_data.content != base64encode(local.rendered_content[file_path]),
-      true # If file doesn't exist, consider it changed
-    )
-  }
+  # # Check which files have changed
+  # changed_files = {
+  #   for file_path, file_data in data.github_repository_file.current_files :
+  #   file_path => try(
+  #     file_data.content != base64encode(local.rendered_content[file_path]),
+  #     true # If file doesn't exist, consider it changed
+  #   )
+  # }
   
-  has_changes = length([for changed in local.changed_files : changed if changed]) > 0
+  #has_changes = length([for changed in local.changed_files : changed if changed]) > 0
+
+  has_changes = (var.bootstrap_mode || var.update_apps) && terraform_data.gitops_trigger.output != null
+
 }

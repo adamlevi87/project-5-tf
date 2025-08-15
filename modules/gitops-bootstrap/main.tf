@@ -14,28 +14,41 @@ data "github_repository" "gitops_repo" {
   full_name = "${var.gitops_repo_owner}/${var.github_gitops_repo}"
 }
 
-data "github_repository_file" "current_files" {
-  for_each = toset(concat(
-    # Always check infra files
-    [local.frontend_infra_values_path, local.backend_infra_values_path],
-    # Conditionally check bootstrap files
-    var.bootstrap_mode ? [
-      local.project_yaml_path,
-      local.frontend_app_path,
-      local.backend_app_path,
-      local.frontend_app_values_path,
-      local.backend_app_values_path
-    ] : []
-  ))
+# data "github_repository_file" "current_files" {
+#   for_each = toset(concat(
+#     # Always check infra files
+#     [local.frontend_infra_values_path, local.backend_infra_values_path],
+#     # Conditionally check bootstrap files
+#     var.bootstrap_mode ? [
+#       local.project_yaml_path,
+#       local.frontend_app_path,
+#       local.backend_app_path,
+#       local.frontend_app_values_path,
+#       local.backend_app_values_path
+#     ] : []
+#   ))
   
-  repository = data.github_repository.gitops_repo.name
-  file       = each.value
-  branch     = var.target_branch
+#   repository = data.github_repository.gitops_repo.name
+#   file       = each.value
+#   branch     = var.target_branch
+# }
+
+resource "terraform_data" "gitops_trigger" {
+  input = {
+    bootstrap_mode = var.bootstrap_mode
+    update_apps    = var.update_apps
+    environment    = var.environment
+    # These will trigger re-evaluation when they change
+    ecr_frontend   = var.ecr_frontend_repo_url
+    ecr_backend    = var.ecr_backend_repo_url
+    alb_groups     = var.alb_security_groups
+    cert_arn       = var.acm_certificate_arn
+  }
 }
 
 # CHANGED: Added local.has_changes condition to branch creation
 resource "github_branch" "gitops_branch" {
-  count = local.has_changes && (var.bootstrap_mode || var.update_apps) ? 1 : 0
+  count = local.has_changes ? 1 : 0
   
   repository = data.github_repository.gitops_repo.name
   branch     = local.branch_name
@@ -88,7 +101,7 @@ resource "github_repository_file" "infra_files" {
 
 # Always create PR
 resource "github_repository_pull_request" "gitops_pr" {
-  count = local.has_changes && (var.bootstrap_mode || var.update_apps) ? 1 : 0
+  count = local.has_changes ? 1 : 0
   
   base_repository   = data.github_repository.gitops_repo.name
   title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
