@@ -98,8 +98,8 @@ resource "github_repository_file" "infra_files" {
   
   overwrite_on_create = true
   depends_on = [
-    github_repository_file.bootstrap_files,
-    terraform_data.gitops_trigger
+    terraform_data.gitops_trigger,
+    github_repository_file.bootstrap_files
   ]
 }
 
@@ -114,6 +114,7 @@ resource "github_repository_pull_request" "gitops_pr" {
   base_ref          = var.target_branch
   
   depends_on = [
+      terraform_data.gitops_trigger,
       github_repository_file.infra_files
     ]
 }
