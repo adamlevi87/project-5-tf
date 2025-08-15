@@ -41,6 +41,8 @@ locals {
     frontend_external_dns_hostname  = var.frontend_external_dns_hostname
     frontend_external_secret_name   = var.frontend_external_secret_name
     frontend_aws_secret_key         = var.frontend_aws_secret_key
+    project_tag                     = var.project_tag
+    environment                     = var.environment
     aws_region                      = var.aws_region
   }
   
@@ -70,6 +72,8 @@ locals {
     backend_external_dns_hostname  = var.backend_external_dns_hostname
     backend_external_secret_name   = var.backend_external_secret_name
     backend_aws_secret_key         = var.backend_aws_secret_key
+    project_tag                     = var.project_tag
+    environment                     = var.environment
     aws_region                     = var.aws_region
   }
   
