@@ -1,5 +1,4 @@
 # Frontend infrastructure values - managed by Terraform
-# Generated on: ${timestamp}
 
 image:
   repository: "${ecr_frontend_repo_url}"

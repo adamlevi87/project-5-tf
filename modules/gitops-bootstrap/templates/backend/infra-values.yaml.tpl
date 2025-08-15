@@ -1,5 +1,4 @@
 # Backend infrastructure values - managed by Terraform
-# Generated on: ${timestamp}
 
 image:
   repository: "${ecr_backend_repo_url}"
