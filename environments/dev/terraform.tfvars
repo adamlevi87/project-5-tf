@@ -6,7 +6,7 @@ aws_region = "us-east-1"
 primary_availability_zones = 1  # Always keep 1 AZ for primary NAT gateway
 
 # Additional infrastructure (optional in single mode, required in real mode)
-additional_availability_zones = 2  # Can be reduced in single mode without affecting primary NAT
+additional_availability_zones = 1  # Can be reduced in single mode without affecting primary NAT
 
 # Network configuration
 vpc_cidr_block = "10.0.0.0/16"
