@@ -1,0 +1,21 @@
+# Backend application values - static configuration
+# This file is created once during bootstrap and maintained in GitOps
+
+replicaCount: 1
+
+# HPA Configuration
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 80  # Optional
+
+# Resource requests/limits for HPA to work
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
