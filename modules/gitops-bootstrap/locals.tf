@@ -53,8 +53,8 @@ locals {
     app_repo_url              = local.app_repo_url
     helm_release_name         = "frontend"
     github_org                = var.github_org
-    github_gitops_repo        = local.gitops_repo_url
-    github_application_repo   = local.github_application_repo
+    github_gitops_repo        = var.gitops_repo_url
+    github_application_repo   = var.github_application_repo
   }
 
   # Template variables for backend infra-values.yaml
@@ -82,8 +82,8 @@ locals {
     app_repo_url              = local.app_repo_url
     helm_release_name         = "backend"
     github_org                = var.github_org
-    github_gitops_repo        = local.gitops_repo_url
-    github_application_repo   = local.github_application_repo
+    github_gitops_repo        = var.gitops_repo_url
+    github_application_repo   = var.github_application_repo
   }
   
   # Applications to create (for bootstrap mode)
