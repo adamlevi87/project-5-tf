@@ -68,10 +68,10 @@ resource "aws_db_instance" "main" {
   allocated_storage     = var.allocated_storage
   max_allocated_storage = var.max_allocated_storage
   storage_type          = var.storage_type
-  storage_encrypted     = true
+  storage_encrypted     = var.storage_encrypted
   
   # Multi-AZ and networking
-  multi_az               = true  # Always enabled for high availability
+  multi_az               = var.multi_az_enabled
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   publicly_accessible    = false
@@ -86,13 +86,17 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot = var.skip_final_snapshot
   
   # Performance and monitoring
-  performance_insights_enabled = var.enable_performance_insights
-  monitoring_interval         = var.monitoring_interval
+  performance_insights_enabled = var.enable_performance_insights && var.instance_class != "db.t3.micro"
+  monitoring_interval         = var.instance_class == "db.t3.micro" ? 0 : var.monitoring_interval
   
+  # Copy tags from snapshot if restoring
+  copy_tags_to_snapshot = var.copy_tags_to_snapshot
+
   tags = {
     Name        = "${var.project_tag}-${var.environment}-db"
     Project     = var.project_tag
     Environment = var.environment
     Purpose     = "application-database"
+    Tier        = var.multi_az_enabled ? "production" : "development"
   }
 }

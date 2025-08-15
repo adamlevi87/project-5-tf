@@ -27,8 +27,12 @@ rds_postgres_table_name = "messages"
 
 # Storage (minimal cost)
 rds_allocated_storage     = 20      # AWS minimum for PostgreSQL
-rds_max_allocated_storage = 100     # Allow some autoscaling growth
+rds_max_allocated_storage = 20     # Allow some autoscaling growth
 rds_storage_type          = "gp2"   # Cheapest storage option
+storage_encrypted         = false
+
+# Multi-AZ and High Availability (NEW)
+multi_az_enabled = false            # Single AZ for free tier (Multi-AZ costs extra)
 
 # Backup and maintenance (minimal)
 rds_backup_retention_period = 1                    # 1 day minimum for dev
@@ -45,6 +49,9 @@ rds_skip_final_snapshot = true   # No final snapshot for dev environment
 # Monitoring (minimal to save costs)
 rds_enable_performance_insights = false  # Disable to save money
 rds_monitoring_interval         = 0      # 0 = disabled, saves costs
+
+# Additional settings for flexibility (NEW)
+copy_tags_to_snapshot = false            # No snapshots in dev anyway
 
 # Configuration for secrets
 secrets_config = {

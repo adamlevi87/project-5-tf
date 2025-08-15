@@ -155,3 +155,21 @@ variable "monitoring_interval" {
     error_message = "Monitoring interval must be one of: 0, 1, 5, 10, 15, 30, 60."
   }
 }
+
+variable "multi_az_enabled" {
+  description = "Enable Multi-AZ deployment for high availability"
+  type        = bool
+  default     = false  # Default to single AZ for cost savings
+}
+
+variable "storage_encrypted" {
+  description = "Enable storage encryption"
+  type        = bool
+  default     = true
+}
+
+variable "copy_tags_to_snapshot" {
+  description = "Copy tags to snapshots"
+  type        = bool
+  default     = true
+}

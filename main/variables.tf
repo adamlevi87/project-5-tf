@@ -138,6 +138,24 @@ variable "rds_monitoring_interval" {
   type        = number
 }
 
+variable "rds_multi_az_enabled" {
+  description = "Enable Multi-AZ deployment for high availability"
+  type        = bool
+  default     = false  # Default to single AZ for cost savings
+}
+
+variable "rds_storage_encrypted" {
+  description = "Enable storage encryption"
+  type        = bool
+  default     = true
+}
+
+variable "rds_copy_tags_to_snapshot" {
+  description = "Copy tags to snapshots"
+  type        = bool
+  default     = true
+}
+
 variable "secrets_config" {
   description = "Map of Configurations of secrets to create"
   type = map(object({
