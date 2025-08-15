@@ -52,6 +52,7 @@ locals {
     app_namespace       = var.frontend_namespace
     app_repo_url        = local.app_repo_url
     helm_release_name   = "frontend"
+    github_org          = var.github_org
     gitops_repo_url     = local.gitops_repo_url
   }
 
@@ -79,6 +80,7 @@ locals {
     app_namespace       = var.backend_namespace
     app_repo_url        = local.app_repo_url
     helm_release_name   = "backend"
+    github_org          = var.github_org
     gitops_repo_url     = local.gitops_repo_url
   }
   
