@@ -179,7 +179,7 @@ resource "helm_release" "this" {
           server_secretkey         = random_password.argocd_server_secretkey.result
         }),
         yamlencode({
-          additionalObjects = local.argocd_additionalObjects
+          extraObjects = local.argocd_additionalObjects
         })
   ]
   
