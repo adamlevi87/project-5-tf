@@ -46,14 +46,15 @@ locals {
   
   #Template variables for frontend Application.yaml
   frontend_app_template_vars = {
-    app_name            = "frontend"
-    argocd_namespace    = var.argocd_namespace
-    argocd_project_name = var.project_tag
-    app_namespace       = var.frontend_namespace
-    app_repo_url        = local.app_repo_url
-    helm_release_name   = "frontend"
-    github_org          = var.github_org
-    gitops_repo_url     = local.gitops_repo_url
+    app_name                  = "frontend"
+    argocd_namespace          = var.argocd_namespace
+    argocd_project_name       = var.project_tag
+    app_namespace             = var.frontend_namespace
+    app_repo_url              = local.app_repo_url
+    helm_release_name         = "frontend"
+    github_org                = var.github_org
+    github_gitops_repo        = local.gitops_repo_url
+    github_application_repo   = local.github_application_repo
   }
 
   # Template variables for backend infra-values.yaml
@@ -74,14 +75,15 @@ locals {
   
   # Template variables for backend Application.yaml
   backend_app_template_vars = {
-    app_name            = "backend"
-    argocd_namespace    = var.argocd_namespace
-    argocd_project_name = var.project_tag
-    app_namespace       = var.backend_namespace
-    app_repo_url        = local.app_repo_url
-    helm_release_name   = "backend"
-    github_org          = var.github_org
-    gitops_repo_url     = local.gitops_repo_url
+    app_name                  = "backend"
+    argocd_namespace          = var.argocd_namespace
+    argocd_project_name       = var.project_tag
+    app_namespace             = var.backend_namespace
+    app_repo_url              = local.app_repo_url
+    helm_release_name         = "backend"
+    github_org                = var.github_org
+    github_gitops_repo        = local.gitops_repo_url
+    github_application_repo   = local.github_application_repo
   }
   
   # Applications to create (for bootstrap mode)
