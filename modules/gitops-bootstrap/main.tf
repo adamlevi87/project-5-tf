@@ -88,11 +88,11 @@ resource "github_repository_file" "infra_files" {
 resource "github_repository_pull_request" "gitops_pr" {
   count = local.has_changes && (var.bootstrap_mode || var.update_apps) ? 1 : 0
   
-  repository = data.github_repository.gitops_repo.name
-  title      = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
-  body       = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
-  head_branch = github_branch.gitops_branch[0].branch
-  base_branch = var.target_branch
+  base_repository   = data.github_repository.gitops_repo.name
+  title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
+  body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
+  head_ref          = github_branch.gitops_branch[0].branch
+  base_ref          = var.target_branch
   
   depends_on = [github_repository_file.infra_files]
 }
