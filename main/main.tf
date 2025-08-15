@@ -493,7 +493,7 @@ module "aws_load_balancer_controller" {
 
 # Call to gitops-bootstrap module
 module "gitops_bootstrap" {
-  source = "./modules/gitops-bootstrap"
+  source = "../modules/gitops-bootstrap"
   
   # GitHub Configuration
   gitops_repo_owner       = var.github_org
