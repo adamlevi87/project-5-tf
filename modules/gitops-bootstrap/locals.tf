@@ -18,7 +18,17 @@ locals {
   frontend_app_path          = "apps/frontend/application.yaml"
   backend_app_path           = "apps/backend/application.yaml"
   
-  # Template variables for frontend values
+  # Template variables for ArgoCD project
+  project_template_vars = {
+    project_tag              = var.project_tag
+    argocd_namespace         = var.argocd_namespace
+    app_name                 = var.project_tag
+    github_org               = var.github_org
+    github_gitops_repo       = var.github_gitops_repo
+    github_application_repo  = var.github_application_repo
+  }
+
+  # Template variables for frontend infra-values.yaml
   frontend_template_vars = {
     ecr_frontend_repo_url           = var.ecr_frontend_repo_url
     frontend_namespace              = var.frontend_namespace
@@ -34,7 +44,18 @@ locals {
     aws_region                      = var.aws_region
   }
   
-  # Template variables for backend values
+  #Template variables for frontend Application.yaml
+  frontend_app_template_vars = {
+    app_name            = "frontend"
+    argocd_namespace    = var.argocd_namespace
+    argocd_project_name = var.project_tag
+    app_namespace       = var.frontend_namespace
+    app_repo_url        = local.app_repo_url
+    helm_release_name   = "frontend"
+    gitops_repo_url     = local.gitops_repo_url
+  }
+
+  # Template variables for backend infra-values.yaml
   backend_template_vars = {
     ecr_backend_repo_url           = var.ecr_backend_repo_url
     backend_namespace              = var.backend_namespace
@@ -50,35 +71,8 @@ locals {
     aws_region                     = var.aws_region
   }
   
-  # Template variables for ArgoCD project
-  project_template_vars = {
-    project_tag              = var.project_tag
-    argocd_namespace         = var.argocd_namespace
-    app_name                 = var.project_tag
-    github_org               = var.github_org
-    github_gitops_repo       = var.github_gitops_repo
-    github_application_repo  = var.github_application_repo
-  }
-  
-  # Applications to create (for bootstrap mode)
-  #applications = ["frontend", "backend"]
-
-  # Always render these for change detection
-  rendered_frontend_infra = templatefile("${path.module}/templates/frontend/infra-values.yaml.tpl", local.frontend_template_vars)
-  rendered_backend_infra  = templatefile("${path.module}/templates/backend/infra-values.yaml.tpl", local.backend_template_vars)
-  
-  # Bootstrap templates (only rendered in bootstrap mode)
-  rendered_project = var.bootstrap_mode ? templatefile("${path.module}/templates/project.yaml.tpl", local.project_template_vars) : ""
-  rendered_frontend_app = var.bootstrap_mode ? templatefile("${path.module}/templates/application.yaml.tpl", {
-    app_name            = "frontend"
-    argocd_namespace    = var.argocd_namespace
-    argocd_project_name = var.project_tag
-    app_namespace       = var.frontend_namespace
-    app_repo_url        = local.app_repo_url
-    helm_release_name   = "frontend"
-    gitops_repo_url     = local.gitops_repo_url
-  }) : ""
-  rendered_backend_app = var.bootstrap_mode ? templatefile("${path.module}/templates/application.yaml.tpl", {
+  # Template variables for backend Application.yaml
+  backend_app_template_vars = {
     app_name            = "backend"
     argocd_namespace    = var.argocd_namespace
     argocd_project_name = var.project_tag
@@ -86,9 +80,37 @@ locals {
     app_repo_url        = local.app_repo_url
     helm_release_name   = "backend"
     gitops_repo_url     = local.gitops_repo_url
-  }) : ""
-  rendered_frontend_app_values = var.bootstrap_mode ? templatefile("${path.module}/templates/frontend/app-values.yaml.tpl", {}) : ""
-  rendered_backend_app_values = var.bootstrap_mode ? templatefile("${path.module}/templates/backend/app-values.yaml.tpl", {}) : ""
+  }
+  
+  # Applications to create (for bootstrap mode)
+  #applications = ["frontend", "backend"]
+
+  # Always render these for change detection
+  rendered_frontend_infra       = templatefile("${path.module}/templates/frontend/infra-values.yaml.tpl", local.frontend_template_vars)
+  rendered_backend_infra        = templatefile("${path.module}/templates/backend/infra-values.yaml.tpl", local.backend_template_vars)
+  
+  # Bootstrap templates (only rendered in bootstrap mode)
+  rendered_project              = var.bootstrap_mode ? templatefile("${path.module}/templates/project.yaml.tpl", local.project_template_vars) : ""
+  rendered_frontend_app         = var.bootstrap_mode ? templatefile("${path.module}/templates/application.yaml.tpl", local.frontend_app_template_vars) : ""
+  rendered_backend_app          = var.bootstrap_mode ? templatefile("${path.module}/templates/application.yaml.tpl", local.backend_app_template_vars) : ""
+  rendered_frontend_app_values  = var.bootstrap_mode ? templatefile("${path.module}/templates/frontend/app-values.yaml.tpl", {}) : ""
+  rendered_backend_app_values   = var.bootstrap_mode ? templatefile("${path.module}/templates/backend/app-values.yaml.tpl", {}) : ""
+
+  rendered_content = merge(
+    # Always include infra files
+    {
+      (local.frontend_infra_values_path) = local.rendered_frontend_infra
+      (local.backend_infra_values_path)  = local.rendered_backend_infra
+    },
+    # Conditionally include bootstrap files
+    var.bootstrap_mode ? {
+      (local.project_yaml_path)          = local.rendered_project
+      (local.frontend_app_path)          = local.rendered_frontend_app
+      (local.backend_app_path)           = local.rendered_backend_app
+      (local.frontend_app_values_path)   = local.rendered_frontend_app_values
+      (local.backend_app_values_path)    = local.rendered_backend_app_values
+    } : {}
+  )
 
   # Check which files have changed
   changed_files = {
