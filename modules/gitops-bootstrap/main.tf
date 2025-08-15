@@ -40,6 +40,8 @@ resource "github_branch" "gitops_branch" {
   repository = data.github_repository.gitops_repo.name
   branch     = local.branch_name
   source_branch = var.target_branch
+
+  depends_on = [data.github_repository_file.current_files]
 }
 
 # Bootstrap files (only in bootstrap mode)
@@ -62,6 +64,8 @@ resource "github_repository_file" "bootstrap_files" {
   commit_email   = "terraform@gitops.local"
   
   overwrite_on_create = true
+
+  depends_on = [data.github_repository_file.current_files]
 }
 
 # Infrastructure files (bootstrap OR update mode)
@@ -94,5 +98,8 @@ resource "github_repository_pull_request" "gitops_pr" {
   head_ref          = github_branch.gitops_branch[0].branch
   base_ref          = var.target_branch
   
-  depends_on = [github_repository_file.infra_files]
+  depends_on = [
+      data.github_repository_file.current_files,
+      github_repository_file.infra_files
+    ]
 }
