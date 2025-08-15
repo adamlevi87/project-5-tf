@@ -9,35 +9,35 @@ terraform {
   }
 }
 
-# Data source to get the repository
-data "github_repository" "gitops_repo" {
-  full_name = "${var.gitops_repo_owner}/${var.github_gitops_repo}"
-}
+# # Data source to get the repository
+# data "github_repository" "gitops_repo" {
+#   full_name = "${var.gitops_repo_owner}/${var.github_gitops_repo}"
+# }
 
-data "github_repository_file" "current_files" {
-  for_each = toset(concat(
-    # Always check infra files
-    [local.frontend_infra_values_path, local.backend_infra_values_path],
-    # Conditionally check bootstrap files
-    var.bootstrap_mode ? [
-      local.project_yaml_path,
-      local.frontend_app_path,
-      local.backend_app_path,
-      local.frontend_app_values_path,
-      local.backend_app_values_path
-    ] : []
-  ))
+# data "github_repository_file" "current_files" {
+#   for_each = toset(concat(
+#     # Always check infra files
+#     [local.frontend_infra_values_path, local.backend_infra_values_path],
+#     # Conditionally check bootstrap files
+#     var.bootstrap_mode ? [
+#       local.project_yaml_path,
+#       local.frontend_app_path,
+#       local.backend_app_path,
+#       local.frontend_app_values_path,
+#       local.backend_app_values_path
+#     ] : []
+#   ))
   
-  repository = data.github_repository.gitops_repo.name
-  file       = each.value
-  branch     = var.target_branch
-}
+#   repository = data.github_repository.gitops_repo.name
+#   file       = each.value
+#   branch     = var.target_branch
+# }
 
 # CHANGED: Added local.has_changes condition to branch creation
 resource "github_branch" "gitops_branch" {
   count = local.has_changes ? 1 : 0
   
-  repository = data.github_repository.gitops_repo.name
+  repository = var.gitops_repo_name
   branch     = local.branch_name
   source_branch = var.target_branch
 }
@@ -52,7 +52,7 @@ resource "github_repository_file" "bootstrap_files" {
     "backend_app_values"   = { path = local.backend_app_values_path, content = local.rendered_backend_app_values }
   } : {}
   
-  repository = data.github_repository.gitops_repo.name
+  repository = var.gitops_repo_name
   file       = each.value.path
   content    = each.value.content
   branch     = github_branch.gitops_branch[0].branch
@@ -71,7 +71,7 @@ resource "github_repository_file" "infra_files" {
     "backend_infra"  = { path = local.backend_infra_values_path, content = local.rendered_backend_infra }
   } : {}
   
-  repository = data.github_repository.gitops_repo.name
+  repository = var.gitops_repo_name
   file       = each.value.path
   content    = each.value.content
   branch     = github_branch.gitops_branch[0].branch
@@ -90,7 +90,7 @@ resource "github_repository_file" "infra_files" {
 resource "github_repository_pull_request" "gitops_pr" {
   count = local.has_changes ? 1 : 0
   
-  base_repository   = data.github_repository.gitops_repo.name
+  base_repository   = var.gitops_repo_name
   title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
   body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
   head_ref          = github_branch.gitops_branch[0].branch

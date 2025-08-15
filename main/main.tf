@@ -495,6 +495,10 @@ module "aws_load_balancer_controller" {
 module "gitops_bootstrap" {
   source = "../modules/gitops-bootstrap"
   
+  # Pass the raw data to module
+  current_files_data = data.github_repository_file.current_gitops_files
+  gitops_repo_name   = data.github_repository.gitops_repo.name
+
   # GitHub Configuration
   gitops_repo_owner       = var.github_org
   github_gitops_repo      = var.github_gitops_repo
@@ -548,6 +552,8 @@ module "gitops_bootstrap" {
   depends_on = [
     module.ecr,
     module.acm,
-    module.argocd
+    module.argocd,
+    data.github_repository.gitops_repo,
+    data.github_repository_file.current_gitops_files
   ]
 }

@@ -116,12 +116,20 @@ locals {
     } : {}
   )
 
-  # Real change detection using data sources
+  # # Real change detection using data sources
+  # changed_files = {
+  #   for file_path, file_data in data.github_repository_file.current_files :
+  #   file_path => try(
+  #     file_data.content != base64encode(local.rendered_content[file_path]),
+  #     true # If file doesn't exist, consider it changed
+  #   )
+  # }
+
   changed_files = {
-    for file_path, file_data in data.github_repository_file.current_files :
+    for file_path, file_data in var.current_files_data :
     file_path => try(
       file_data.content != base64encode(local.rendered_content[file_path]),
-      true # If file doesn't exist, consider it changed
+      true
     )
   }
 

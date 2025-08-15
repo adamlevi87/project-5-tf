@@ -210,3 +210,16 @@ variable "update_apps" {
   type        = bool
   default     = false
 }
+
+variable "current_files_data" {
+  description = "Map of current file data from GitHub repository"
+  type = map(object({
+    content = string
+    # Add other attributes as needed
+  }))
+}
+
+variable "gitops_repo_name" {
+  description = "GitHub repository name (from data source)"
+  type        = string
+}

@@ -5,6 +5,28 @@ data "aws_availability_zones" "available" {
 
 data "aws_caller_identity" "current" {}
 
+# GitOps file data - pass to module for change detection
+data "github_repository" "gitops_repo" {
+  full_name = "${var.github_org}/${var.github_gitops_repo}"
+}
+
+data "github_repository_file" "current_gitops_files" {
+  for_each = var.bootstrap_mode || var.update_apps ? toset(concat(
+    ["manifests/frontend/infra-values.yaml", "manifests/backend/infra-values.yaml"],
+    var.bootstrap_mode ? [
+      "projects/${var.project_tag}.yaml",
+      "apps/frontend/application.yaml", 
+      "apps/backend/application.yaml",
+      "manifests/frontend/app-values.yaml",
+      "manifests/backend/app-values.yaml"
+    ] : []
+  )) : toset([])
+  
+  repository = data.github_repository.gitops_repo.name
+  file       = each.value
+  branch     = var.gitops_target_branch
+}
+
 locals {
     # Calculate total AZs needed
     total_azs = var.primary_availability_zones + var.additional_availability_zones
