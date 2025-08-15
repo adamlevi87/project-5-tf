@@ -37,7 +37,7 @@ for NS in "${NAMESPACES[@]}"; do
   # Handle ArgoCD applications for backend/frontend namespaces
   case "$NS" in
     "backend"|"frontend")
-      delete_argocd_apps "$NS-app"
+      delete_argocd_apps "$NS"
       ;;
     *)
       echo "ℹ️  Namespace $NS: Skipping ArgoCD application check"
