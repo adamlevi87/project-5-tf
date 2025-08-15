@@ -199,3 +199,8 @@ variable "bootstrap_mode" {
   type        = bool
   default     = false
 }
+
+variable "applications" {
+  description = "List of applications to create (for bootstrap mode)"
+  type        = list(string)
+}

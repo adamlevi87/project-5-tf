@@ -61,7 +61,7 @@ locals {
   }
   
   # Applications to create (for bootstrap mode)
-  applications = ["frontend", "backend"]
+  #applications = ["frontend", "backend"]
 
   # Always render these for change detection
   rendered_frontend_infra = templatefile("${path.module}/templates/frontend/infra-values.yaml.tpl", local.frontend_template_vars)
