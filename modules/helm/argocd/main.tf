@@ -32,8 +32,8 @@ locals {
       spec = {
         description = "${var.project_tag} apps and infra"
         sourceRepos = [
-          "https://github.com/${var.github_org}/${github_gitops_repo}.git",
-          "https://github.com/${var.github_org}/${github_application_repo}.git"
+          "https://github.com/${var.github_org}/${var.github_gitops_repo}.git",
+          "https://github.com/${var.github_org}/${var.github_application_repo}.git"
         ]
         destinations = [
           {
@@ -101,7 +101,7 @@ locals {
       spec = {
         project = "${var.project_tag}"
         source = {
-          repoURL        = "https://github.com/${var.github_org}/${github_gitops_repo}.git"
+          repoURL        = "https://github.com/${var.github_org}/${var.github_gitops_repo}.git"
           path           = "${var.app_of_apps_path}"
           targetRevision = "${var.app_of_apps_target_revision}"
           directory = {
