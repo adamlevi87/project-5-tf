@@ -15,6 +15,123 @@
 
 locals {
   argo_security_group_list = "${aws_security_group.argocd.id},${var.frontend_security_group_id},${var.backend_security_group_id}"
+  argocd_additionalObjects = [
+    # 1) setting up the Project
+    {
+      apiVersion = "argoproj.io/v1alpha1"
+      kind       = "AppProject"
+      metadata = {
+        name      = "project-5"
+        namespace = "argocd"
+        annotations = {
+          "helm.sh/hook"                = "post-install,post-upgrade"
+          "helm.sh/hook-weight"         = "1"
+          "helm.sh/hook-delete-policy"  = "before-hook-creation"
+        }
+      }
+      spec = {
+        description = "Project-5 apps and infra"
+        sourceRepos = [
+          "https://github.com/adamlevi87/project-5-gitops.git",
+          "https://github.com/adamlevi87/project-5-app.git"
+        ]
+        destinations = [
+          {
+            namespace = "*"
+            server    = "https://kubernetes.default.svc"
+          }
+        ]
+        namespaceResourceWhitelist = [
+          {
+            group = "external-secrets.io"
+            kind  = "SecretStore"
+          },
+          {
+            group = "external-secrets.io"
+            kind  = "ExternalSecret"
+          },
+          {
+            group = ""
+            kind  = "Secret"
+          },
+          {
+            group = ""
+            kind  = "ServiceAccount"
+          },
+          {
+            group = "networking.k8s.io"
+            kind  = "Ingress"
+          },
+          {
+            group = ""
+            kind  = "Service"
+          },
+          {
+            group = "apps"
+            kind  = "Deployment"
+          },
+          {
+            group = "argoproj.io"
+            kind  = "Application"
+          },
+          {
+            group = "autoscaling"
+            kind  = "HorizontalPodAutoscaler"
+          }
+        ]
+        clusterResourceWhitelist = []
+        orphanedResources = {
+          warn = true
+        }
+      } 
+    },
+    # 2) setting up App-of-Apps
+    {
+      apiVersion = "argoproj.io/v1alpha1"
+      kind       = "Application"
+      metadata = {
+        name      = "app-of-apps"
+        namespace = "argocd"
+        annotations = {
+          "helm.sh/hook"                = "post-install,post-upgrade"
+          "helm.sh/hook-weight"         = "5"
+          "helm.sh/hook-delete-policy"  = "before-hook-creation"
+        }
+      }
+      spec = {
+        project = "project-5"
+        source = {
+          repoURL        = "https://github.com/adamlevi87/project-5-gitops.git"
+          path           = "apps"
+          targetRevision = "main"
+          directory = {
+            recurse = true
+          }
+        }
+        destination = {
+          server    = "https://kubernetes.default.svc"
+          namespace = "default"
+        }
+        revisionHistoryLimit = 3
+        syncPolicy = {
+          retry = {
+            limit = 5
+            backoff = {
+              duration    = "5s"
+              factor      = 2
+              maxDuration = "3m"
+            }
+          }
+          syncOptions = [
+            "CreateNamespace=true",
+            "PruneLast=true",
+            "PrunePropagationPolicy=background",
+            "ApplyOutOfSyncOnly=true"
+          ]
+        }
+      }
+    }
+  ]
 }
 
 resource "random_password" "argocd_server_secretkey" {
@@ -50,7 +167,7 @@ resource "helm_release" "this" {
   # ]
 
   values = [
-      templatefile("${path.module}/values.yaml", {
+        templatefile("${path.module}/values.yaml", {
           service_account_name = var.service_account_name
           #environment         = var.environment
           domain_name         = var.domain_name
@@ -60,9 +177,15 @@ resource "helm_release" "this" {
           security_group_id         = local.argo_security_group_list
           acm_cert_arn             = var.acm_cert_arn
           server_secretkey         = random_password.argocd_server_secretkey.result
-      })
+        })
   ]
-
+  set = [
+    {
+      name  = "additionalObjects"
+      value = yamlencode(local.argocd_additionalObjects)
+    } 
+  ]
+  
   depends_on = [
       kubernetes_namespace.this,
       kubernetes_service_account.this,
