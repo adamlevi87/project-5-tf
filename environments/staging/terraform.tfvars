@@ -17,10 +17,10 @@ rds_postgres_table_name = "messages"
 rds_allocated_storage     = 50      # More space for staging data
 rds_max_allocated_storage = 100     # Allow growth for testing
 rds_storage_type          = "gp3"   # Better performance than gp2
-storage_encrypted         = true    # Enable encryption for staging
+rds_storage_encrypted         = true    # Enable encryption for staging
 
 # Multi-AZ and High Availability
-multi_az_enabled = false            # Still single AZ to save costs (~$25/month savings)
+rds_multi_az_enabled = false            # Still single AZ to save costs (~$25/month savings)
 
 # Backup and maintenance (Better retention for staging)
 rds_backup_retention_period = 7                     # 7 days retention
@@ -36,4 +36,4 @@ rds_enable_performance_insights = true   # Enable PI for staging testing
 rds_monitoring_interval         = 60     # 1-minute monitoring
 
 # Additional settings
-copy_tags_to_snapshot = true             # Copy tags to snapshots
+rds_copy_tags_to_snapshot = true             # Copy tags to snapshots

@@ -17,10 +17,10 @@ rds_postgres_table_name = "messages"
 rds_allocated_storage     = 100     # Adequate starting storage
 rds_max_allocated_storage = 500     # Allow significant growth
 rds_storage_type          = "gp3"   # High performance storage
-storage_encrypted         = true    # Always encrypt in production
+rds_storage_encrypted         = true    # Always encrypt in production
 
 # Multi-AZ and High Availability (CRITICAL for production)
-multi_az_enabled = true             # Enable Multi-AZ for high availability
+rds_multi_az_enabled = true             # Enable Multi-AZ for high availability
 
 # Backup and maintenance (Production-grade retention)
 rds_backup_retention_period = 30                    # 30 days retention
@@ -36,4 +36,4 @@ rds_enable_performance_insights = true   # Enable Performance Insights
 rds_monitoring_interval         = 60     # 1-minute detailed monitoring
 
 # Additional settings
-copy_tags_to_snapshot = true             # Always copy tags in production
+rds_copy_tags_to_snapshot = true             # Always copy tags in production
