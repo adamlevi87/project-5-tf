@@ -103,3 +103,64 @@ resource "github_repository_pull_request" "gitops_pr" {
       github_repository_file.infra_files
     ]
 }
+
+# Change detection using null_resource with local-exec
+resource "null_resource" "change_detection" {
+  triggers = {
+    bootstrap_mode = var.bootstrap_mode
+    update_apps    = var.update_apps
+    # Force re-evaluation when mode variables change
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      echo "Checking for file changes..."
+      
+      # Create temp directory for comparison
+      mkdir -p /tmp/terraform-gitops-compare
+      
+      # Initialize has_changes flag
+      echo "false" > /tmp/terraform-gitops-compare/has_changes
+      
+      # Function to check if file changed
+      check_file_change() {
+        local file_path="$1"
+        local rendered_content="$2"
+        
+        # Get current file content from GitHub (base64 encoded)
+        current_content=$(gh api repos/${var.gitops_repo_owner}/${var.github_gitops_repo}/contents/"$file_path" \
+          --jq '.content' 2>/dev/null || echo "")
+        
+        # Encode our rendered content to base64
+        our_content=$(echo -n "$rendered_content" | base64 -w 0)
+        
+        # Compare
+        if [ "$current_content" != "$our_content" ]; then
+          echo "true" > /tmp/terraform-gitops-compare/has_changes
+          echo "File changed: $file_path"
+        fi
+      }
+      
+      # Check infra files (always)
+      check_file_change "manifests/frontend/infra-values.yaml" "${local.rendered_frontend_infra}"
+      check_file_change "manifests/backend/infra-values.yaml" "${local.rendered_backend_infra}"
+      
+      # Check bootstrap files (if bootstrap mode)
+      if [ "${var.bootstrap_mode}" = "true" ]; then
+        check_file_change "projects/${var.project_tag}.yaml" "${local.rendered_project}"
+        check_file_change "apps/frontend/application.yaml" "${local.rendered_frontend_app}"
+        check_file_change "apps/backend/application.yaml" "${local.rendered_backend_app}"
+        check_file_change "manifests/frontend/app-values.yaml" "${local.rendered_frontend_app_values}"
+        check_file_change "manifests/backend/app-values.yaml" "${local.rendered_backend_app_values}"
+      fi
+      
+      echo "Change detection complete."
+    EOT
+  }
+}
+
+# Read the result of change detection
+data "local_file" "has_changes" {
+  filename = "/tmp/terraform-gitops-compare/has_changes"
+  depends_on = [null_resource.change_detection]
+}

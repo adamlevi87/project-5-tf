@@ -125,5 +125,6 @@ locals {
     )
   }
   
-  has_changes = length([for changed in local.changed_files : changed if changed]) > 0
+  has_changes = trimspace(data.local_file.has_changes.content) == "true"
+  #has_changes = length([for changed in local.changed_files : changed if changed]) > 0
 }
