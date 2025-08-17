@@ -171,6 +171,10 @@ elif [[ "$SELECTION_METHOD" == "filter" ]]; then
     'module.acm.aws_route53_record.cert_validation\[[^]]+\]'
     'module.ecr.aws_ecr_lifecycle_policy.this\[[^]]+\]'
     'module.ecr.aws_ecr_repository.this\[[^]]+\]'
+    'module.github_oidc.aws_iam_role.github_actions'
+    'module.github_oidc.aws_iam_role_policy_attachment.attach_admin_policy'
+    'module.github_repo_secrets.github_actions_secret.secrets\[[^]]+\]'
+    'module.github_repo_secrets.github_actions_variable.variables\[[^]]+\]'
   )
   #echo -e "${CYAN}after building base...${RESET}"
   # Additional patterns for real mode only
