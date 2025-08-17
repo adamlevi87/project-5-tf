@@ -6,12 +6,12 @@ on:
       env:
         description: "Environment"
         required: true
-        default: DEV
+        default: dev
         type: choice
         options:
-          - DEV
-          - STAGING
-          - PROD
+          - dev
+          - staging
+          - prod
 
       app_repo:
         description: "Target application repository"

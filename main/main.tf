@@ -342,6 +342,9 @@ module "github_repo_secrets" {
     ECR_REPOSITORY_BACKEND  = "${module.ecr.ecr_repository_urls["backend"]}"
     ECR_REPOSITORY_FRONTEND = "${module.ecr.ecr_repository_urls["frontend"]}"
     
+    #Github Token (allows App repo to push into gitops repo)
+    TOKEN_GITHUB = "${var.github_token}"
+
     # Inject backend-specific values
     # SERVICE_NAME_BACKEND   = "${var.backend_service_account_name}"
 
