@@ -333,6 +333,7 @@ module "github_repo_secrets" {
 
   github_variables = {
     AWS_REGION = "${var.aws_region}"
+    GITOPS_REPO = "${var.github_org}/${var.github_gitops_repo}"
   }
 
   # every value which comes from an output requires SHA generation
