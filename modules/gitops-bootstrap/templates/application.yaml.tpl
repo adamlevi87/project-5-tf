@@ -24,8 +24,8 @@ spec:
       helm:
         releaseName: ${helm_release_name}
         valueFiles:
-          - $values/manifests/${app_name}/infra-values.yaml          # <-- infrastructure values (Terraform)
-          - $values/manifests/${app_name}/app-values.yaml            # <-- application values (static)
+          - $values/environments/${environment}/manifests/${app_name}/infra-values.yaml          # <-- infrastructure values (Terraform)
+          - $values/environments/${environment}/manifests/${app_name}/app-values.yaml            # <-- application values (static)
     - repoURL: https://github.com/${github_org}/${github_gitops_repo}.git     # values source
       targetRevision: main
       ref: values

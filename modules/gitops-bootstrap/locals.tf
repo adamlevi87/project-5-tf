@@ -11,12 +11,12 @@ locals {
   
   # File paths
   project_yaml_path          = "projects/${var.project_tag}.yaml"
-  frontend_infra_values_path = "manifests/frontend/infra-values.yaml"
-  frontend_app_values_path   = "manifests/frontend/app-values.yaml"
-  backend_infra_values_path  = "manifests/backend/infra-values.yaml"
-  backend_app_values_path    = "manifests/backend/app-values.yaml"
-  frontend_app_path          = "apps/frontend/application.yaml"
-  backend_app_path           = "apps/backend/application.yaml"
+  frontend_infra_values_path = "environments/${var.environment}/manifests/frontend/infra-values.yaml"
+  frontend_app_values_path   = "environments/${var.environment}/frontend/app-values.yaml"
+  backend_infra_values_path  = "environments/${var.environment}/backend/infra-values.yaml"
+  backend_app_values_path    = "environments/${var.environment}/backend/app-values.yaml"
+  frontend_app_path          = "environments/${var.environment}/apps/frontend/application.yaml"
+  backend_app_path           = "environments/${var.environment}/apps/backend/application.yaml"
   
   # Template variables for ArgoCD project
   project_template_vars = {
@@ -54,6 +54,7 @@ locals {
     app_namespace             = var.frontend_namespace
     app_repo_url              = local.app_repo_url
     helm_release_name         = "frontend"
+    environment               = var.environment
     github_org                = var.github_org
     github_gitops_repo        = var.github_gitops_repo
     github_application_repo   = var.github_application_repo
@@ -85,6 +86,7 @@ locals {
     app_namespace             = var.backend_namespace
     app_repo_url              = local.app_repo_url
     helm_release_name         = "backend"
+    environment               = var.environment
     github_org                = var.github_org
     github_gitops_repo        = var.github_gitops_repo
     github_application_repo   = var.github_application_repo
