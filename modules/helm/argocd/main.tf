@@ -91,19 +91,20 @@ locals {
       apiVersion = "argoproj.io/v1alpha1"
       kind       = "Application"
       metadata = {
-        name      = "app-of-apps"
+        name      = "${var.project_tag}-app-of-apps-${var.environment}"
         namespace = "${var.namespace}"
         annotations = {
-          "helm.sh/hook"                = "post-install,post-upgrade"
-          "helm.sh/hook-weight"         = "5"
-          "helm.sh/hook-delete-policy"  = "before-hook-creation"
+          "helm.sh/hook"                 = "post-install,post-upgrade"
+          "helm.sh/hook-weight"          = "5"
+          "helm.sh/hook-delete-policy"   = "before-hook-creation"
+          "argocd.argoproj.io/sync-wave" = "-10"
         }
       }
       spec = {
         project = "${var.project_tag}"
         source = {
           repoURL        = "https://github.com/${var.github_org}/${var.github_gitops_repo}.git"
-          path           = "${var.app_of_apps_path}"
+          path           = "environments/${var.environment}/${var.app_of_apps_path}"
           targetRevision = "${var.app_of_apps_target_revision}"
           directory = {
             recurse = true
