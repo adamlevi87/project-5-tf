@@ -72,7 +72,6 @@ jobs:
             -var="github_oidc_role_arn=$AWS_ROLE_TO_ASSUME"
             -var="argocd_app_id=$ARGOCD_APP_ID"
             -var="argocd_installation_id=$ARGOCD_INSTALLATION_ID"
-            -var="argocd_github_app_private_key_path=$ARGOCD_GITHUB_APP_PRIVATE_KEY_PATH"
             -var="argocd_private_key_b64=$ARGOCD_PRIVATE_KEY_B64"
             
           )
