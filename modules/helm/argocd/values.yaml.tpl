@@ -82,8 +82,8 @@ server:
       # Team to Role Mapping
       
       
-      g, ${github_org}:${github_admin_team}, role:admin
-      g, ${github_org}:${github_readonly_team}, role:readonly
+      g, ${github_org}-org:${github_admin_team}, role:admin
+      g, ${github_org}-org:${github_readonly_team}, role:readonly
 
 
 # Global configuration
