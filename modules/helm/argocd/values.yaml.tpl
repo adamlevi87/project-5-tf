@@ -42,6 +42,30 @@ server:
   config:
     # This tells ArgoCD what its external URL is
     url: "https://${domain_name}"
+    # openID connect settings
+    oidc.config: |
+      name: GitHub
+      issuer: https://github.com
+      clientId: ${github_oauth_client_id}
+      requestedScopes: ["user:email", "read:org"]
+      requestedIDTokenClaims: {"groups": {"essential": true}}
+      
+    # RBAC Policy Configuration
+    policy.default: role:readonly
+    policy.csv: |
+      p, role:admin, applications, *, */*, allow
+      p, role:admin, clusters, *, *, allow
+      p, role:admin, repositories, *, *, allow
+      p, role:admin, logs, get, *, allow
+      p, role:admin, exec, create, */*, allow
+      p, role:readonly, applications, get, */*, allow
+      p, role:readonly, clusters, get, *, allow
+      p, role:readonly, repositories, get, *, allow
+      
+      # Team to Role Mapping
+      g, adamlevi87-org:Project-5/devops, role:admin
+      g, adamlevi87-org:Project-5/developers, role:readonly
+
 
 # Global configuration
 global:

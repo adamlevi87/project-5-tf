@@ -180,6 +180,7 @@ resource "helm_release" "this" {
       security_group_id           = local.joined_security_group_ids
       acm_cert_arn                = var.acm_cert_arn
       server_secretkey            = random_password.argocd_server_secretkey.result
+      github_oauth_client_id      = var.github_oauth_client_id
     }),
     yamlencode({
       extraObjects = local.argocd_additionalObjects

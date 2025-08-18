@@ -130,8 +130,7 @@ locals {
                 type                        = "git"
                 REPO_URL_GITOPS             = "https://github.com/${var.github_org}/${var.github_gitops_repo}"
                 REPO_URL_APP                = "https://github.com/${var.github_org}/${var.github_application_repo}"
-                GITHUB_OAUTH_CLIENT_ID      = "${var.github_oauth_client_id}"
-                GITHUB_OAUTH_CLIENT_SECRET  = "${var.github_oauth_client_secret}"
+                oidc.github.clientSecret    = "${var.github_oauth_client_secret}"
             })
         }
     }
