@@ -129,3 +129,15 @@ variable "github_oauth_client_id" {
   type        = string
   sensitive   = true
 }
+
+variable "github_admin_team" {
+  description = "GitHub team name for admin access to ArgoCD"
+  type        = string
+  default     = "devops"
+}
+
+variable "github_readonly_team" {
+  description = "GitHub team name for readonly access to ArgoCD"
+  type        = string
+  default     = "developers"
+}

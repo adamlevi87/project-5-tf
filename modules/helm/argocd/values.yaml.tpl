@@ -49,7 +49,7 @@ server:
       clientId: ${github_oauth_client_id}
       requestedScopes: ["user:email", "read:org"]
       requestedIDTokenClaims: {"groups": {"essential": true}}
-      
+
     # RBAC Policy Configuration
     policy.default: role:readonly
     policy.csv: |
@@ -63,8 +63,10 @@ server:
       p, role:readonly, repositories, get, *, allow
       
       # Team to Role Mapping
-      g, adamlevi87-org:Project-5/devops, role:admin
-      g, adamlevi87-org:Project-5/developers, role:readonly
+      
+      
+      g, ${github_org}:${github_admin_team}, role:admin
+      g, ${github_org}:${github_readonly_team}, role:readonly
 
 
 # Global configuration
