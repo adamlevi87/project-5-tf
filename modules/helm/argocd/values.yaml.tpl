@@ -75,8 +75,9 @@ configs:
     create: true
     extra:
         server.secretkey: "${server_secretkey}"
+  # RBAC Policy Configuration
   rbac:
-    # RBAC Policy Configuration
+    create: true
     policy.default: role:readonly
     policy.csv: |
       p, role:admin, applications, *, */*, allow
