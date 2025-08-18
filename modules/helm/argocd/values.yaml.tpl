@@ -60,6 +60,22 @@ server:
     # This tells ArgoCD what its external URL is
     url: "https://${domain_name}"
     # openID connect settings
+
+# Global configuration
+global:
+  # Ensure ArgoCD knows its domain
+  domain: "${domain_name}"
+
+# Optional: Configure RBAC if needed
+configs:
+  params:
+    # Enable insecure mode if you're terminating TLS at ALB
+    server.insecure: true
+  secret:
+    create: true
+    extra:
+        server.secretkey: "${server_secretkey}"
+  cm:
     oidc.config: |
       name: GitHub
       issuer: https://github.com
@@ -79,24 +95,7 @@ server:
       p, role:readonly, clusters, get, *, allow
       p, role:readonly, repositories, get, *, allow
       
-      # Team to Role Mapping
-      
-      
+      # Team to Role Mapping      
       g, ${github_org}-org:${github_admin_team}, role:admin
       g, ${github_org}-org:${github_readonly_team}, role:readonly
-
-
-# Global configuration
-global:
-  # Ensure ArgoCD knows its domain
-  domain: "${domain_name}"
-
-# Optional: Configure RBAC if needed
-configs:
-  params:
-    # Enable insecure mode if you're terminating TLS at ALB
-    server.insecure: true
-  secret:
-    create: true
-    extra:
-        server.secretkey: "${server_secretkey}"
+      
