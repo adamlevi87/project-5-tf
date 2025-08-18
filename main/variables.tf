@@ -467,3 +467,15 @@ variable "gitops_target_branch" {
   type        = string
   default     = "main"
 }
+
+variable "github_oauth_client_id" {
+  description = "GitHub OAuth App Client ID for ArgoCD authentication"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_oauth_client_secret" {
+  description = "GitHub OAuth App Client Secret for ArgoCD authentication"
+  type        = string
+  sensitive   = true
+}
