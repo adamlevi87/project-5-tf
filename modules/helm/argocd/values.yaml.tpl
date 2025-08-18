@@ -15,6 +15,9 @@ server:
     hostname: "${domain_name}"
     path: /
     pathType: Prefix
+    extraAnnotations:
+      # This ensures the ALB controller finishes cleaning up before Ingress is deleted
+      "kubectl.kubernetes.io/last-applied-configuration": ""  # optional workaround
     annotations:
       # ALB Controller annotations
       alb.ingress.kubernetes.io/scheme: internet-facing
@@ -23,16 +26,30 @@ server:
       alb.ingress.kubernetes.io/ssl-redirect: "443"
       alb.ingress.kubernetes.io/group.name: "${alb_group_name}"
       alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=60
-      # CIDR restrictions
-      alb.ingress.kubernetes.io/conditions.${release_name}-server: |
-            [{"field":"source-ip","sourceIpConfig":{"values":${allowed_cidrs}}}]
       alb.ingress.kubernetes.io/security-groups: "${security_group_id}"
       alb.ingress.kubernetes.io/certificate-arn: "${acm_cert_arn}"
       # External DNS annotation (optional - helps external-dns identify the record)
       external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
-    extraAnnotations:
-      # This ensures the ALB controller finishes cleaning up before Ingress is deleted
-      "kubectl.kubernetes.io/last-applied-configuration": ""  # optional workaround
+      # restrictions and rules
+      alb.ingress.kubernetes.io/conditions.${release_name}-server: |
+            [
+              {
+                "field": "path-pattern", 
+                "pathPatternConfig": {
+                  "values": ["/auth/*"]
+                },
+                "sourceIpConfig": {
+                  "values": ["0.0.0.0/0"]
+                }
+              },
+              {
+                "field":  "source-ip",
+                "sourceIpConfig": {
+                  "values": ${allowed_cidrs}
+                }
+              }
+            ]
+    
 
   extraMetadata:
     finalizers:
