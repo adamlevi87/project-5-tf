@@ -34,15 +34,6 @@ server:
       alb.ingress.kubernetes.io/conditions.${release_name}-server: |
             [
               {
-                "field": "path-pattern", 
-                "pathPatternConfig": {
-                  "values": ["/api/dex/*"]
-                },
-                "sourceIpConfig": {
-                  "values": ["0.0.0.0/0"]
-                }
-              },
-              {
                 "field":  "source-ip",
                 "sourceIpConfig": {
                   "values": ${allowed_cidrs}
