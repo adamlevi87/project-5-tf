@@ -31,25 +31,24 @@ server:
       # External DNS annotation (optional - helps external-dns identify the record)
       external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
       # restrictions and rules
-      alb.ingress.kubernetes.io/conditions.${release_name}-server: |
-            [
-              {
-                "field": "path-pattern", 
-                "pathPatternConfig": {
-                  "values": ["/api/dex/*"]
-                },
-                "sourceIpConfig": {
-                  "values": ["0.0.0.0/0"]
-                }
-              },
-              {
-                "field":  "source-ip",
-                "sourceIpConfig": {
-                  "values": ["0.0.0.0/0"]
-                }
-              }
-            ]
-    
+      # alb.ingress.kubernetes.io/conditions.${release_name}-server: |
+      #       [
+      #         {
+      #           "field": "path-pattern", 
+      #           "pathPatternConfig": {
+      #             "values": ["/api/dex/*"]
+      #           },
+      #           "sourceIpConfig": {
+      #             "values": ["0.0.0.0/0"]
+      #           }
+      #         },
+      #         {
+      #           "field":  "source-ip",
+      #           "sourceIpConfig": {
+      #             "values": ["0.0.0.0/0"]
+      #           }
+      #         }
+      #       ]
 
   extraMetadata:
     finalizers:
@@ -77,7 +76,7 @@ configs:
     # Enable insecure mode if you're terminating TLS at ALB
     server.insecure: true  
     # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
-    server.dex.server: "http://argocd-dev-dex-server:5556"
+    server.dex.server: "http://argocd-${environment}-dex-server:5556"
 
   secret:
     create: true
