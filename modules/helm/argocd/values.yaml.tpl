@@ -60,7 +60,8 @@ server:
     # This tells ArgoCD what its external URL is
     url: "https://${domain_name}"
     # openID connect settings
-
+  dex.server.strict.tls: "false"
+  
 # Global configuration
 global:
   # Ensure ArgoCD knows its domain
@@ -94,6 +95,7 @@ configs:
       g, ${github_org}-org:${github_readonly_team}, role:readonly
   cm:
     url: "https://${domain_name}"
+    issuer: https://${domain_name}/api/dex
     users.anonymous.enabled: "false"
     dex.config: |
       connectors:
