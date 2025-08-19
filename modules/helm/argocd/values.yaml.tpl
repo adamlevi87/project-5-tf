@@ -75,11 +75,11 @@ dex:
 
 configs:
   params:
-    server:
-      # Enable insecure mode if you're terminating TLS at ALB
-      insecure: true
-      # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
-      dex.server: "http://argocd-dev-dex-server:5556"
+    # Enable insecure mode if you're terminating TLS at ALB
+    server.insecure: true  
+    # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
+    server.dex.server: "http://argocd-dev-dex-server:5556"
+    
   secret:
     create: true
     extra:
