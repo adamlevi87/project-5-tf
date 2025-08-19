@@ -100,8 +100,8 @@ configs:
           id: github
           name: GitHub
           config:
-            clientID: $${argocd_github_sso_secret_name}:clientID
-            clientSecret: $${argocd_github_sso_secret_name}:clientSecret
+            clientID: ${dollar}${argocd_github_sso_secret_name}:clientID
+            clientSecret: ${dollar}${argocd_github_sso_secret_name}:clientSecret
             orgs:
               - name: ${github_org}-org
 
