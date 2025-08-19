@@ -45,7 +45,7 @@ server:
               {
                 "field":  "source-ip",
                 "sourceIpConfig": {
-                  "values": ${allowed_cidrs}
+                  "values": ["0.0.0.0/0"]
                 }
               }
             ]
