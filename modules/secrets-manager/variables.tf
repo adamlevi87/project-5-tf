@@ -22,6 +22,12 @@ variable "secrets_config_with_passwords" {
   }))
 }
 
+variable "secret_keys" {
+  description = "List of secret keys for iteration (non-sensitive)"
+  type        = list(string)
+  default     = []
+}
+
 variable "app_secrets_config" {
   description = "Map of application secrets (key → JSON string of env vars)"
   type = map(object({
@@ -29,4 +35,5 @@ variable "app_secrets_config" {
     secret_value  = string
   }))
   default = {}
+  sensitive   = true
 }

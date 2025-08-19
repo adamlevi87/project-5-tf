@@ -169,21 +169,26 @@ resource "helm_release" "this" {
   # ]
 
   values = [
-        templatefile("${path.module}/values.yaml.tpl", {
-          service_account_name        = var.service_account_name
-          #environment                = var.environment
-          domain_name                 = var.domain_name
-          ingress_controller_class    = var.ingress_controller_class
-          alb_group_name              = var.alb_group_name
-          release_name                = var.release_name
-          allowed_cidrs               = jsonencode(var.argocd_allowed_cidr_blocks)
-          security_group_id           = local.joined_security_group_ids
-          acm_cert_arn                = var.acm_cert_arn
-          server_secretkey            = random_password.argocd_server_secretkey.result
-        }),
-        yamlencode({
-          extraObjects = local.argocd_additionalObjects
-        })
+    templatefile("${path.module}/values.yaml.tpl", {
+      service_account_name        = var.service_account_name
+      #environment                = var.environment
+      domain_name                 = var.domain_name
+      ingress_controller_class    = var.ingress_controller_class
+      alb_group_name              = var.alb_group_name
+      release_name                = var.release_name
+      allowed_cidrs               = jsonencode(var.argocd_allowed_cidr_blocks)
+      security_group_id           = local.joined_security_group_ids
+      acm_cert_arn                = var.acm_cert_arn
+      server_secretkey            = random_password.argocd_server_secretkey.result
+      #github_oauth_client_id      = var.github_oauth_client_id
+      github_org                  = var.github_org
+      github_admin_team           = var.github_admin_team
+      github_readonly_team        = var.github_readonly_team
+      argocd_github_sso_secret_name = var.argocd_github_sso_secret_name
+    }),
+    yamlencode({
+      extraObjects = local.argocd_additionalObjects
+    })
   ]
   
   depends_on = [

@@ -87,8 +87,6 @@ eks_api_allowed_cidr_blocks    = ["85.64.225.89/32","0.0.0.0/0"]
 argocd_allowed_cidr_blocks = ["85.64.225.89/32"]
 
 
-
-
 # EKS Node Group Configuration (minimal for dev)
 eks_node_instance_types   = ["t3.small"]  # Bare minimum instance type
 eks_node_desired_capacity = 1             # Single node for dev
@@ -124,6 +122,8 @@ argocd_aws_secret_key = "argocd-credentials"
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
 github_gitops_repo  = "project-5-gitops"
+github_admin_team = "Project-5/devops"
+github_readonly_team = "Project-5/developers"
 
 # Gitops related settings
 update_apps = false
