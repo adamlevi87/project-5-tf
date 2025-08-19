@@ -12,13 +12,13 @@ data "github_repository" "gitops_repo" {
 
 data "github_repository_file" "current_gitops_files" {
   for_each = var.bootstrap_mode || var.update_apps ? toset(concat(
-    ["manifests/frontend/infra-values.yaml", "manifests/backend/infra-values.yaml"],
+    ["environments/${var.environment}/manifests/frontend/infra-values.yaml", "environments/${var.environment}/manifests/backend/infra-values.yaml"],
     var.bootstrap_mode ? [
       "projects/${var.project_tag}.yaml",
-      "apps/frontend/application.yaml", 
-      "apps/backend/application.yaml",
-      "manifests/frontend/app-values.yaml",
-      "manifests/backend/app-values.yaml"
+      "environments/${var.environment}/apps/frontend/application.yaml", 
+      "environments/${var.environment}/apps/backend/application.yaml",
+      "environments/${var.environment}/manifests/frontend/app-values.yaml",
+      "environments/${var.environment}/manifests/backend/app-values.yaml"
     ] : []
   )) : toset([])
   
