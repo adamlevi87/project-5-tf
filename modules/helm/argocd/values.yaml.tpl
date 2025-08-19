@@ -104,13 +104,4 @@ configs:
             clientSecret: $${argocd_github_sso_secret_name}:clientSecret
             orgs:
               - name: ${github_org}-org
-    # oidc.config: |
-    #   name: GitHub
-    #   issuer: https://github.com
-    #   clientId: ${github_oauth_client_id}
-    #   requestedScopes: ["user:email", "read:org"]
-    #   requestedIDTokenClaims: {"groups": {"essential": true}}
-    #   # GitHub-specific endpoints
-    #   authorizationURL: https://github.com/login/oauth/authorize
-    #   tokenURL: https://github.com/login/oauth/access_token
-    #   userInfoURL: https://api.github.com/user
+
