@@ -21,6 +21,7 @@ on:
           - plan
           - apply
           - plan-and-apply
+          - bootstrap
           - destroy
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -88,6 +89,9 @@ jobs:
             plan-and-apply)
               terraform plan "${COMMON_VARS[@]}"
               terraform apply -auto-approve "${COMMON_VARS[@]}"
+              ;;
+            bootstrap)
+              terraform apply -auto-approve "${COMMON_VARS[@]}" --var="bootstrap_mode=true"
               ;;
             destroy)
               terraform destroy -auto-approve "${COMMON_VARS[@]}"
