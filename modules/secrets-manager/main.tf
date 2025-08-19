@@ -27,10 +27,10 @@ resource "aws_secretsmanager_secret_version" "secrets" {
 }
 
 resource "aws_secretsmanager_secret" "app_secrets" {
-  for_each = var.app_secrets_config
+  for_each = toset(var.secret_keys)
 
   name        = "${var.project_tag}-${var.environment}-${each.key}"
-  description = each.value.description
+  description = var.app_secrets_config[each.key].description
   recovery_window_in_days = 0
 
   tags = {
@@ -43,8 +43,8 @@ resource "aws_secretsmanager_secret" "app_secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "app_secrets" {
-  for_each = var.app_secrets_config
+  for_each = toset(var.secret_keys)
 
   secret_id     = aws_secretsmanager_secret.app_secrets[each.key].id
-  secret_string = each.value.secret_value
+  secret_string = var.app_secrets_config[each.key].secret_value
 }

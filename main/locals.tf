@@ -95,9 +95,15 @@ locals {
     }
 
     #argocd_private_key = file(var.argocd_github_app_private_key_path)
-    argocd_private_key= base64decode(var.argocd_private_key_b64)
+    argocd_private_key= sensitive(base64decode(var.argocd_private_key_b64))
 
-    app_secrets_config = {
+    secret_keys = [
+        var.frontend_aws_secret_key,    # e.g., "frontend-secrets"
+        var.backend_aws_secret_key,     # e.g., "backend-secrets" 
+        var.argocd_aws_secret_key       # e.g., "argocd-secrets"
+    ]
+
+    app_secrets_config = sensitive({
         (var.frontend_aws_secret_key) = {
             description  = "Frontend env vars"
             secret_value = jsonencode({
@@ -135,7 +141,7 @@ locals {
                 #"oidc.github.clientSecret"  = 
             })
         }
-    }
+    })
 
     argocd_github_sso_secret_name = "${var.project_tag}-${var.environment}-argocd-github-sso"
 }

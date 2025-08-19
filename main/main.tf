@@ -127,6 +127,7 @@ module "secrets_app_envs" {
   environment = var.environment
   
   secrets_config_with_passwords = {}
+  secret_keys                   = local.secret_keys
   app_secrets_config            = local.app_secrets_config
   
   depends_on = [module.secrets_rds_password]
