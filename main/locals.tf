@@ -137,4 +137,5 @@ locals {
         }
     }
 
+    argocd_github_sso_secret_name = "${var.project_tag}-${var.environment}-argocd-github-sso"
 }

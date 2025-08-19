@@ -429,9 +429,10 @@ module "argocd" {
   app_of_apps_path              = var.argocd_app_of_apps_path
   app_of_apps_target_revision   = var.argocd_app_of_apps_target_revision
 
-  github_oauth_client_id        = var.github_oauth_client_id
+  #github_oauth_client_id        = var.github_oauth_client_id
   github_admin_team             = var.github_admin_team
   github_readonly_team          = var.github_readonly_team
+  argocd_github_sso_secret_name = local.argocd_github_sso_secret_name
 
   lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
   depends_on = [
@@ -461,6 +462,8 @@ module "external_secrets_operator" {
   aws_region         = var.aws_region
   argocd_service_account_role_arn = module.argocd.service_account_role_arn
   argocd_secret_name = module.secrets_app_envs.app_secrets_names["${var.argocd_aws_secret_key}"]
+
+  argocd_github_sso_secret_name = local.argocd_github_sso_secret_name
 
   set_values = [
     # {

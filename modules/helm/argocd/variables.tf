@@ -124,11 +124,11 @@ variable "app_of_apps_target_revision" {
   default     = "main"
 }
 
-variable "github_oauth_client_id" {
-  description = "GitHub OAuth App Client ID for ArgoCD authentication"
-  type        = string
-  sensitive   = true
-}
+# variable "github_oauth_client_id" {
+#   description = "GitHub OAuth App Client ID for ArgoCD authentication"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "github_admin_team" {
   description = "GitHub team name for admin access to ArgoCD"
@@ -140,4 +140,9 @@ variable "github_readonly_team" {
   description = "GitHub team name for readonly access to ArgoCD"
   type        = string
   default     = "developers"
+}
+
+variable "argocd_github_sso_secret_name" {
+  description = "Name of the GitHub SSO secret for ArgoCD"
+  type        = string
 }

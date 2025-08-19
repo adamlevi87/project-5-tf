@@ -79,3 +79,8 @@ variable "argocd_service_account_role_arn" {
   type        = string
   description = "The ARN of the IAM role of the service account of argocd"
 }
+
+variable "argocd_github_sso_secret_name" {
+  description = "Name of the GitHub SSO secret for ArgoCD"
+  type        = string
+}
