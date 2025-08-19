@@ -122,8 +122,10 @@ argocd_aws_secret_key = "argocd-credentials"
 github_org = "adamlevi87"
 github_application_repo = "project-5-app"
 github_gitops_repo  = "project-5-gitops"
-github_admin_team = "Project-5/devops"
-github_readonly_team = "Project-5/developers"
+github_admin_team = "devops"
+github_readonly_team = "developers"
+# github_admin_team = "Project-5/devops"
+# github_readonly_team = "Project-5/developers"
 
 # Gitops related settings
 update_apps = false
