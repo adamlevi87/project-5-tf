@@ -21,7 +21,8 @@ on:
           - plan
           - apply
           - plan-and-apply
-          - bootstrap
+          - bootstrap-tf-changes-gitops
+          - bootstrap-all
           - destroy
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -90,7 +91,10 @@ jobs:
               terraform plan "${COMMON_VARS[@]}"
               terraform apply -auto-approve "${COMMON_VARS[@]}"
               ;;
-            bootstrap)
+            bootstrap-tf-changes-gitops)
+              terraform apply -auto-approve "${COMMON_VARS[@]}" --var="update_apps=true"
+              ;;
+            bootstrap-all)
               terraform apply -auto-approve "${COMMON_VARS[@]}" --var="bootstrap_mode=true"
               ;;
             destroy)
