@@ -61,17 +61,25 @@ server:
     url: "https://${domain_name}"
     # openID connect settings
   dex.server.strict.tls: "false"
-  
+
 # Global configuration
 global:
   # Ensure ArgoCD knows its domain
   domain: "${domain_name}"
 
-# Optional: Configure RBAC if needed
+
+dex:
+  env:
+    - name: ARGO_DEX_SERVER_DISABLE_TLS
+      value: "true"
+
 configs:
   params:
-    # Enable insecure mode if you're terminating TLS at ALB
-    server.insecure: true
+    server:
+      # Enable insecure mode if you're terminating TLS at ALB
+      insecure: true
+      # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
+      dex.server: "http://argocd-dev-dex-server:5556"
   secret:
     create: true
     extra:
