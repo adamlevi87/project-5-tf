@@ -31,24 +31,24 @@ server:
       # External DNS annotation (optional - helps external-dns identify the record)
       external-dns.alpha.kubernetes.io/hostname: "${domain_name}"
       # restrictions and rules
-      # alb.ingress.kubernetes.io/conditions.${release_name}-server: |
-      #       [
-      #         {
-      #           "field": "path-pattern", 
-      #           "pathPatternConfig": {
-      #             "values": ["/api/dex/*"]
-      #           },
-      #           "sourceIpConfig": {
-      #             "values": ["0.0.0.0/0"]
-      #           }
-      #         },
-      #         {
-      #           "field":  "source-ip",
-      #           "sourceIpConfig": {
-      #             "values": ["0.0.0.0/0"]
-      #           }
-      #         }
-      #       ]
+      alb.ingress.kubernetes.io/conditions.${release_name}-server: |
+            [
+              {
+                "field": "path-pattern", 
+                "pathPatternConfig": {
+                  "values": ["/api/dex/*"]
+                },
+                "sourceIpConfig": {
+                  "values": ["0.0.0.0/0"]
+                }
+              },
+              {
+                "field":  "source-ip",
+                "sourceIpConfig": {
+                  "values": ["0.0.0.0/0"]
+                }
+              }
+            ]
 
   extraMetadata:
     finalizers:
@@ -101,7 +101,6 @@ configs:
       g, ${github_org}-org:${github_readonly_team}, role:readonly
   cm:
     url: "https://${domain_name}"
-    issuer: https://${domain_name}/api/dex
     users.anonymous.enabled: "false"
     dex.config: |
       connectors:
