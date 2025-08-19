@@ -77,6 +77,7 @@ configs:
     server.insecure: true  
     # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
     server.dex.server: "http://argocd-${environment}-dex-server:5556"
+    server.enable.proxy.extension: "true"
 
   secret:
     create: true
