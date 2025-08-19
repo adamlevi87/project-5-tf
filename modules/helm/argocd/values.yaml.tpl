@@ -36,7 +36,7 @@ server:
               {
                 "field": "path-pattern", 
                 "pathPatternConfig": {
-                  "values": ["/auth/*"]
+                  "values": ["/api/dex/*"]
                 },
                 "sourceIpConfig": {
                   "values": ["0.0.0.0/0"]
