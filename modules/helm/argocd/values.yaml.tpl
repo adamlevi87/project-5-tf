@@ -93,7 +93,8 @@ configs:
       g, ${github_org}-org:${github_admin_team}, role:admin
       g, ${github_org}-org:${github_readonly_team}, role:readonly
   cm:
-    url: "https://${domain_name}" 
+    url: "https://${domain_name}"
+    users.anonymous.enabled: "false"
     dex.config: |
       connectors:
         - type: github
