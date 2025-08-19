@@ -1,4 +1,5 @@
 # Frontend infrastructure values - managed by Terraform
+# digest is managed by the application repo workflow (build-and-push action or update-digest-only)
 
 image:
   repository: "${ecr_frontend_repo_url}"
