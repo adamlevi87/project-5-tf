@@ -62,6 +62,8 @@ jobs:
           ARGOCD_APP_ID: ${{ secrets.ARGOCD_APP_ID }}
           ARGOCD_INSTALLATION_ID: ${{ secrets.ARGOCD_INSTALLATION_ID }}
           ARGOCD_PRIVATE_KEY_B64: ${{ secrets.ARGOCD_PRIVATE_KEY }}
+          OAUTH_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          OAUTH_GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
           
         run: |
           COMMON_VARS=(
@@ -73,7 +75,8 @@ jobs:
             -var="argocd_app_id=$ARGOCD_APP_ID"
             -var="argocd_installation_id=$ARGOCD_INSTALLATION_ID"
             -var="argocd_private_key_b64=$ARGOCD_PRIVATE_KEY_B64"
-            
+            -var="github_oauth_client_id=$OAUTH_GITHUB_CLIENT_ID"
+            -var="github_oauth_client_secret=$OAUTH_GITHUB_CLIENT_SECRET"
           )
           case "${{ github.event.inputs.action }}" in
             plan)
