@@ -63,7 +63,7 @@ locals {
         }
       }
       spec = {
-        refreshInterval = "1h"
+        refreshInterval = "1m"
         secretStoreRef  = {
           name = "aws-sm-argocd"
           kind = "SecretStore"
@@ -142,7 +142,7 @@ locals {
         }
       }
       spec = {
-        refreshInterval = "1h"
+        refreshInterval = "1m"
         secretStoreRef  = {
           name = "aws-sm-argocd"
           kind = "SecretStore"
@@ -222,7 +222,7 @@ locals {
         }
       }
       spec = {
-        refreshInterval = "1h"
+        refreshInterval = "1m"
         secretStoreRef  = {
           name = "aws-sm-argocd"
           kind = "SecretStore"
