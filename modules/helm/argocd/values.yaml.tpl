@@ -69,9 +69,8 @@ global:
 
 
 dex:
-  env:
-    - name: ARGO_DEX_SERVER_DISABLE_TLS
-      value: "true"
+  extraArgs:
+    - --disable-tls
 
 configs:
   params:
@@ -79,7 +78,7 @@ configs:
     server.insecure: true  
     # Sets dex server (for sso) - communication between argocd-server and argocd-dex-server internally
     server.dex.server: "http://argocd-dev-dex-server:5556"
-    
+
   secret:
     create: true
     extra:
