@@ -75,6 +75,7 @@ locals {
             metadata = {
               labels = {
                 "argocd.argoproj.io/secret-type" = "repository"
+                "app.kubernetes.io/part-of" = "argocd"
               }
             }
           }
