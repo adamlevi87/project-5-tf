@@ -29,4 +29,5 @@ variable "app_secrets_config" {
     secret_value  = string
   }))
   default = {}
+  sensitive   = true
 }
