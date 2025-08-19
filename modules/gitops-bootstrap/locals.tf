@@ -12,9 +12,9 @@ locals {
   # File paths
   project_yaml_path          = "projects/${var.project_tag}.yaml"
   frontend_infra_values_path = "environments/${var.environment}/manifests/frontend/infra-values.yaml"
-  frontend_app_values_path   = "environments/${var.environment}/frontend/app-values.yaml"
-  backend_infra_values_path  = "environments/${var.environment}/backend/infra-values.yaml"
-  backend_app_values_path    = "environments/${var.environment}/backend/app-values.yaml"
+  frontend_app_values_path   = "environments/${var.environment}/manifests/frontend/app-values.yaml"
+  backend_infra_values_path  = "environments/${var.environment}/manifests/backend/infra-values.yaml"
+  backend_app_values_path    = "environments/${var.environment}/manifests/backend/app-values.yaml"
   frontend_app_path          = "environments/${var.environment}/apps/frontend/application.yaml"
   backend_app_path           = "environments/${var.environment}/apps/backend/application.yaml"
   
