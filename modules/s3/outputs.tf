@@ -20,7 +20,7 @@ output "bucket_regional_domain_name" {
   value       = aws_s3_bucket.app_data.bucket_regional_domain_name
 }
 
-output "lambda_s3_policy_arn" {
-  description = "ARN of the IAM policy for Lambda S3 access"
-  value       = aws_iam_policy.lambda_s3_access.arn
-}
+# output "lambda_s3_policy_arn" {
+#   description = "ARN of the IAM policy for Lambda S3 access"
+#   value       = aws_iam_policy.lambda_s3_access.arn
+# }

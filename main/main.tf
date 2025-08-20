@@ -93,7 +93,8 @@ module "lambda" {
   
   # S3 integration (from S3 module)
   s3_bucket_name        = module.s3_app_data.bucket_name
-  s3_lambda_policy_arn  = module.s3_app_data.lambda_s3_policy_arn
+  s3_bucket_arn         = module.s3_app_data.bucket_arn
+  #s3_lambda_policy_arn  = module.s3_app_data.lambda_s3_policy_arn
   
   # Event source mapping configuration
   batch_size                         = 1    # Process one message at a time

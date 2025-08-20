@@ -89,37 +89,3 @@ resource "aws_s3_bucket_lifecycle_configuration" "app_data_lifecycle" {
     }
   }
 }
-
-# IAM policy for lambda access
-resource "aws_iam_policy" "lambda_s3_access" {
-  name        = "${var.project_tag}-${var.environment}-lambda-s3-access"
-  description = "IAM policy for Lambda to access S3 app data bucket"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject"
-        ]
-        Resource = "${aws_s3_bucket.app_data.arn}/*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:ListBucket"
-        ]
-        Resource = aws_s3_bucket.app_data.arn
-      }
-    ]
-  })
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-lambda-s3-policy"
-    Project     = var.project_tag
-    Environment = var.environment
-  }
-}

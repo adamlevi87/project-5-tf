@@ -107,8 +107,13 @@ variable "s3_bucket_name" {
   type        = string
 }
 
-variable "s3_lambda_policy_arn" {
-  description = "ARN of the IAM policy for Lambda S3 access"
+# variable "s3_lambda_policy_arn" {
+#   description = "ARN of the IAM policy for Lambda S3 access"
+#   type        = string
+# }
+
+variable "s3_bucket_arn" {
+  description = "ARN of the S3 bucket"
   type        = string
 }
 

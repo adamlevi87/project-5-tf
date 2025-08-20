@@ -73,6 +73,40 @@ resource "aws_iam_role" "lambda_role" {
   }
 }
 
+# IAM policy for lambda access
+resource "aws_iam_policy" "lambda_s3_access" {
+  name        = "${var.project_tag}-${var.environment}-lambda-s3-access"
+  description = "IAM policy for Lambda to access S3 app data bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${var.s3_bucket_arn}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = "${var.var.s3_bucket_arn}"
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-lambda-s3-policy"
+    Project     = var.project_tag
+    Environment = var.environment
+  }
+}
+
 # Attach basic Lambda execution policy
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
@@ -88,7 +122,7 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_access" {
 # Attach S3 access policy (from S3 module)
 resource "aws_iam_role_policy_attachment" "lambda_s3_access" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = var.s3_lambda_policy_arn
+  policy_arn = aws_iam_policy.lambda_s3_access.arn
 }
 
 # Event Source Mapping to connect SQS to Lambda

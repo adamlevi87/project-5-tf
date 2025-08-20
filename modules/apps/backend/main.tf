@@ -51,14 +51,14 @@ resource "aws_iam_role_policy" "this" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject"
-        ]
-        Resource = "${var.s3_bucket_arn}/*"
-      },
+      # {
+      #   Effect = "Allow"
+      #   Action = [
+      #     "s3:PutObject",
+      #     "s3:GetObject"
+      #   ]
+      #   Resource = "${var.s3_bucket_arn}/*"
+      # },
       {
         Effect = "Allow"
         Action = [
