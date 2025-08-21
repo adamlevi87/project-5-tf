@@ -31,3 +31,8 @@ variable "aws_iam_openid_connect_provider_github_arn" {
   description = "github provider arn [created beforhand, using .requirements folder]"
   sensitive   = true
 }
+
+variable "ecr_repository_arns" {
+  description = "List of ECR repository ARNs that GitHub Actions can access"
+  type        = list(string)
+}

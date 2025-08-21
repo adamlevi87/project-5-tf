@@ -325,6 +325,11 @@ module "github_oidc" {
   github_org         = var.github_org
   github_repo        = var.github_application_repo
   aws_iam_openid_connect_provider_github_arn = var.aws_iam_openid_connect_provider_github_arn
+
+  ecr_repository_arns = [
+    module.ecr.ecr_repository_arns["backend"],
+    module.ecr.ecr_repository_arns["frontend"]
+  ]
 }
 
 module "github_repo_secrets" {

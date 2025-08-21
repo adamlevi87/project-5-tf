@@ -1,10 +1,6 @@
 # modules/iam-github-oidc/main.tf
 
 resource "aws_iam_role" "github_actions" {
-  # the name will be project-5-dev-APP_REPO-github-actions-role
-  # as APP_REPO = project-5-app , final name will be:
-  # project-5-dev-project-5-app-github-actions-role
-  # might look like a duplication but its fine
   name = "${var.project_tag}-${var.environment}-${var.github_repo}-github-actions-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -13,7 +9,6 @@ resource "aws_iam_role" "github_actions" {
         Action = "sts:AssumeRoleWithWebIdentity",
         Effect = "Allow",
         Principal = {
-          # Federated = aws_iam_openid_connect_provider.github.arn
           Federated = var.aws_iam_openid_connect_provider_github_arn
         },
         Condition = {
@@ -24,9 +19,71 @@ resource "aws_iam_role" "github_actions" {
       }
     ]
   })
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-github-actions-role"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "github-actions-oidc"
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "attach_admin_policy" {
+# Create custom ECR policy instead of AdministratorAccess
+resource "aws_iam_policy" "github_actions_ecr_policy" {
+  name        = "${var.project_tag}-${var.environment}-github-actions-ecr-policy"
+  description = "IAM policy for GitHub Actions to access ECR repositories"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # Global ECR permissions (required for authentication)
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        # Repository-specific ECR permissions
+        Effect = "Allow"
+        Action = [
+          # Read permissions (for getting image details/digests)
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:DescribeImages",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          
+          # Write permissions (for pushing images)
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ]
+        Resource = var.ecr_repository_arns
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-github-actions-ecr-policy"
+    Project     = var.project_tag
+    Environment = var.environment
+    Purpose     = "github-actions-ecr-access"
+  }
+}
+
+
+# resource "aws_iam_role_policy_attachment" "attach_admin_policy" {
+#   role       = aws_iam_role.github_actions.name
+#   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# }
+
+
+# Attach the custom ECR policy instead of AdministratorAccess
+resource "aws_iam_role_policy_attachment" "attach_ecr_policy" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = aws_iam_policy.github_actions_ecr_policy.arn
 }
