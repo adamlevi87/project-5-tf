@@ -1,4 +1,5 @@
-<img width="6553" height="3102" alt="133333" src="https://github.com/user-attachments/assets/696ee841-377b-4283-adfc-ad6586f52099" />
+
+<img width="8192" height="3983" alt="project5" src="https://github.com/user-attachments/assets/9aa2948f-daef-4cbc-a851-a05cf7c3e303" />
 
 HPA + Cluster AutoScaler general Explanation:
 <img width="4008" height="3028" alt="Scale" src="https://github.com/user-attachments/assets/6343cf36-1836-4526-b41d-0cf7767a6d95" />
