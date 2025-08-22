@@ -287,7 +287,7 @@ module "backend" {
   oidc_provider_url         = module.eks.cluster_oidc_issuer_url
   namespace                 = var.backend_service_namespace
   service_account_name      = var.backend_service_account_name
-  s3_bucket_arn             = module.s3_app_data.bucket_arn
+  #s3_bucket_arn             = module.s3_app_data.bucket_arn
   sqs_queue_arn             = module.sqs.queue_arn
   node_group_security_group = module.eks.node_group_security_group_id
 
