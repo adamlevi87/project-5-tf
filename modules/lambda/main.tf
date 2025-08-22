@@ -95,7 +95,7 @@ resource "aws_iam_policy" "lambda_s3_access" {
         Action = [
           "s3:ListBucket"
         ]
-        Resource = "${var.var.s3_bucket_arn}"
+        Resource = "${var.s3_bucket_arn}"
       }
     ]
   })
