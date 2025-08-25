@@ -306,9 +306,9 @@ variable "github_org" {
 # When run from the workflow: will be pulled from the TF's application repo secrets so it must exists beforehand
 # example for the cli command usage: terraform plan -var="github_token=YOURKEY" ..."
 variable "github_token" {
-description = "GitHub PAT with access to manage secrets"
-type        = string
-sensitive   = true
+  description = "GitHub PAT with access to manage secrets"
+  type        = string
+  sensitive   = true
 }
 
 # github provider ARN, created using the requirements folder

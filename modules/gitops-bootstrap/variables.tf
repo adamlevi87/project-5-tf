@@ -223,3 +223,9 @@ variable "gitops_repo_name" {
   description = "GitHub repository name (from data source)"
   type        = string
 }
+
+variable "github_token" {
+  description = "GitHub PAT with access to manage secrets"
+  type        = string
+  sensitive   = true
+}

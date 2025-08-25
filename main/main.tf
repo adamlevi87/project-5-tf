@@ -524,7 +524,7 @@ module "gitops_bootstrap" {
   github_gitops_repo      = var.github_gitops_repo
   github_org              = var.github_org  
   github_application_repo = var.github_application_repo
-  
+  github_token            = var.github_token
   # Project Configuration
   project_tag   = var.project_tag
   app_name      = var.project_tag

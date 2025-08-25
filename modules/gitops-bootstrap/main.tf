@@ -95,3 +95,80 @@ resource "github_repository_pull_request" "gitops_pr" {
       github_repository_file.infra_files
     ]
 }
+
+# Cleanup resource - runs after PR creation
+resource "null_resource" "cleanup_empty_pr" {
+  depends_on = [
+    github_repository_pull_request.gitops_pr,
+    github_repository_file.bootstrap_files,
+    github_repository_file.infra_files
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      #!/bin/bash
+      set -e
+      
+      # Variables
+      GITHUB_TOKEN="${var.github_token}"
+      REPO_OWNER="${var.github_org}"
+      REPO_NAME="${var.github_gitops_repo}"
+      PR_NUMBER="${github_repository_pull_request.gitops_pr.number}"
+      BRANCH_NAME="${github_branch.gitops_branch.branch}"
+      
+      echo "Checking PR #$PR_NUMBER for file changes..."
+      
+      # Check if PR has file changes using GitHub API
+      CHANGED_FILES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER/files" | \
+        jq length)
+      
+      echo "PR #$PR_NUMBER has $CHANGED_FILES file changes"
+      
+      if [ "$CHANGED_FILES" -eq 0 ]; then
+        echo "No file changes detected. Cleaning up PR and branch..."
+        
+        # Delete the PR
+        echo "Deleting PR #$PR_NUMBER..."
+        curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER" \
+          -d '{"state":"closed"}'
+        
+        if [ $? -eq 0 ]; then
+          echo "PR closed successfully"
+          
+          # Delete the branch
+          echo "Deleting branch $BRANCH_NAME..."
+          curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/git/refs/heads/$BRANCH_NAME"
+          
+          if [ $? -eq 0 ]; then
+            echo "Branch deleted successfully"
+            
+            # Remove resources from Terraform state
+            echo "Removing resources from Terraform state..."
+            terraform state rm github_repository_pull_request.gitops_pr
+            terraform state rm github_branch.gitops_branch
+            
+            echo "Cleanup completed successfully"
+          else
+            echo "Failed to delete branch" >&2
+            exit 1
+          fi
+        else
+          echo "Failed to close PR" >&2
+          exit 1
+        fi
+      else
+        echo "PR has file changes. Leaving PR and branch intact."
+      fi
+    EOT
+  }
+
+  # Trigger cleanup anytime the PR changes
+  triggers = {
+    pr_number = github_repository_pull_request.gitops_pr.number
+  }
+}
