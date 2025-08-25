@@ -71,7 +71,7 @@ resource "github_repository_file" "infra_files" {
   repository = var.gitops_repo_name
   file       = each.value.path
   content    = each.value.content
-  branch     = github_branch.gitops_branch[0].branch
+  branch     = github_branch.gitops_branch.branch
   
   commit_message = var.bootstrap_mode ? "Bootstrap: Create ${each.key} values" : "Update: ${each.key} values for ${var.environment}"
   commit_author  = "Terraform GitOps"
@@ -88,7 +88,7 @@ resource "github_repository_pull_request" "gitops_pr" {
   base_repository   = var.gitops_repo_name
   title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
   body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
-  head_ref          = github_branch.gitops_branch[0].branch
+  head_ref          = github_branch.gitops_branch.branch
   base_ref          = var.target_branch
   
   depends_on = [
