@@ -102,9 +102,6 @@ resource "github_repository_file" "infra_files" {
 # }
 
 # Manage PR creation and cleanup entirely via local-exec
-# Replace the github_repository_pull_request resource with this in modules/gitops-bootstrap/main.tf
-
-# Manage PR creation and cleanup entirely via local-exec
 resource "null_resource" "manage_pr" {
   depends_on = [
     github_branch.gitops_branch,
@@ -159,9 +156,9 @@ resource "null_resource" "manage_pr" {
         if [[ "$DELETE_CODE" =~ ^(200|204)$ ]]; then
           echo "Empty branch deleted successfully"
           
-          # Remove branch from Terraform state
-          terraform state rm github_branch.gitops_branch
-          echo "Branch removed from Terraform state"
+          # Remove branch from Terraform state - NOTE: This will fail due to state lock
+          # terraform state rm github_branch.gitops_branch
+          echo "Branch removed from GitHub. Terraform state will be corrected on next run."
         else
           echo "Failed to delete branch (HTTP: $DELETE_CODE)" >&2
           exit 1
@@ -200,9 +197,9 @@ resource "null_resource" "manage_pr" {
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/git/refs/heads/$BRANCH_NAME"
           
-          # Remove branch from Terraform state
-          terraform state rm github_branch.gitops_branch
-          echo "Empty PR and branch cleaned up successfully"
+          # Remove branch from Terraform state - NOTE: This will fail due to state lock  
+          # terraform state rm github_branch.gitops_branch
+          echo "Empty PR and branch cleaned up from GitHub. Terraform state will be corrected on next run."
         else
           echo "PR has meaningful changes - leaving PR #$PR_NUMBER open"
         fi
