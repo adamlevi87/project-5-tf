@@ -37,11 +37,6 @@ resource "github_branch" "gitops_branch" {
   repository = var.gitops_repo_name
   branch     = local.branch_name
   source_branch = var.target_branch
-
-  # when PR management block happens-> 
-  lifecycle {
-    replace_triggered_by = [null_resource.manage_pr.id]
-  }
 }
 
 # Bootstrap files (only in bootstrap mode)
