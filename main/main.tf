@@ -511,7 +511,7 @@ module "aws_load_balancer_controller" {
 
 # Call to gitops-bootstrap module
 module "gitops_bootstrap" {
-  count = (var.bootstrap_mode || var.update_apps) ? 1 : 0
+  #count = (var.bootstrap_mode || var.update_apps) ? 1 : 0
   
   source = "../modules/gitops-bootstrap"
   
