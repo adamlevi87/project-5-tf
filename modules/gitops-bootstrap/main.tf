@@ -83,28 +83,30 @@ resource "github_repository_file" "infra_files" {
   ]
 }
 
-# Always create PR
-resource "github_repository_pull_request" "gitops_pr" {  
-  base_repository   = var.gitops_repo_name
-  title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
-  body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
-  head_ref          = github_branch.gitops_branch.branch
-  base_ref          = var.target_branch
+# # Always create PR
+# resource "github_repository_pull_request" "gitops_pr" {  
+#   base_repository   = var.gitops_repo_name
+#   title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
+#   body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"
+#   head_ref          = github_branch.gitops_branch.branch
+#   base_ref          = var.target_branch
   
-  provisioner "local-exec" {
-    on_failure = continue  # Don't fail Terraform if this fails
-    command = "echo 'PR creation attempted'"
-  }
+#   provisioner "local-exec" {
+#     on_failure = continue  # Don't fail Terraform if this fails
+#     command = "echo 'PR creation attempted'"
+#   }
 
-  depends_on = [
-    github_repository_file.infra_files
-  ]
-}
+#   depends_on = [
+#     github_repository_file.infra_files
+#   ]
+# }
 
-# Cleanup resource - runs after PR creation
-resource "null_resource" "cleanup_empty_pr" {
+# Replace the github_repository_pull_request resource with this in modules/gitops-bootstrap/main.tf
+
+# Manage PR creation and cleanup entirely via local-exec
+resource "null_resource" "manage_pr" {
   depends_on = [
-    github_repository_pull_request.gitops_pr,
+    github_branch.gitops_branch,
     github_repository_file.bootstrap_files,
     github_repository_file.infra_files
   ]
@@ -118,62 +120,98 @@ resource "null_resource" "cleanup_empty_pr" {
       GITHUB_TOKEN="${var.github_token}"
       REPO_OWNER="${var.github_org}"
       REPO_NAME="${var.github_gitops_repo}"
-      PR_NUMBER="${github_repository_pull_request.gitops_pr.number}"
       BRANCH_NAME="${github_branch.gitops_branch.branch}"
+      TARGET_BRANCH="${var.target_branch}"
+      PR_TITLE="${var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"}"
+      PR_BODY="${var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"}"
       
-      echo "Checking PR #$PR_NUMBER for file changes..."
+      echo "Attempting to create PR from $BRANCH_NAME to $TARGET_BRANCH..."
       
-      # Check if PR has file changes using GitHub API
-      CHANGED_FILES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-        "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER/files" | \
-        jq length)
+      # Try to create PR
+      PR_RESPONSE=$(curl -s -w "\n%{http_code}" \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls" \
+        -d "{\"title\":\"$PR_TITLE\",\"body\":\"$PR_BODY\",\"head\":\"$BRANCH_NAME\",\"base\":\"$TARGET_BRANCH\"}")
       
-      echo "PR #$PR_NUMBER has $CHANGED_FILES file changes"
+      # Extract HTTP status code (last line)
+      HTTP_CODE=$(echo "$PR_RESPONSE" | tail -n1)
+      PR_DATA=$(echo "$PR_RESPONSE" | head -n -1)
       
-      if [ "$CHANGED_FILES" -eq 0 ]; then
-        echo "No file changes detected. Cleaning up PR and branch..."
+      if [ "$HTTP_CODE" = "422" ]; then
+        echo "No commits between branches - cleaning up empty branch..."
         
-        # Delete the PR
-        echo "Deleting PR #$PR_NUMBER..."
-        curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
+        # Delete the empty branch
+        echo "Deleting branch $BRANCH_NAME..."
+        DELETE_RESPONSE=$(curl -s -w "%{http_code}" \
+          -X DELETE \
+          -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER" \
-          -d '{"state":"closed"}'
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/git/refs/heads/$BRANCH_NAME")
         
-        if [ $? -eq 0 ]; then
-          echo "PR closed successfully"
+        DELETE_CODE=$(echo "$DELETE_RESPONSE" | tail -c 4)
+        
+        if [[ "$DELETE_CODE" =~ ^(200|204)$ ]]; then
+          echo "Empty branch deleted successfully"
+          
+          # Remove branch from Terraform state
+          terraform state rm github_branch.gitops_branch
+          echo "Branch removed from Terraform state"
+        else
+          echo "Failed to delete branch (HTTP: $DELETE_CODE)" >&2
+          exit 1
+        fi
+        
+      elif [[ "$HTTP_CODE" =~ ^(200|201)$ ]]; then
+        echo "PR created successfully"
+        
+        # Extract PR number
+        PR_NUMBER=$(echo "$PR_DATA" | jq -r '.number')
+        echo "PR #$PR_NUMBER created"
+        
+        # Check if PR has actual file changes
+        echo "Checking PR #$PR_NUMBER for file changes..."
+        CHANGED_FILES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER/files" | \
+          jq length)
+        
+        echo "PR #$PR_NUMBER has $CHANGED_FILES file changes"
+        
+        if [ "$CHANGED_FILES" -eq 0 ]; then
+          echo "No file changes detected - cleaning up empty PR and branch..."
+          
+          # Close the PR
+          echo "Closing PR #$PR_NUMBER..."
+          curl -s -X PATCH \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER" \
+            -d '{"state":"closed"}'
           
           # Delete the branch
           echo "Deleting branch $BRANCH_NAME..."
-          curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+          curl -s -X DELETE \
+            -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/git/refs/heads/$BRANCH_NAME"
           
-          if [ $? -eq 0 ]; then
-            echo "Branch deleted successfully"
-            
-            # Remove resources from Terraform state
-            echo "Removing resources from Terraform state..."
-            terraform state rm github_repository_pull_request.gitops_pr
-            terraform state rm github_branch.gitops_branch
-            
-            echo "Cleanup completed successfully"
-          else
-            echo "Failed to delete branch" >&2
-            exit 1
-          fi
+          # Remove branch from Terraform state
+          terraform state rm github_branch.gitops_branch
+          echo "Empty PR and branch cleaned up successfully"
         else
-          echo "Failed to close PR" >&2
-          exit 1
+          echo "PR has meaningful changes - leaving PR #$PR_NUMBER open"
         fi
+        
       else
-        echo "PR has file changes. Leaving PR and branch intact."
+        echo "Failed to create PR (HTTP: $HTTP_CODE)" >&2
+        echo "Response: $PR_DATA" >&2
+        exit 1
       fi
     EOT
   }
 
-  # Trigger cleanup anytime the PR changes
+  # Trigger when branch changes
   triggers = {
-    pr_number = github_repository_pull_request.gitops_pr.number
+    branch_name = github_branch.gitops_branch.branch
   }
 }
