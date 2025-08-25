@@ -33,10 +33,7 @@ terraform {
 #   branch     = var.target_branch
 # }
 
-# CHANGED: Added local.has_changes condition to branch creation
-resource "github_branch" "gitops_branch" {
-  count = local.has_changes ? 1 : 0
-  
+resource "github_branch" "gitops_branch" { 
   repository = var.gitops_repo_name
   branch     = local.branch_name
   source_branch = var.target_branch
@@ -44,7 +41,7 @@ resource "github_branch" "gitops_branch" {
 
 # Bootstrap files (only in bootstrap mode)
 resource "github_repository_file" "bootstrap_files" {
-  for_each = var.bootstrap_mode && local.has_changes ? {
+  for_each = var.bootstrap_mode ? {
     "project"              = { path = local.project_yaml_path, content = local.rendered_project }
     "frontend_application" = { path = local.frontend_app_path, content = local.rendered_frontend_app }
     "backend_application"  = { path = local.backend_app_path, content = local.rendered_backend_app }
@@ -66,7 +63,7 @@ resource "github_repository_file" "bootstrap_files" {
 
 # Infrastructure files (bootstrap OR update mode)
 resource "github_repository_file" "infra_files" {
-  for_each = local.has_changes && (var.bootstrap_mode || var.update_apps) ? {
+  for_each = var.bootstrap_mode || var.update_apps ? {
     "frontend_infra" = { path = local.frontend_infra_values_path, content = local.rendered_frontend_infra }
     "backend_infra"  = { path = local.backend_infra_values_path, content = local.rendered_backend_infra }
   } : {}
@@ -87,9 +84,7 @@ resource "github_repository_file" "infra_files" {
 }
 
 # Always create PR
-resource "github_repository_pull_request" "gitops_pr" {
-  count = local.has_changes ? 1 : 0
-  
+resource "github_repository_pull_request" "gitops_pr" {  
   base_repository   = var.gitops_repo_name
   title             = var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"
   body              = var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"

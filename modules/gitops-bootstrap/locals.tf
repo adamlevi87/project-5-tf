@@ -131,13 +131,13 @@ locals {
   #   )
   # }
 
-  changed_files = {
-    for file_path, file_data in var.current_files_data :
-    file_path => try(
-      file_data.content != base64encode(local.rendered_content[file_path]),
-      true
-    )
-  }
+  # changed_files = {
+  #   for file_path, file_data in var.current_files_data :
+  #   file_path => try(
+  #     file_data.content != base64encode(local.rendered_content[file_path]),
+  #     true
+  #   )
+  # }
 
-  has_changes = length([for changed in local.changed_files : changed if changed]) > 0
+  #has_changes = length([for changed in local.changed_files : changed if changed]) > 0
 }
