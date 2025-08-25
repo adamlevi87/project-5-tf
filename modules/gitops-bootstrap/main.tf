@@ -91,9 +91,14 @@ resource "github_repository_pull_request" "gitops_pr" {
   head_ref          = github_branch.gitops_branch.branch
   base_ref          = var.target_branch
   
+  provisioner "local-exec" {
+    on_failure = continue  # Don't fail Terraform if this fails
+    command = "echo 'PR creation attempted'"
+  }
+
   depends_on = [
-      github_repository_file.infra_files
-    ]
+    github_repository_file.infra_files
+  ]
 }
 
 # Cleanup resource - runs after PR creation
