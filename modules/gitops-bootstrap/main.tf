@@ -101,6 +101,7 @@ resource "github_repository_file" "infra_files" {
 #   ]
 # }
 
+# Manage PR creation and cleanup entirely via local-exec
 # Replace the github_repository_pull_request resource with this in modules/gitops-bootstrap/main.tf
 
 # Manage PR creation and cleanup entirely via local-exec
@@ -127,29 +128,33 @@ resource "null_resource" "manage_pr" {
       
       echo "Attempting to create PR from $BRANCH_NAME to $TARGET_BRANCH..."
       
-      # Try to create PR
-      PR_RESPONSE=$(curl -s -w "\n%{http_code}" \
+      # Create JSON payload properly using jq
+      JSON_PAYLOAD=$(jq -n \
+        --arg title "$PR_TITLE" \
+        --arg body "$PR_BODY" \
+        --arg head "$BRANCH_NAME" \
+        --arg base "$TARGET_BRANCH" \
+        '{title: $title, body: $body, head: $head, base: $base}')
+      
+      # Try to create PR - store response and HTTP code separately
+      HTTP_CODE=$(curl -s -o /tmp/pr_response.json -w "%%{http_code}" \
         -H "Authorization: token $GITHUB_TOKEN" \
         -H "Accept: application/vnd.github.v3+json" \
         "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls" \
-        -d "{\"title\":\"$PR_TITLE\",\"body\":\"$PR_BODY\",\"head\":\"$BRANCH_NAME\",\"base\":\"$TARGET_BRANCH\"}")
+        -d "$JSON_PAYLOAD")
       
-      # Extract HTTP status code (last line)
-      HTTP_CODE=$(echo "$PR_RESPONSE" | tail -n1)
-      PR_DATA=$(echo "$PR_RESPONSE" | head -n -1)
+      PR_DATA=$(cat /tmp/pr_response.json)
       
       if [ "$HTTP_CODE" = "422" ]; then
         echo "No commits between branches - cleaning up empty branch..."
         
         # Delete the empty branch
         echo "Deleting branch $BRANCH_NAME..."
-        DELETE_RESPONSE=$(curl -s -w "%{http_code}" \
+        DELETE_CODE=$(curl -s -o /dev/null -w "%%{http_code}" \
           -X DELETE \
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3+json" \
           "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/git/refs/heads/$BRANCH_NAME")
-        
-        DELETE_CODE=$(echo "$DELETE_RESPONSE" | tail -c 4)
         
         if [[ "$DELETE_CODE" =~ ^(200|204)$ ]]; then
           echo "Empty branch deleted successfully"
