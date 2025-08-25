@@ -52,7 +52,7 @@ resource "github_repository_file" "bootstrap_files" {
   repository = var.gitops_repo_name
   file       = each.value.path
   content    = each.value.content
-  branch     = github_branch.gitops_branch[0].branch
+  branch     = github_branch.gitops_branch.branch
   
   commit_message = "Bootstrap: Create ${each.key}"
   commit_author  = "Terraform GitOps"
