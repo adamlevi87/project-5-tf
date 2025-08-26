@@ -12,10 +12,19 @@ resource "helm_release" "this" {
 
   # Configuration for metrics-server
   set = [
-    # EKS-specific args
+    # EKS-specific args (fixed for kubelet connectivity)
     {
       name  = "args"
-      value = "{--cert-dir=/tmp,--secure-port=4443,--kubelet-preferred-address-types=InternalIP\\,ExternalIP\\,Hostname,--kubelet-use-node-status-port,--metric-resolution=15s,--kubelet-insecure-tls}"
+      value = "{--cert-dir=/tmp,--secure-port=4443,--kubelet-preferred-address-types=InternalIP\\,ExternalIP\\,Hostname,--kubelet-use-node-status-port,--kubelet-insecure-tls}"
+    },
+    # Fix health check ports
+    {
+      name  = "livenessProbe.httpGet.port"
+      value = "4443"
+    },
+    {
+      name  = "readinessProbe.httpGet.port"
+      value = "4443"
     },
     # Disable Prometheus integration (not needed for HPA)
     {
