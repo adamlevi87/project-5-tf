@@ -59,10 +59,4 @@ resource "helm_release" "this" {
   ]
 
   depends_on = [var.eks_dependency]
-
-  tags = {
-    Project     = var.project_tag
-    Environment = var.environment
-    Purpose     = "metrics-server"
-  }
 }
