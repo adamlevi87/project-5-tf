@@ -123,6 +123,14 @@ resource "null_resource" "manage_pr" {
       PR_TITLE="${var.bootstrap_mode ? "Bootstrap: ${var.project_tag} ${var.environment}" : "Update: ${var.environment} infrastructure"}"
       PR_BODY="${var.bootstrap_mode ? "Bootstrap GitOps configuration for ${var.project_tag}" : "Update infrastructure values for ${var.environment}"}"
       
+
+      # Add at the start of local-exec script:
+      exec > /tmp/tf-gitops-debug.log 2>&1
+      echo "=== PR Management Debug Log - $(date) ==="
+      echo "BRANCH_NAME: $BRANCH_NAME"
+      echo "REPO_NAME: $REPO_NAME" 
+      echo "Variables passed: bootstrap_mode=${var.bootstrap_mode}, update_apps=${var.update_apps}"
+      
       echo "Attempting to create PR from $BRANCH_NAME to $TARGET_BRANCH..."
       
       # Create JSON payload properly using jq
