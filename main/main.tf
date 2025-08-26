@@ -404,6 +404,28 @@ module "aws_auth_config" {
   eks_dependency = module.eks
 }
 
+# Add this to your main/main.tf file, after the EKS module and before applications
+
+module "metrics_server" {
+  source = "../modules/helm/metrics-server"
+
+  project_tag  = var.project_tag
+  environment  = var.environment
+
+  release_name = "metrics-server"
+  namespace    = "kube-system"
+  
+  # Resource configuration (optional - defaults are provided)
+  cpu_requests    = "100m"
+  memory_requests = "200Mi"
+  cpu_limits      = "1000m"
+  memory_limits   = "1000Mi"
+
+  # Ensure EKS cluster is ready
+  eks_dependency = module.eks
+  depends_on = [module.eks]
+}
+
 module "argocd" {
   source         = "../modules/helm/argocd"
 
