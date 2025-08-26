@@ -19,6 +19,11 @@ resource "helm_release" "this" {
       "--kubelet-use-node-status-port",
       "--kubelet-insecure-tls"
     ]
+    service = {
+        annotations = {
+        "service.beta.kubernetes.io/aws-load-balancer-type" = "none"
+        }
+    }
     livenessProbe = {
       httpGet = { port = 4443 }
     }
