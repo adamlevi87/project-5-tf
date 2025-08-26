@@ -14,7 +14,6 @@ resource "helm_release" "this" {
   values = [yamlencode({
     args = [
       "--cert-dir=/tmp",
-      "--secure-port=4443",
       "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname",
       "--kubelet-use-node-status-port",
       "--kubelet-insecure-tls"
@@ -23,12 +22,6 @@ resource "helm_release" "this" {
         annotations = {
         "service.beta.kubernetes.io/aws-load-balancer-type" = "none"
         }
-    }
-    livenessProbe = {
-      httpGet = { port = 4443 }
-    }
-    readinessProbe = {
-      httpGet = { port = 4443 }
     }
     metrics = {
       enabled = false
