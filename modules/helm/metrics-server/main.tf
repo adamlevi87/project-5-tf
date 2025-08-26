@@ -11,61 +11,50 @@ resource "helm_release" "this" {
   create_namespace = false
 
   # Configuration for metrics-server
-  set = [
-    # EKS-specific args (fixed for kubelet connectivity)
-    {
-      name  = "args"
-      value = "{--cert-dir=/tmp,--secure-port=4443,--kubelet-preferred-address-types=InternalIP\\,ExternalIP\\,Hostname,--kubelet-use-node-status-port,--kubelet-insecure-tls}"
-    },
-    # Fix health check ports
-    {
-      name  = "livenessProbe.httpGet.port"
-      value = "4443"
-    },
-    {
-      name  = "readinessProbe.httpGet.port"
-      value = "4443"
-    },
-    # Disable Prometheus integration (not needed for HPA)
-    {
-      name  = "metrics.enabled"
-      value = "false"
-    },
-    {
-      name  = "serviceMonitor.enabled"
-      value = "false"
-    },
-    # Resource configuration
-    {
-      name  = "resources.requests.cpu"
-      value = var.cpu_requests
-    },
-    {
-      name  = "resources.requests.memory"
-      value = var.memory_requests
-    },
-    {
-      name  = "resources.limits.cpu"
-      value = var.cpu_limits
-    },
-    {
-      name  = "resources.limits.memory"
-      value = var.memory_limits
-    },
-    # Node affinity for system workloads (Linux nodes only)
-    {
-      name  = "affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key"
-      value = "kubernetes.io/os"
-    },
-    {
-      name  = "affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator"
-      value = "In"
-    },
-    {
-      name  = "affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]"
-      value = "linux"
+  values = [yamlencode({
+    args = [
+      "--cert-dir=/tmp",
+      "--secure-port=4443",
+      "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname",
+      "--kubelet-use-node-status-port",
+      "--kubelet-insecure-tls"
+    ]
+    livenessProbe = {
+      httpGet = { port = 4443 }
     }
-  ]
+    readinessProbe = {
+      httpGet = { port = 4443 }
+    }
+    metrics = {
+      enabled = false
+    }
+    serviceMonitor = {
+      enabled = false
+    }
+    resources = {
+      requests = {
+        cpu    = var.cpu_requests
+        memory = var.memory_requests
+      }
+      limits = {
+        cpu    = var.cpu_limits
+        memory = var.memory_limits
+      }
+    }
+    affinity = {
+      nodeAffinity = {
+        requiredDuringSchedulingIgnoredDuringExecution = {
+          nodeSelectorTerms = [{
+            matchExpressions = [{
+              key      = "kubernetes.io/os"
+              operator = "In"
+              values   = ["linux"]
+            }]
+          }]
+        }
+      }
+    }
+  })]
 
   depends_on = [var.eks_dependency, var.lbc_webhook_ready]
 }
