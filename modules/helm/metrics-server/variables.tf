@@ -52,6 +52,11 @@ variable "memory_limits" {
   default     = "1000Mi"
 }
 
+variable "lbc_webhook_ready" {
+  description = "AWS LBC webhook readiness signal"
+  type        = string
+}
+
 variable "eks_dependency" {
   description = "Dependency on EKS cluster being ready"
   type        = any

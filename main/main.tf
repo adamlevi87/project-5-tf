@@ -404,8 +404,6 @@ module "aws_auth_config" {
   eks_dependency = module.eks
 }
 
-# Add this to your main/main.tf file, after the EKS module and before applications
-
 module "metrics_server" {
   source = "../modules/helm/metrics-server"
 
@@ -421,9 +419,10 @@ module "metrics_server" {
   cpu_limits      = "1000m"
   memory_limits   = "1000Mi"
 
-  # Ensure EKS cluster is ready
-  eks_dependency = module.eks
-  depends_on = [module.eks]
+  # Ensure EKS cluster is ready and LBC webhook is available
+  eks_dependency    = module.eks
+  lbc_webhook_ready = module.aws_load_balancer_controller.webhook_ready
+  depends_on = [module.eks, module.aws_load_balancer_controller]
 }
 
 module "argocd" {

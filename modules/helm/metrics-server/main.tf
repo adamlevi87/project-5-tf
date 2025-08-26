@@ -58,5 +58,5 @@ resource "helm_release" "this" {
     }
   ]
 
-  depends_on = [var.eks_dependency]
+  depends_on = [var.eks_dependency, var.lbc_webhook_ready]
 }
