@@ -81,10 +81,10 @@ eks_kubernetes_version = "1.33"
 # Whitelist your host + temporary - for github - all IPs - EKS api access
 # this is mainly for Github runners until we move onto a better method- maybe VPC endpoints? 
 # github workflow that runs the TF apply uses kubernetes/helm modules which requires white listing the runners
-eks_api_allowed_cidr_blocks    = ["85.64.225.89/32","0.0.0.0/0"]
+eks_api_allowed_cidr_blocks    = ["85.64.231.47/32","0.0.0.0/0"]
 
 
-argocd_allowed_cidr_blocks = ["85.64.225.89/32"]
+argocd_allowed_cidr_blocks = ["85.64.231.47/32"]
 
 
 # EKS Node Group Configuration (minimal for dev)
