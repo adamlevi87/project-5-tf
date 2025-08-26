@@ -413,6 +413,8 @@ module "metrics_server" {
   release_name = "metrics-server"
   namespace    = "kube-system"
   
+  chart_version = "3.13.0"
+
   # Resource configuration (optional - defaults are provided)
   cpu_requests    = "100m"
   memory_requests = "200Mi"
