@@ -256,7 +256,7 @@ resource "aws_launch_template" "nodes" {
   name_prefix   = "${var.project_tag}-${var.environment}-eks-nodes-lt-"
   #image_id      = data.aws_ami.eks_default.image_id
   image_id      = "ami-03943441037953e69"
-  instance_type = var.node_group_instance_types[0]
+  instance_type = var.node_group_instance_types
 
   # iam_instance_profile {
   #   name = aws_iam_instance_profile.nodes.name
