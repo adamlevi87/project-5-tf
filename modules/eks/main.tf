@@ -242,15 +242,15 @@ data "aws_ami" "eks_default" {
   }
 }
 
-# Create IAM instance profile for the node group
-resource "aws_iam_instance_profile" "nodes" {
-  name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
-  role = aws_iam_role.node_group_role.name
+# # Create IAM instance profile for the node group
+# resource "aws_iam_instance_profile" "nodes" {
+#   name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+#   role = aws_iam_role.node_group_role.name
   
-  tags = {
-    Name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
-  }
-}
+#   tags = {
+#     Name = "${var.project_tag}-${var.environment}-eks-nodes-instance-profile"
+#   }
+# }
 
 resource "aws_launch_template" "nodes" {
   name_prefix   = "${var.project_tag}-${var.environment}-eks-nodes-lt-"
@@ -258,9 +258,9 @@ resource "aws_launch_template" "nodes" {
   image_id      = "ami-03943441037953e69"
   instance_type = var.node_group_instance_type
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.nodes.name
-  }
+  # iam_instance_profile {
+  #   name = aws_iam_instance_profile.nodes.name
+  # }
 
   tag_specifications {
     resource_type = "volume"
