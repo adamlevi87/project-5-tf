@@ -284,6 +284,17 @@ resource "aws_launch_template" "nodes" {
     }
   }
 
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      "eks:cluster-name" = var.cluster_name
+      "eks:nodegroup-name" = "${var.project_tag}-${var.environment}-node-group"
+      Name        = "${var.project_tag}-${var.environment}-eks-node"
+      Project     = var.project_tag
+      Environment = var.environment
+    }
+  }
+
   # Add the required user data for EKS bootstrap
   user_data = base64encode(local.user_data)
 
