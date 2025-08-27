@@ -35,8 +35,7 @@ variable "eks_api_allowed_cidr_blocks" {
 # Node Group Configuration
 variable "node_group_instance_types" {
   description = "EC2 instance types for the node group"
-  type        = list(string)
-  default     = ["t3.small"]
+  type        = string
 }
 
 variable "node_group_desired_capacity" {
