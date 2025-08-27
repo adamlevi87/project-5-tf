@@ -226,7 +226,7 @@ module "eks" {
   vpc_id = module.vpc_network.vpc_id
   
   # Node group configuration
-  node_group_instance_types   = var.eks_node_instance_types
+  node_group_instance_type    = var.eks_node_instance_type
   node_group_desired_capacity = var.eks_node_desired_capacity
   node_group_max_capacity     = var.eks_node_max_capacity
   node_group_min_capacity     = var.eks_node_min_capacity

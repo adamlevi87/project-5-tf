@@ -33,8 +33,8 @@ variable "eks_api_allowed_cidr_blocks" {
 }
 
 # Node Group Configuration
-variable "node_group_instance_types" {
-  description = "EC2 instance types for the node group"
+variable "node_group_instance_type" {
+  description = "EC2 instance type for the node group"
   type        = string
 }
 
