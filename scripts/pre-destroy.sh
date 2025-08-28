@@ -20,7 +20,7 @@ delete_argocd_apps() {
     kubectl delete application "$APP_NAME" -n argocd --timeout=30s || {
       echo "⚠️  Graceful deletion failed, force removing finalizers..."
       kubectl patch application "$APP_NAME" -n argocd -p '{"metadata":{"finalizers":null}}' --type=merge || true
-      kubectl delete application "$APP_NAME" -n argocd --force --grace-period=0 || true
+      kubectl delete application "$APP_NAME" -n argocd --cascade=foreground --force --grace-period=0 || true
     }
     
     # Wait a bit for ArgoCD to stop managing resources
