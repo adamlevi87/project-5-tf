@@ -61,6 +61,11 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = aws_lambda_function.message_processor.ARN
+          }
+        }
       }
     ]
   })
