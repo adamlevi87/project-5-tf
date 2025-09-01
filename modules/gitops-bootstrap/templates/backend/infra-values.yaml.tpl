@@ -7,7 +7,9 @@ image:
   tag: ""
   pullPolicy: Always
 
-namespace: ${backend_namespace}
+namespace: 
+  name: ${backend_namespace}
+  create: false
 
 service:
   type: "ClusterIP"
