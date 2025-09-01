@@ -1,32 +1,46 @@
 // lambda-code/index.js
-const AWS = require('aws-sdk');
-const { v4: uuidv4 } = require('uuid');
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { randomUUID } from 'crypto';
 
-// Initialize AWS services
-const s3 = new AWS.S3();
+// Initialize AWS S3 client
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION || 'us-east-1'
+});
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
     console.log('Lambda triggered with event:', JSON.stringify(event, null, 2));
     
     try {
         // Process each SQS message in the batch
-        for (const record of event.Records) {
-            await processMessage(record);
+        const results = await Promise.allSettled(
+            event.Records.map(record => processMessage(record))
+        );
+        
+        // Log any failures
+        const failures = results.filter(result => result.status === 'rejected');
+        if (failures.length > 0) {
+            console.error(`Failed to process ${failures.length} messages:`, 
+                failures.map(f => f.reason));
         }
         
-        console.log(`Successfully processed ${event.Records.length} messages`);
+        const successCount = results.filter(result => result.status === 'fulfilled').length;
+        console.log(`Successfully processed ${successCount} out of ${event.Records.length} messages`);
+        
+        // If any message failed, throw error to trigger retry/DLQ behavior
+        if (failures.length > 0) {
+            throw new Error(`Failed to process ${failures.length} messages`);
+        }
+        
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: `Processed ${event.Records.length} messages successfully`
+                message: `Processed ${successCount} messages successfully`
             })
         };
         
     } catch (error) {
         console.error('Error processing messages:', error);
-        
-        // Re-throw error to trigger retry/DLQ behavior
-        throw error;
+        throw error; // Re-throw to trigger retry/DLQ behavior
     }
 };
 
@@ -40,26 +54,35 @@ async function processMessage(record) {
         
         // Create S3 object key with timestamp and unique ID
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const key = `messages/${timestamp}-${uuidv4()}.json`;
+        const key = `messages/${timestamp}-${randomUUID()}.json`;
         
-        // Prepare S3 object
-        const s3Params = {
-            Bucket: process.env.S3_BUCKET,
-            Key: key,
-            Body: JSON.stringify({
-                messageId: record.messageId,
-                timestamp: new Date().toISOString(),
-                originalMessage: messageBody,
-                processedBy: 'lambda-message-processor'
-            }, null, 2),
-            ContentType: 'application/json'
+        // Prepare S3 object data
+        const objectData = {
+            messageId: record.messageId,
+            timestamp: new Date().toISOString(),
+            originalMessage: messageBody,
+            processedBy: 'lambda-message-processor',
+            runtime: 'nodejs22.x'
         };
         
+        // Create PutObject command
+        const putCommand = new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET,
+            Key: key,
+            Body: JSON.stringify(objectData, null, 2),
+            ContentType: 'application/json',
+            Metadata: {
+                'message-id': record.messageId,
+                'processed-at': new Date().toISOString()
+            }
+        });
+        
         // Save to S3
-        console.log(`Saving to S3: ${s3Params.Bucket}/${key}`);
-        await s3.putObject(s3Params).promise();
+        console.log(`Saving to S3: ${process.env.S3_BUCKET}/${key}`);
+        await s3Client.send(putCommand);
         
         console.log(`Successfully saved message ${record.messageId} to S3`);
+        return { messageId: record.messageId, status: 'success', s3Key: key };
         
     } catch (error) {
         console.error(`Error processing message ${record.messageId}:`, error);

@@ -83,7 +83,7 @@ module "lambda" {
   function_name     = "message-processor"
   lambda_source_dir = "./lambda-code"  # Module will auto-run npm install here
   handler           = "index.handler"
-  runtime           = "nodejs18.x"
+  runtime           = "nodejs22.x"
   timeout           = 60
   memory_size       = 256
   
@@ -108,6 +108,7 @@ module "lambda" {
   environment_variables = {
     NODE_ENV = var.environment
     DEBUG    = var.environment == "dev" ? "true" : "false"
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED = "1"
   }
 }
 

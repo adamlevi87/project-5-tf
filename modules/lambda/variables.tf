@@ -31,7 +31,6 @@ variable "handler" {
 variable "runtime" {
   description = "Lambda runtime"
   type        = string
-  default     = "nodejs18.x"
 }
 
 variable "timeout" {
