@@ -61,11 +61,6 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = aws_lambda_function.message_processor.ARN
-          }
-        }
       }
     ]
   })
@@ -76,6 +71,27 @@ resource "aws_iam_role" "lambda_role" {
     Environment = var.environment
     Purpose     = "lambda-execution"
   }
+}
+
+resource "aws_iam_role_policy" "lambda_assume_restriction" {
+  name = "lambda-assume-restriction"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Deny"
+        Action = "sts:AssumeRole"
+        Resource = aws_iam_role.lambda_role.arn
+        Condition = {
+          StringNotEquals = {
+            "aws:SourceArn" = aws_lambda_function.message_processor.arn
+          }
+        }
+      }
+    ]
+  })
 }
 
 # IAM policy for lambda access
