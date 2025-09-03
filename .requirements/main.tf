@@ -58,7 +58,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # the ARN of this resources goes into the repo's secret AWS_ROLE_TO_ASSUME
 resource "aws_iam_role" "github_actions" {
-  name = var.aws_iam_role_github_actions_name
+  name = "${var.project_tag}-${var.environment}-${var.aws_iam_role_github_actions_name}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
