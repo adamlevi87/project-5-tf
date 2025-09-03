@@ -38,18 +38,24 @@ locals {
   ])
 }
 
-resource "kubernetes_config_map_v1" "aws_auth" {
-  metadata {
-    name      = "aws-auth" 
-    namespace = "kube-system"
+resource "null_resource" "aws_auth_patch" {
+  triggers = {
+    merged_roles = yamlencode(local.merged_map_roles)
+    merged_users = yamlencode(local.merged_map_users)
   }
 
-  data = {
-    mapRoles = yamlencode(local.merged_map_roles)
-    mapUsers = yamlencode(local.merged_map_users)
-  }
-  
-  lifecycle {
-    replace_triggered_by = [data.kubernetes_config_map_v1.existing_aws_auth]
+  provisioner "local-exec" {
+    command = <<-EOT
+      # Update kubeconfig for EKS
+      aws eks update-kubeconfig --region ${var.aws_region} --name ${var.cluster_name}
+      
+      # Apply the merged configmap
+      kubectl patch configmap aws-auth -n kube-system --type merge -p '{
+        "data": {
+          "mapRoles": ${jsonencode(yamlencode(local.merged_map_roles))},
+          "mapUsers": ${jsonencode(yamlencode(local.merged_map_users))}
+        }
+      }'
+    EOT
   }
 }
