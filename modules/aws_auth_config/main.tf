@@ -6,91 +6,48 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.6.0"
     }
-    # kubernetes = {
-    #   source  = "hashicorp/kubernetes"
-    #   version = "~> 2.38"
-    # }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.38"
+    }
   }
 }
 
-
-locals {
-  github_actions_role_arn = [
-    for role in var.map_roles : role.rolearn
-      if role.username == "github"
-  ][0]
-}
-
-data "aws_eks_cluster" "main" {
-  name = var.cluster_name
-}
-
-data "aws_eks_cluster_auth" "main" {
-  name = var.cluster_name
-}
-
-# the delete will only run if the config map that exists does not have the github actions arn
-resource "null_resource" "delete_default_aws_auth" {
-  provisioner "local-exec" {
-    command = <<EOT
-mkdir -p ~/.kube
-
-cat <<EOF > ~/.kube/config
-apiVersion: v1
-kind: Config
-clusters:
-- cluster:
-    server: "${data.aws_eks_cluster.main.endpoint}"
-    certificate-authority-data: "${data.aws_eks_cluster.main.certificate_authority[0].data}"
-  name: eks
-contexts:
-- context:
-    cluster: eks
-    user: eks-user
-  name: eks
-current-context: eks
-users:
-- name: eks-user
-  user:
-    token: "${data.aws_eks_cluster_auth.main.token}"
-EOF
-
-
-if ! kubectl get configmap aws-auth -n kube-system -o yaml | grep -q '${local.github_actions_role_arn}'; then
-  echo "Default aws-auth configmap detected. Deleting..."
-  kubectl delete configmap aws-auth -n kube-system
-else
-  echo "aws-auth already contains GitHub Actions role. Skipping deletion."
-fi
-EOT
-  }
-
-  triggers = {
-    always_run = timestamp()
-  }
-
-  depends_on = [var.eks_dependency]
-}
-
-
-
-
-resource "kubernetes_config_map" "aws_auth" {
+# Read existing aws-auth configmap to preserve node group roles
+data "kubernetes_config_map_v1" "existing_aws_auth" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
   }
+  depends_on = [var.eks_dependency]
+}
+
+locals {
+  # Parse existing mapRoles
+  existing_map_roles = try(yamldecode(data.kubernetes_config_map_v1.existing_aws_auth.data["mapRoles"]), [])
+  existing_map_users = try(yamldecode(data.kubernetes_config_map_v1.existing_aws_auth.data["mapUsers"]), [])
+  
+  # Merge existing roles with new roles (new roles take precedence)
+  merged_map_roles = concat(local.existing_map_roles, var.map_roles)
+  merged_map_users = concat(local.existing_map_users, [
+    for user_key, user in var.eks_user_access_map : {
+      userarn  = user.userarn
+      username = user.username
+      groups   = user.groups
+    }
+  ])
+}
+
+resource "kubernetes_config_map_v1" "aws_auth" {
+  metadata {
+    name      = "aws-auth" 
+    namespace = "kube-system"
+  }
 
   data = {
-    mapRoles = yamlencode(var.map_roles)
-    mapUsers = yamlencode([
-      for user_key, user in var.eks_user_access_map : {
-        userarn  = user.userarn
-        username = user.username
-        groups   = user.groups
-      }
-    ])
+    mapRoles = yamlencode(local.merged_map_roles)
+    mapUsers = yamlencode(local.merged_map_users)
   }
   
-  depends_on = [null_resource.delete_default_aws_auth]
+  depends_on = [var.eks_dependency]
 }
