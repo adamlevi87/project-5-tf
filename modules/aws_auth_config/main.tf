@@ -17,7 +17,7 @@ terraform {
 locals {
   github_actions_role_arn = [
     for role in var.map_roles : role.rolearn
-    if role.username == "github"
+      if role.username == "github"
   ][0]
 }
 

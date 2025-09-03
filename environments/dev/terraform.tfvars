@@ -141,7 +141,7 @@ eks_user_access_map = {
     groups   = ["system:masters"]
   }
   adam_login = {
-    username = "adam-login"
+    username = "adam.login"
     groups   = ["system:masters"]
   }
 }
