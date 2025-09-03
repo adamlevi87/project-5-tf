@@ -49,5 +49,7 @@ resource "kubernetes_config_map_v1" "aws_auth" {
     mapUsers = yamlencode(local.merged_map_users)
   }
   
-  depends_on = [var.eks_dependency]
+  lifecycle {
+    replace_triggered_by = [data.kubernetes_config_map_v1.existing_aws_auth]
+  }
 }
