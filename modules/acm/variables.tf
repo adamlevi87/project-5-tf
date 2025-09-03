@@ -18,7 +18,7 @@ variable "environment" {
   description = "Deployment environment (e.g., dev, prod)"
 }
 
-variable "route53_depends_on" {
-  description = "Used to enforce a dependency on Route53 zone creation"
-  type        = string
-}
+# variable "route53_depends_on" {
+#   description = "Used to enforce a dependency on Route53 zone creation"
+#   type        = string
+# }

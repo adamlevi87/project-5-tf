@@ -208,7 +208,7 @@ module "acm" {
 
   cert_domain_name  = "*.${var.subdomain_name}.${var.domain_name}"
   route53_zone_id  = module.route53.zone_id
-  route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
+  #route53_depends_on = module.route53.zone_id   # this is just to create a dependency chain
 }
 
 module "eks" {

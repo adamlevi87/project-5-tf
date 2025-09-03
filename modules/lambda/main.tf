@@ -158,11 +158,6 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   scaling_config {
     maximum_concurrency = var.maximum_concurrency
   }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_sqs_access,
-    aws_iam_role_policy_attachment.lambda_basic,
-  ]
 }
 
 # CloudWatch Log Group for Lambda
