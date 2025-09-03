@@ -80,9 +80,9 @@ locals {
 
     map_users = {
         for name, user in var.eks_user_access_map : name => {
-        userarn  = "arn:aws:iam::${local.account_id}:user/${user.username}"
-        username = user.username
-        groups   = user.groups
+            userarn  = "arn:aws:iam::${local.account_id}:user/${user.username}"
+            username = user.username
+            groups   = user.groups
         }
     }
     

@@ -1,7 +1,7 @@
 # modules/frontend/main.tf
 
 resource "aws_iam_role" "this" {
-  name = "${var.service_account_name}-irsa-role"
+  name = "${var.project_tag}-${var.environment}-${var.service_account_name}-irsa-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
