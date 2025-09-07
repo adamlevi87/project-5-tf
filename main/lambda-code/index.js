@@ -56,7 +56,7 @@ async function updateIndexFile(s3Client, bucketName, fileName) {
             ContentType: 'text/html'
         };
         
-        await s3Client.putObject(indexParams);
+        await s3Client.send(new PutObjectCommand(indexParams));
         console.log('Index file updated');
         
     } catch (error) {
