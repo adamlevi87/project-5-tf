@@ -4,7 +4,7 @@
 resource "aws_wafv2_ip_set" "allowed_ips" {
   name               = "${var.project_tag}-${var.environment}-allowed-ips"
   description        = "IP addresses allowed to access ${var.project_tag}"
-  scope              = "CLOUDFRONT"  # Must be CLOUDFRONT for CloudFront distributions
+  scope              = "CLOUDFRONT"
   ip_address_version = "IPV4"
 
   addresses = var.allowed_ip_addresses
@@ -18,12 +18,12 @@ resource "aws_wafv2_ip_set" "allowed_ips" {
 
 # WAF Web ACL
 resource "aws_wafv2_web_acl" "main" {
-  name  = "${var.project_tag}-${var.environment}-waf-acl"
+  name        = "${var.project_tag}-${var.environment}-waf-acl"
   description = "WAF ACL for ${var.project_tag} CloudFront distribution"
-  scope = "CLOUDFRONT"  # Must be CLOUDFRONT for CloudFront distributions
+  scope       = "CLOUDFRONT"
 
   default_action {
-    block {}  # Block by default, only allow specific IPs
+    block {}
   }
 
   # Rule 1: Allow specific IP addresses
@@ -31,18 +31,14 @@ resource "aws_wafv2_web_acl" "main" {
     name     = "AllowSpecificIPs"
     priority = 1
 
-    override_action {
-      none {}
+    action {
+      allow {}
     }
 
     statement {
       ip_set_reference_statement {
         arn = aws_wafv2_ip_set.allowed_ips.arn
       }
-    }
-
-    action {
-      allow {}
     }
 
     visibility_config {
@@ -52,13 +48,13 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # Rule 2: Block common attacks (optional, adds minimal cost)
+  # Rule 2: Block common attacks  
   rule {
     name     = "BlockCommonAttacks"
     priority = 2
 
-    override_action {
-      none {}
+    action {
+      block {}
     }
 
     statement {
@@ -66,10 +62,6 @@ resource "aws_wafv2_web_acl" "main" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
       }
-    }
-
-    action {
-      block {}
     }
 
     visibility_config {
@@ -89,6 +81,5 @@ resource "aws_wafv2_web_acl" "main" {
     Name        = "${var.project_tag}-${var.environment}-waf-acl"
     Project     = var.project_tag
     Environment = var.environment
-    Purpose     = "cloudfront-protection"
   }
 }
