@@ -608,7 +608,7 @@ module "kms" {
 
   project_tag = var.project_tag
   environment = var.environment
-  account_id  = local.aws_caller_identity.current.account_id
+  account_id  = data.aws_caller_identity.current.account_id
   
   # KMS configuration
   deletion_window_in_days = var.environment == "prod" ? 30 : 7
