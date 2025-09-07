@@ -20,7 +20,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "${var.project_tag} ${var.environment} CloudFront Distribution"
-  #default_root_object = var.default_root_object
+  # index is created by the lambda
+  default_root_object = "index.html"
 
   # Cost optimization: Use PriceClass_100 (US, Canada, Europe only)
   price_class = "PriceClass_100"
