@@ -156,6 +156,9 @@ argocd_app_of_apps_path             = "apps"
 argocd_app_of_apps_target_revision  = "main"
 argocd_base_domain_name             = "argocd"
 
+json_view_base_domain_name = "json-view"
+
+
 
 # container_port = 3000
 # task_cpu = 256

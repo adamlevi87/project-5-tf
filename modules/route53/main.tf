@@ -12,13 +12,12 @@ resource "aws_route53_zone" "this" {
 
 resource "aws_route53_record" "cloudfront_json_viewer" {
   zone_id = aws_route53_zone.this.zone_id
-  name    = "json-view-${var.environment}-${var.project_tag}"
+  name    = var.json_view_base_domain_name
   type    = "CNAME"
   ttl     = 300
 
   records = [var.cloudfront_domain_name]
 }
-
 # # A record pointing to the ALB
 # resource "aws_route53_record" "app_dns" {
 #   zone_id = aws_route53_zone.this.zone_id

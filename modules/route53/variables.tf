@@ -26,6 +26,11 @@ variable "cloudfront_domain_name" {
   default     = ""
 }
 
+variable "json_view_base_domain_name" {
+  description = "JSON viewer base domain name"
+  type        = string
+}
+
 # variable "alb_dns_name" {
 #   type        = string
 #   description = "DNS name of the Application Load Balancer"

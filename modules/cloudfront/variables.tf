@@ -30,6 +30,21 @@ variable "waf_web_acl_arn" {
   type        = string
 }
 
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate for HTTPS"
+  type        = string
+}
+
+variable "domain" {
+  description = "Full domain name (subdomain.domain)"
+  type        = string
+}
+
+variable "json_view_base_domain_name" {
+  description = "Full JSON viewer domain name"
+  type        = string
+}
+
 # variable "default_root_object" {
 #   description = "Default root object for CloudFront"
 #   type        = string

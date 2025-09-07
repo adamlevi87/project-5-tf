@@ -205,6 +205,7 @@ module "route53" {
   subdomain_name = var.subdomain_name
 
   cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
+  json_view_base_domain_name = local.json_view_base_domain_name
 
   # alb_dns_name = 1
   # alb_zone_id = 1
@@ -640,5 +641,10 @@ module "cloudfront" {
   # WAF integration (from WAF module)
   waf_web_acl_arn = module.waf.web_acl_arn
   
+  # Handling SSL/Certificate
+  acm_certificate_arn = module.acm.this_certificate_arn
+  domain             = "${var.subdomain_name}.${var.domain_name}"
+  json_view_base_domain_name = local.json_view_base_domain_name
+
   depends_on = [module.s3_app_data, module.waf]
 }

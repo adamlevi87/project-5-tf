@@ -497,3 +497,9 @@ variable "github_readonly_team" {
   type        = string
   default     = "developers"
 }
+
+variable "json_view_base_domain_name" {
+  description = "Base domain name for JSON viewer CloudFront (without full domain)"
+  type        = string
+  default     = "json-view"
+}
