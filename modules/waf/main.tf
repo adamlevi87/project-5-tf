@@ -53,8 +53,8 @@ resource "aws_wafv2_web_acl" "main" {
     name     = "BlockCommonAttacks"
     priority = 2
 
-    action {
-      block {}
+    override_action {
+      count {}
     }
 
     statement {
