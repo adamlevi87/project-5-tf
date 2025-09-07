@@ -144,5 +144,5 @@ locals {
     })
 
     argocd_github_sso_secret_name   = "${var.project_tag}-${var.environment}-argocd-github-sso"
-    json_view_base_domain_name      = "${var.json_view_base_domain_name}-${var.environment}-${var.project_tag}"
+    json_view_base_domain_name      = "${var.json_view_base_domain_name}-${var.environment}"
 }
