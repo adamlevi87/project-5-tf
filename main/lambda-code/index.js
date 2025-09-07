@@ -15,7 +15,7 @@ async function updateIndexFile(s3Client, bucketName, fileName) {
             Prefix: 'messages/'
         };
         
-        const objects = await s3Client.listObjectsV2(listParams);
+        const objects = await s3Client.send(new ListObjectsV2Command(listParams));
         
         // Create HTML content
         let html = `
