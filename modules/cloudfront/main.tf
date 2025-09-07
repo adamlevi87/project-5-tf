@@ -36,6 +36,11 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-${var.s3_bucket_name}"
 
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.block_default_domain.arn
+    }
+    
     forwarded_values {
       query_string = false
       cookies {
@@ -81,6 +86,36 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     Environment = var.environment
     Purpose     = "s3-static-files"
   }
+}
+
+# CloudFront function to block default domain access
+resource "aws_cloudfront_function" "block_default_domain" {
+  name    = "${var.project_tag}-${var.environment}-block-default-domain"
+  runtime = "cloudfront-js-1.0"
+  comment = "Block access via default CloudFront domain"
+  publish = true
+  code    = <<-EOT
+function handler(event) {
+    var request = event.request;
+    var host = request.headers.host.value;
+    
+    // Only allow access via our custom domain
+    var allowedHost = "${var.json_view_base_domain_name}.${var.domain}";
+    
+    if (host !== allowedHost) {
+        return {
+            statusCode: 403,
+            statusDescription: "Forbidden",
+            headers: {
+                "content-type": { "value": "text/plain" }
+            },
+            body: "Access via this domain is not allowed"
+        };
+    }
+    
+    return request;
+}
+EOT
 }
 
 # S3 Bucket Policy to allow CloudFront OAC access
