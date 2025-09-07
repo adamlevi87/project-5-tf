@@ -204,6 +204,8 @@ module "route53" {
   domain_name    = var.domain_name
   subdomain_name = var.subdomain_name
 
+  cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
+
   # alb_dns_name = 1
   # alb_zone_id = 1
 }

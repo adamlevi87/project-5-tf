@@ -20,6 +20,12 @@ variable "subdomain_name" {
   description = "Subdomain to use for the ALB (e.g. project-5)"
 }
 
+variable "cloudfront_domain_name" {
+  type        = string
+  description = "CloudFront distribution domain name"
+  default     = ""
+}
+
 # variable "alb_dns_name" {
 #   type        = string
 #   description = "DNS name of the Application Load Balancer"
