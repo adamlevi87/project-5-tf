@@ -602,7 +602,6 @@ module "gitops_bootstrap" {
   ]
 }
 
-# KMS module - create first since S3 and Lambda depend on it
 module "kms" {
   source = "../modules/kms"
 
@@ -613,4 +612,31 @@ module "kms" {
   # KMS configuration
   deletion_window_in_days = var.environment == "prod" ? 30 : 7
   enable_key_rotation     = true
+}
+
+module "waf" {
+  source = "../modules/waf"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # Add your IP address in CIDR notation
+  allowed_ip_addresses = var.cloudfront_allowed_cidr_blocks
+}
+
+module "cloudfront" {
+  source = "../modules/cloudfront"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  # S3 integration (from S3 module)
+  s3_bucket_name        = module.s3_app_data.bucket_name
+  s3_bucket_arn         = module.s3_app_data.bucket_arn
+  s3_bucket_domain_name = module.s3_app_data.bucket_domain_name
+  
+  # WAF integration (from WAF module)
+  waf_web_acl_arn = module.waf.web_acl_arn
+  
+  depends_on = [module.s3_app_data, module.waf]
 }

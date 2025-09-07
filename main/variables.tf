@@ -214,6 +214,12 @@ variable "argocd_allowed_cidr_blocks" {
   default     = []
 }
 
+variable "cloudfront_allowed_cidr_blocks" {
+  description = "CIDR blocks allowed to access the cloudfront"
+  type        = list(string)
+  default     = []
+}
+
 # EKS Node Group Configuration
 variable "eks_node_instance_type" {
   description = "EC2 instance type for the EKS node group"

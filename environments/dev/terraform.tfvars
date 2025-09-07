@@ -86,6 +86,8 @@ eks_api_allowed_cidr_blocks    = ["85.64.231.47/32","0.0.0.0/0"]
 
 argocd_allowed_cidr_blocks = ["85.64.231.47/32"]
 
+cloudfront_allowed_cidr_blocks = ["85.64.231.47/32"]
+
 
 # EKS Node Group Configuration (minimal for dev)
 eks_node_instance_type   = "t3.small"  # Bare minimum instance type
