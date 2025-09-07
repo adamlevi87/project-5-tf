@@ -126,3 +126,9 @@ variable "log_retention_days" {
     error_message = "Log retention days must be a valid CloudWatch retention period."
   }
 }
+
+# KMS Integration
+variable "kms_key_arn" {
+  description = "ARN of the KMS key for S3 bucket encryption"
+  type        = string
+}

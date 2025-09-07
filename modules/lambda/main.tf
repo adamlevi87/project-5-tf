@@ -128,6 +128,34 @@ resource "aws_iam_policy" "lambda_s3_access" {
   }
 }
 
+# IAM policy for Lambda KMS access (Lambda handles its own KMS permissions)
+resource "aws_iam_policy" "lambda_kms_access" {
+  name        = "${var.project_tag}-${var.environment}-lambda-kms-access"
+  description = "IAM policy for Lambda to access KMS key for S3 encryption"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:DescribeKey"
+        ]
+        Resource = "${var.kms_key_arn}"
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.project_tag}-${var.environment}-lambda-kms-policy"
+    Project     = var.project_tag
+    Environment = var.environment
+  }
+}
+
 # Attach basic Lambda execution policy
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
@@ -146,6 +174,12 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_access" {
   policy_arn = aws_iam_policy.lambda_s3_access.arn
 }
 
+# Attach KMS access policy
+resource "aws_iam_role_policy_attachment" "lambda_kms_access" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_kms_access.arn
+}
+
 # Event Source Mapping to connect SQS to Lambda
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = var.sqs_queue_arn
@@ -158,6 +192,11 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   scaling_config {
     maximum_concurrency = var.maximum_concurrency
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_sqs_access,
+    aws_iam_role_policy_attachment.lambda_basic,
+  ]
 }
 
 # CloudWatch Log Group for Lambda

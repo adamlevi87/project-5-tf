@@ -44,13 +44,18 @@ module "s3_app_data" {
 
   project_tag   = var.project_tag
   environment   = var.environment
+
+  # KMS encryption
+  kms_key_arn = module.kms.kms_key_arn
   
   # Lifecycle configuration
   enable_lifecycle_policy = true
   data_retention_days     = var.environment == "prod" ? 0 : 365  # Keep prod data forever, dev/staging for 1 year
-  
+
   # Allow force destroy for non-prod environments
   force_destroy = var.environment != "prod"
+
+  depends_on = [module.kms]
 }
 
 module "sqs" {
@@ -95,6 +100,9 @@ module "lambda" {
   s3_bucket_name        = module.s3_app_data.bucket_name
   s3_bucket_arn         = module.s3_app_data.bucket_arn
   #s3_lambda_policy_arn  = module.s3_app_data.lambda_s3_policy_arn
+
+  # KMS integration
+  kms_key_arn = module.kms.kms_key_arn
   
   # Event source mapping configuration
   batch_size                         = 1    # Process one message at a time
@@ -598,13 +606,9 @@ module "gitops_bootstrap" {
 module "kms" {
   source = "../modules/kms"
 
-  project_tag   = var.project_tag
-  environment   = var.environment
-  account_id    = local.aws_caller_identity.current.account_id
-  
-  # These will be filled after S3 and Lambda are created
-  s3_bucket_arn        = module.s3_app_data.bucket_arn
-  lambda_function_arn  = module.lambda.lambda_function_arn
+  project_tag = var.project_tag
+  environment = var.environment
+  account_id  = local.aws_caller_identity.current.account_id
   
   # KMS configuration
   deletion_window_in_days = var.environment == "prod" ? 30 : 7

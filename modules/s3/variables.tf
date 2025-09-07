@@ -1,11 +1,5 @@
 # modules/s3/variables.tf
 
-variable "force_destroy" {
-  description = "Allow deletion of non-empty bucket (WARNING: will delete all objects)"
-  type        = bool
-  default     = false
-}
-
 variable "project_tag" {
   description = "Project tag for resource naming"
   type        = string
@@ -23,11 +17,22 @@ variable "enable_lifecycle_policy" {
 }
 
 variable "data_retention_days" {
-  description = "Number of days to retain data before deletion (0 = never delete)"
+  description = "Number of days to retain data before deletion (0 = keep forever)"
   type        = number
   default     = 0
   validation {
     condition     = var.data_retention_days >= 0
-    error_message = "Data retention days must be 0 or greater (0 means never delete)."
+    error_message = "Data retention days must be non-negative."
   }
+}
+
+variable "force_destroy" {
+  description = "Allow force destruction of bucket even if it contains objects"
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key for S3 bucket encryption"
+  type        = string
 }
