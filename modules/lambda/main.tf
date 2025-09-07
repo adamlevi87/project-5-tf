@@ -4,6 +4,7 @@
 resource "null_resource" "npm_install" {
   triggers = {
     package_json = filebase64("${var.lambda_source_dir}/package.json")
+    source_code  = sha1(join("", [for f in fileset(var.lambda_source_dir, "**/*.js") : filesha1("${var.lambda_source_dir}/${f}")]))
   }
 
   provisioner "local-exec" {
