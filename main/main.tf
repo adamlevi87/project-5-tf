@@ -48,7 +48,7 @@ module "s3_app_data" {
   # Lifecycle configuration
   enable_lifecycle_policy = true
   data_retention_days     = var.environment == "prod" ? 0 : 365  # Keep prod data forever, dev/staging for 1 year
-
+  
   # Allow force destroy for non-prod environments
   force_destroy = var.environment != "prod"
 }
@@ -592,4 +592,21 @@ module "gitops_bootstrap" {
     data.github_repository.gitops_repo,
     data.github_repository_file.current_gitops_files
   ]
+}
+
+# KMS module - create first since S3 and Lambda depend on it
+module "kms" {
+  source = "../modules/kms"
+
+  project_tag   = var.project_tag
+  environment   = var.environment
+  account_id    = local.aws_caller_identity.current.account_id
+  
+  # These will be filled after S3 and Lambda are created
+  s3_bucket_arn        = module.s3_app_data.bucket_arn
+  lambda_function_arn  = module.lambda.lambda_function_arn
+  
+  # KMS configuration
+  deletion_window_in_days = var.environment == "prod" ? 30 : 7
+  enable_key_rotation     = true
 }

@@ -81,75 +81,7 @@ resource "aws_iam_policy" "kms_key_admin_policy" {
   }
 }
 
-# IAM policy for S3 service to use the key
-resource "aws_iam_policy" "kms_s3_policy" {
-  name        = "${var.project_tag}-${var.environment}-kms-s3-access"
-  description = "IAM policy for S3 service to use KMS key"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "s3.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey*"
-        ]
-        Resource = aws_kms_key.s3_key.arn
-        Condition = {
-          StringEquals = {
-            "kms:ViaService" = var.s3_bucket_arn
-          }
-        }
-      }
-    ]
-  })
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-kms-s3-policy"
-    Project     = var.project_tag
-    Environment = var.environment
-  }
-}
-
-# IAM policy for Lambda service to use the key
-resource "aws_iam_policy" "kms_lambda_policy" {
-  name        = "${var.project_tag}-${var.environment}-kms-lambda-access"
-  description = "IAM policy for Lambda service to use KMS key"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:GenerateDataKey*"
-        ]
-        Resource = aws_kms_key.s3_key.arn
-        Condition = {
-          StringEquals = {
-            "kms:ViaService" = var.lambda_function_arn
-          }
-        }
-      }
-    ]
-  })
-
-  tags = {
-    Name        = "${var.project_tag}-${var.environment}-kms-lambda-policy"
-    Project     = var.project_tag
-    Environment = var.environment
-  }
-}
-
-# IAM policy for CloudFront service to use the key
+# IAM policy for CloudFront service to use the key (global service, so kept here)
 resource "aws_iam_policy" "kms_cloudfront_policy" {
   name        = "${var.project_tag}-${var.environment}-kms-cloudfront-access"
   description = "IAM policy for CloudFront service to use KMS key"
@@ -166,7 +98,7 @@ resource "aws_iam_policy" "kms_cloudfront_policy" {
           "kms:Decrypt",
           "kms:GenerateDataKey*"
         ]
-        Resource = "*"
+        Resource = aws_kms_key.s3_key.arn
       }
     ]
   })
@@ -182,18 +114,6 @@ resource "aws_iam_policy" "kms_cloudfront_policy" {
 resource "aws_iam_role_policy_attachment" "kms_admin_attachment" {
   role       = aws_iam_role.kms_key_role.name
   policy_arn = aws_iam_policy.kms_key_admin_policy.arn
-}
-
-# Attach S3 policy to role
-resource "aws_iam_role_policy_attachment" "kms_s3_attachment" {
-  role       = aws_iam_role.kms_key_role.name
-  policy_arn = aws_iam_policy.kms_s3_policy.arn
-}
-
-# Attach Lambda policy to role
-resource "aws_iam_role_policy_attachment" "kms_lambda_attachment" {
-  role       = aws_iam_role.kms_key_role.name
-  policy_arn = aws_iam_policy.kms_lambda_policy.arn
 }
 
 # Attach CloudFront policy to role

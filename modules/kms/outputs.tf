@@ -30,16 +30,6 @@ output "kms_admin_policy_arn" {
   value       = aws_iam_policy.kms_key_admin_policy.arn
 }
 
-output "kms_s3_policy_arn" {
-  description = "The Amazon Resource Name (ARN) of the KMS S3 policy"
-  value       = aws_iam_policy.kms_s3_policy.arn
-}
-
-output "kms_lambda_policy_arn" {
-  description = "The Amazon Resource Name (ARN) of the KMS Lambda policy"
-  value       = aws_iam_policy.kms_lambda_policy.arn
-}
-
 output "kms_cloudfront_policy_arn" {
   description = "The Amazon Resource Name (ARN) of the KMS CloudFront policy"
   value       = aws_iam_policy.kms_cloudfront_policy.arn

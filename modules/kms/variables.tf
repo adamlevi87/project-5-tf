@@ -15,16 +15,6 @@ variable "account_id" {
   type        = string
 }
 
-variable "s3_bucket_arn" {
-  description = "ARN of the specific S3 bucket that will use this KMS key"
-  type        = string
-}
-
-variable "lambda_function_arn" {
-  description = "ARN of the specific Lambda function that will use this KMS key"
-  type        = string
-}
-
 variable "deletion_window_in_days" {
   description = "Number of days before the KMS key is deleted after destruction"
   type        = number
