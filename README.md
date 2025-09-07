@@ -1,5 +1,5 @@
 
-<img width="8192" height="3983" alt="480998446-9aa2948f-daef-4cbc-a851-a05cf7c3e303" src="https://github.com/user-attachments/assets/99470b63-4a26-4aac-899f-28625f91cfcd" />
+<img width="8192" height="3983" alt="Untitled Diagram(1)" src="https://github.com/user-attachments/assets/95cf658f-b508-46ca-9aee-a9015773a349" />
 
 
 **In the Terraform repository**, manually create the following GitHub secrets and variable (one-time setup):
