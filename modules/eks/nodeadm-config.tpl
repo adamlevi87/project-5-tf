@@ -1,3 +1,4 @@
+# yaml-language-server: disable
 ---
 apiVersion: node.eks.aws/v1alpha1
 kind: NodeConfig

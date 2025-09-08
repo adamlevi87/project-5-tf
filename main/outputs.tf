@@ -136,5 +136,5 @@ output "rds_password_secret_arn" {
 }
 
 output "debug_nodeadm_config" {
-  value = module.eks.debug_nodeadm_config
+  value = module.eks.debug_nodeadm_configs
 }
