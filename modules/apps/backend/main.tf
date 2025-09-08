@@ -134,11 +134,13 @@ resource "aws_security_group" "backend" {
 }
 
 resource "aws_security_group_rule" "allow_alb_to_backend_pods" {
+  for_each = var.node_group_security_groups
+
   type                     = "ingress"
   from_port                = 3000
   to_port                  = 3000
   protocol                 = "tcp"
-  security_group_id        = var.node_group_security_group
+  security_group_id        = each.value
   source_security_group_id = aws_security_group.backend.id
-  description              = "Allow ALB to access Backend pods on port 3000"
+  description              = "Allow ALB to access Backend pods on port 3000 (${each.key} nodes)"
 }

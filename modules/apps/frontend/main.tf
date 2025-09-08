@@ -98,11 +98,13 @@ resource "aws_security_group" "frontend" {
 }
 
 resource "aws_security_group_rule" "allow_alb_to_frontend_pods" {
+  for_each = var.node_group_security_groups
+
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  security_group_id        = var.node_group_security_group
+  security_group_id        = each.value
   source_security_group_id = aws_security_group.frontend.id
-  description              = "Allow ALB to access Frontend pods on port 3000"
+  description              = "Allow ALB to access Frontend pods on port 80 (${each.key} nodes)"
 }

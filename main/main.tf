@@ -238,10 +238,7 @@ module "eks" {
   vpc_id = module.vpc_network.vpc_id
   
   # Node group configuration
-  node_group_instance_type    = var.eks_node_instance_type
-  node_group_desired_capacity = var.eks_node_desired_capacity
-  node_group_max_capacity     = var.eks_node_max_capacity
-  node_group_min_capacity     = var.eks_node_min_capacity
+  node_groups = var.eks_node_groups
   
   # Logging
   cluster_enabled_log_types = var.cluster_enabled_log_types
@@ -301,7 +298,7 @@ module "backend" {
   service_account_name      = var.backend_service_account_name
   #s3_bucket_arn             = module.s3_app_data.bucket_arn
   sqs_queue_arn             = module.sqs.queue_arn
-  node_group_security_group = module.eks.node_group_security_group_id
+  node_group_security_groups = module.eks.node_group_security_group_ids
 
   secret_arn = module.secrets_app_envs.app_secrets_arns["${var.backend_aws_secret_key}"]
 
@@ -321,7 +318,7 @@ module "frontend" {
   oidc_provider_url         = module.eks.cluster_oidc_issuer_url
   namespace                 = var.frontend_service_namespace
   service_account_name      = var.frontend_service_account_name
-  node_group_security_group = module.eks.node_group_security_group_id
+  node_group_security_groups = module.eks.node_group_security_group_ids
 
   secret_arn = module.secrets_app_envs.app_secrets_arns["${var.frontend_aws_secret_key}"]
 
@@ -451,7 +448,7 @@ module "argocd" {
   argocd_allowed_cidr_blocks   = var.argocd_allowed_cidr_blocks
   domain_name               = "${var.argocd_base_domain_name}-${var.environment}.${var.subdomain_name}.${var.domain_name}"
   acm_cert_arn              = module.acm.this_certificate_arn
-  node_group_security_group = module.eks.node_group_security_group_id
+  node_group_security_groups = module.eks.node_group_security_group_ids
   backend_security_group_id = module.backend.security_group_id
   frontend_security_group_id = module.frontend.security_group_id
 

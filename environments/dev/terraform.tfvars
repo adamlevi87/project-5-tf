@@ -89,11 +89,38 @@ argocd_allowed_cidr_blocks = ["85.64.231.47/32"]
 cloudfront_allowed_cidr_blocks = ["85.64.231.47/32"]
 
 
-# EKS Node Group Configuration (minimal for dev)
-eks_node_instance_type   = "t3.small"  # Bare minimum instance type
-eks_node_desired_capacity = 2             # Single node for dev
-eks_node_max_capacity     = 3             # Allow scaling if needed
-eks_node_min_capacity     = 1             # Keep at least one node
+# EKS Node Groups Configuration - Multi-NodeGroup Setup
+eks_node_groups = {
+  critical = {
+    instance_type     = "t3.small"
+    ami_id           = "ami-03943441037953e69"
+    desired_capacity = 1
+    max_capacity     = 2
+    min_capacity     = 1
+    labels = {
+      nodegroup-type = "critical"
+      instance-size  = "small"
+      workload-type  = "system"
+    }
+  }
+  distributed = {
+    instance_type     = "t3.micro"
+    ami_id           = "ami-03943441037953e69"
+    desired_capacity = 3
+    max_capacity     = 4
+    min_capacity     = 1
+    labels = {
+      nodegroup-type = "distributed"
+      instance-size  = "micro"
+      workload-type  = "application"
+    }
+  }
+}
+
+# eks_node_instance_type   = "t3.small"  # Bare minimum instance type
+# eks_node_desired_capacity = 2             # Single node for dev
+# eks_node_max_capacity     = 3             # Allow scaling if needed
+# eks_node_min_capacity     = 1             # Keep at least one node
 
 # EKS Logging Configuration (minimal retention for cost)
 eks_log_retention_days = 7  # 1 week retention for dev environment

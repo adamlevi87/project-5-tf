@@ -221,25 +221,42 @@ variable "cloudfront_allowed_cidr_blocks" {
 }
 
 # EKS Node Group Configuration
-variable "eks_node_instance_type" {
-  description = "EC2 instance type for the EKS node group"
-  type        = string
+variable "eks_node_groups" {
+  description = "Map of EKS node group configurations"
+  type = map(object({
+    instance_type     = string
+    ami_id           = string
+    desired_capacity = number
+    max_capacity     = number
+    min_capacity     = number
+    labels           = map(string)
+  }))
+  
+  validation {
+    condition = length(var.eks_node_groups) > 0
+    error_message = "At least one node group must be defined."
+  }
 }
 
-variable "eks_node_desired_capacity" {
-  description = "Desired number of nodes in the EKS node group"
-  type        = number
-}
+# variable "eks_node_instance_type" {
+#   description = "EC2 instance type for the EKS node group"
+#   type        = string
+# }
 
-variable "eks_node_max_capacity" {
-  description = "Maximum number of nodes in the EKS node group"
-  type        = number
-}
+# variable "eks_node_desired_capacity" {
+#   description = "Desired number of nodes in the EKS node group"
+#   type        = number
+# }
 
-variable "eks_node_min_capacity" {
-  description = "Minimum number of nodes in the EKS node group"
-  type        = number
-}
+# variable "eks_node_max_capacity" {
+#   description = "Maximum number of nodes in the EKS node group"
+#   type        = number
+# }
+
+# variable "eks_node_min_capacity" {
+#   description = "Minimum number of nodes in the EKS node group"
+#   type        = number
+# }
 
 # EKS Logging Configuration
 variable "cluster_enabled_log_types" {

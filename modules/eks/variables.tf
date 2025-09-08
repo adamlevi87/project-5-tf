@@ -33,28 +33,45 @@ variable "eks_api_allowed_cidr_blocks" {
 }
 
 # Node Group Configuration
-variable "node_group_instance_type" {
-  description = "EC2 instance type for the node group"
-  type        = string
+variable "node_groups" {
+  description = "Map of node group configurations"
+  type = map(object({
+    instance_type     = string
+    ami_id           = string
+    desired_capacity = number
+    max_capacity     = number
+    min_capacity     = number
+    labels           = map(string)
+  }))
+  
+  validation {
+    condition = length(var.node_groups) > 0
+    error_message = "At least one node group must be defined."
+  }
 }
 
-variable "node_group_desired_capacity" {
-  description = "Desired number of nodes in the node group"
-  type        = number
-  default     = 1
-}
+# variable "node_group_instance_type" {
+#   description = "EC2 instance type for the node group"
+#   type        = string
+# }
 
-variable "node_group_max_capacity" {
-  description = "Maximum number of nodes in the node group"
-  type        = number
-  default     = 3
-}
+# variable "node_group_desired_capacity" {
+#   description = "Desired number of nodes in the node group"
+#   type        = number
+#   default     = 1
+# }
 
-variable "node_group_min_capacity" {
-  description = "Minimum number of nodes in the node group"
-  type        = number
-  default     = 1
-}
+# variable "node_group_max_capacity" {
+#   description = "Maximum number of nodes in the node group"
+#   type        = number
+#   default     = 3
+# }
+
+# variable "node_group_min_capacity" {
+#   description = "Minimum number of nodes in the node group"
+#   type        = number
+#   default     = 1
+# }
 
 # Logging
 variable "cluster_log_retention_days" {

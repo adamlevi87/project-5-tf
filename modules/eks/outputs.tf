@@ -30,34 +30,29 @@ output "cluster_security_group_id" {
   value       = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
 }
 
-# output "node_group_default_security_group" {
-#   description = "Default Security group ID attached to the node group"
-#   value       = data.aws_security_group.node_group_sg.id
-# }
-
-output "node_group_security_group_id" {
-  description = "Security group ID attached to the node group"
-  value       = aws_security_group.nodes.id
+output "node_group_security_group_ids" {
+  description = "Map of node group names to their security group IDs"
+  value       = { for ng_name, ng in aws_security_group.nodes : ng_name => ng.id }
 }
 
-output "node_group_name" {
-  description = "EKS node group name"
-  value       = aws_eks_node_group.main_v2.node_group_name
+output "node_group_names" {
+  description = "Map of node group names to their full resource names"
+  value       = { for ng_name, ng in aws_eks_node_group.main : ng_name => ng.node_group_name }
 }
 
-output "node_group_arn" {
-  description = "EKS node group ARN"
-  value       = aws_eks_node_group.main_v2.arn
+output "node_group_arns" {
+  description = "Map of node group names to their ARNs"
+  value       = { for ng_name, ng in aws_eks_node_group.main : ng_name => ng.arn }
 }
 
 output "node_group_role_arn" {
   value       = aws_iam_role.node_group_role.arn
-  description = "IAM role ARN for the EKS node group"
+  description = "IAM role ARN for the EKS node groups (shared)"
 }
 
-output "node_group_status" {
-  description = "EKS node group status"
-  value       = aws_eks_node_group.main_v2.status
+output "node_group_statuses" {
+  description = "Map of node group names to their statuses"
+  value       = { for ng_name, ng in aws_eks_node_group.main : ng_name => ng.status }
 }
 
 output "cluster_oidc_issuer_url" {
@@ -79,11 +74,7 @@ output "cluster_certificate_authority_data" {
   value = aws_eks_cluster.main.certificate_authority[0].data
 }
 
-output "debug_nodeadm_config" {
-  value = templatefile("${path.module}/nodeadm-config.yaml", {
-    cluster_name        = aws_eks_cluster.main.name
-    cluster_endpoint    = aws_eks_cluster.main.endpoint
-    cluster_ca          = aws_eks_cluster.main.certificate_authority[0].data
-    cluster_cidr        = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
-  })
+# Debug output for nodeadm configs per node group
+output "debug_nodeadm_configs" {
+  value = local.nodeadm_configs
 }

@@ -25,9 +25,9 @@ variable "service_account_name" {
   type        = string
 }
 
-variable "node_group_security_group" {
-  type        = string
-  description = "Security group ID attached to the node group"
+variable "node_group_security_groups" {
+  type        = map(string)
+  description = "Map of node group names to their security group IDs"
 }
 
 variable "project_tag" {
