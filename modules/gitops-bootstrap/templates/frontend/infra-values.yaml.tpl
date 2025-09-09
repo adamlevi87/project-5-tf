@@ -3,7 +3,7 @@
 
 image:
   repository: "${ecr_frontend_repo_url}"
-  digest: "sha256:84783d64c351cf966a7f87eef83793d512a628103676b3d609c5a5c4ad3fcc66"
+  digest: "sha256:YOUR_SHA"
   tag: ""
   pullPolicy: Always
 
