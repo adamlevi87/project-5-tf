@@ -12,6 +12,7 @@ locals {
       cluster_cidr        = aws_eks_cluster.main.kubernetes_network_config[0].service_ipv4_cidr
       nodegroup_name      = ng_name
       node_labels         = ng_config.labels
+      node_taints         = ng_config.taints
     })
   }
   

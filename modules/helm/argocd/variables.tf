@@ -146,3 +146,36 @@ variable "argocd_github_sso_secret_name" {
   description = "Name of the GitHub SSO secret for ArgoCD"
   type        = string
 }
+
+variable "global_scheduling" {
+  description = "Global scheduling configuration for all ArgoCD components"
+  type = object({
+    nodeSelector = map(string)
+    tolerations = list(object({
+      key      = string
+      operator = string
+      value    = string
+      effect   = string
+    }))
+    affinity = object({
+      nodeAffinity = object({
+        type = string
+        matchExpressions = list(object({
+          key      = string
+          operator = string
+          values   = list(string)
+        }))
+      })
+    })
+  })
+  default = {
+    nodeSelector = {}
+    tolerations = []
+    affinity = {
+      nodeAffinity = {
+        type = "none"
+        matchExpressions = []
+      }
+    }
+  }
+}

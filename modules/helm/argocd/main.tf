@@ -186,6 +186,7 @@ resource "helm_release" "this" {
       github_readonly_team        = var.github_readonly_team
       dollar                      = "$"
       argocd_github_sso_secret_name = var.argocd_github_sso_secret_name
+      global_scheduling            = var.global_scheduling
     }),
     yamlencode({
       extraObjects = local.argocd_additionalObjects

@@ -102,6 +102,11 @@ eks_node_groups = {
       instance-size  = "small"
       workload-type  = "system"
     }
+    taints = [{
+      key    = "dedicated"
+      value  = "critical"
+      effect = "NoSchedule"
+    }]
   }
   distributed = {
     instance_type     = "t3.micro"
@@ -114,6 +119,7 @@ eks_node_groups = {
       instance-size  = "micro"
       workload-type  = "application"
     }
+    taints = []
   }
 }
 

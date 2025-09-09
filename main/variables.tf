@@ -230,6 +230,11 @@ variable "eks_node_groups" {
     max_capacity     = number
     min_capacity     = number
     labels           = map(string)
+    taints           = list(object({
+      key    = string
+      value  = string
+      effect = string
+    }))
   }))
   
   validation {
@@ -445,6 +450,39 @@ variable "argocd_app_of_apps_target_revision" {
   description = "Branch or Git reference in the GitOps repository that ArgoCD should track."
   type        = string
   default     = "main"
+}
+
+variable "global_scheduling" {
+  description = "Global scheduling configuration for all ArgoCD components"
+  type = object({
+    nodeSelector = map(string)
+    tolerations = list(object({
+      key      = string
+      operator = string
+      value    = string
+      effect   = string
+    }))
+    affinity = object({
+      nodeAffinity = object({
+        type = string
+        matchExpressions = list(object({
+          key      = string
+          operator = string
+          values   = list(string)
+        }))
+      })
+    })
+  })
+  default = {
+    nodeSelector = {}
+    tolerations = []
+    affinity = {
+      nodeAffinity = {
+        type = "none"
+        matchExpressions = []
+      }
+    }
+  }
 }
 
 variable "frontend_base_domain_name" {
