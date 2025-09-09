@@ -345,9 +345,13 @@ resource "aws_eks_node_group" "main" {
 # ================================
 
 # ================================
-# SECTION 1: CLUSTER ↔ NODE COMMUNICATION
+# SECTION 1: CLUSTER ↔ NODE COMMUNICATION  
 # Purpose: Enable essential EKS cluster control plane to communicate with worker nodes
-# These rules are REQUIRED for EKS to function properly
+# 
+# NOTE: AWS automatically creates an egress rule on the cluster security group 
+# allowing ALL outbound traffic (0.0.0.0/0, all ports, all protocols).
+# Therefore, all "cluster_to_node_*" egress rules below are DOCUMENTATION ONLY
+# but kept for explicit clarity of required EKS communication patterns.
 # ================================
 
 # ── CLUSTER to NODES (Egress from Cluster Security Group) ──
