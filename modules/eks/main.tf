@@ -350,7 +350,7 @@ resource "aws_eks_node_group" "main" {
 # These rules are REQUIRED for EKS to function properly
 # ================================
 
-# ── CLUSTER → NODES (Egress from Cluster Security Group) ──
+# ── CLUSTER to NODES (Egress from Cluster Security Group) ──
 
 resource "aws_vpc_security_group_egress_rule" "cluster_to_node_kubelet" {
   for_each = var.node_groups
@@ -360,7 +360,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_kubelet" {
   from_port                    = 10250
   to_port                      = 10250
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: Cluster control plane → kubelet API on ${each.key} nodes"
+  description                  = "REQUIRED: Cluster control plane to kubelet API on ${each.key} nodes"
   
   tags = {
     Purpose = "eks-essential"
@@ -376,7 +376,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_ephemeral" {
   from_port                    = 1025
   to_port                      = 65535
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: Cluster control plane → ephemeral ports on ${each.key} nodes (includes pod-to-pod via CNI)"
+  description                  = "REQUIRED: Cluster control plane to ephemeral ports on ${each.key} nodes (includes pod-to-pod via CNI)"
   
   tags = {
     Purpose = "eks-essential"
@@ -393,7 +393,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_https" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
-  description                  = "DOCUMENTATION: Cluster control plane → HTTPS on ${each.key} nodes (covered by ephemeral rule but explicit for clarity)"
+  description                  = "DOCUMENTATION: Cluster control plane to HTTPS on ${each.key} nodes (covered by ephemeral rule but explicit for clarity)"
   
   tags = {
     Purpose = "documentation"
@@ -402,7 +402,7 @@ resource "aws_vpc_security_group_egress_rule" "cluster_to_node_https" {
   }
 }
 
-# ── NODES → CLUSTER (Egress from Node Security Groups) ──
+# ── NODES to CLUSTER (Egress from Node Security Groups) ──
 
 resource "aws_vpc_security_group_egress_rule" "node_to_cluster_api" {
   for_each = var.node_groups
@@ -412,7 +412,7 @@ resource "aws_vpc_security_group_egress_rule" "node_to_cluster_api" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: ${each.key} nodes → cluster API server (authentication, API calls)"
+  description                  = "REQUIRED: ${each.key} nodes to cluster API server (authentication, API calls)"
   
   tags = {
     Purpose = "eks-essential"
@@ -430,7 +430,7 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_allow_node_api" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: Allow ${each.key} nodes → cluster API server access"
+  description                  = "REQUIRED: Allow ${each.key} nodes to cluster API server access"
   
   tags = {
     Purpose = "eks-essential"
@@ -448,7 +448,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_kubelet" {
   from_port                    = 10250
   to_port                      = 10250
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: Allow cluster control plane → kubelet on ${each.key} nodes"
+  description                  = "REQUIRED: Allow cluster control plane to kubelet on ${each.key} nodes"
   
   tags = {
     Purpose = "eks-essential"
@@ -464,7 +464,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_ephemeral" {
   from_port                    = 1025
   to_port                      = 65535
   ip_protocol                  = "tcp"
-  description                  = "REQUIRED: Allow cluster control plane → ephemeral ports on ${each.key} nodes"
+  description                  = "REQUIRED: Allow cluster control plane to ephemeral ports on ${each.key} nodes"
   
   tags = {
     Purpose = "eks-essential"
@@ -480,7 +480,7 @@ resource "aws_vpc_security_group_ingress_rule" "node_allow_cluster_https" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "tcp"
-  description                  = "DOCUMENTATION: Allow cluster control plane → HTTPS on ${each.key} nodes (covered by ephemeral but explicit)"
+  description                  = "DOCUMENTATION: Allow cluster control plane to HTTPS on ${each.key} nodes (covered by ephemeral but explicit)"
   
   tags = {
     Purpose = "documentation"
@@ -559,7 +559,7 @@ resource "aws_vpc_security_group_ingress_rule" "cross_nodegroup_communication" {
   security_group_id            = aws_security_group.nodes[each.value.target].id
   referenced_security_group_id = aws_security_group.nodes[each.value.source].id
   ip_protocol                  = "-1"  # All protocols
-  description                  = "CROSS-GROUP: Allow all communication from ${each.value.source} nodes → ${each.value.target} nodes (enables pod scheduling flexibility)"
+  description                  = "CROSS-GROUP: Allow all communication from ${each.value.source} nodes to ${each.value.target} nodes (enables pod scheduling flexibility)"
   
   tags = {
     Purpose = "kubernetes-networking"
@@ -577,7 +577,7 @@ resource "aws_vpc_security_group_egress_rule" "cross_nodegroup_communication" {
   security_group_id            = aws_security_group.nodes[each.value.source].id
   referenced_security_group_id = aws_security_group.nodes[each.value.target].id
   ip_protocol                  = "-1"  # All protocols
-  description                  = "CROSS-GROUP: Allow all communication from ${each.value.source} nodes → ${each.value.target} nodes"
+  description                  = "CROSS-GROUP: Allow all communication from ${each.value.source} nodes to ${each.value.target} nodes"
   
   tags = {
     Purpose = "kubernetes-networking"
@@ -613,7 +613,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_all_outbound" {
   }
 }
 
-# ── DOCUMENTATION RULES: Specific Services ──
+# -- DOCUMENTATION RULES: Specific Services --
 # These rules are COVERED by the all_outbound rule above but kept for:
 # 1. Explicit documentation of what services nodes need
 # 2. Future ability to remove all_outbound and use granular rules
@@ -623,7 +623,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_dns_udp" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: DNS resolution (UDP) from ${each.key} nodes → internet (covered by all_outbound)"
+  description       = "DOCUMENTATION: DNS resolution (UDP) from ${each.key} nodes to internet (covered by all_outbound)"
   
   ip_protocol = "udp"
   from_port   = 53
@@ -641,7 +641,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_dns_tcp" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: DNS resolution (TCP) from ${each.key} nodes → internet (large queries, covered by all_outbound)"
+  description       = "DOCUMENTATION: DNS resolution (TCP) from ${each.key} nodes to internet (large queries, covered by all_outbound)"
   
   ip_protocol = "tcp"
   from_port   = 53
@@ -659,7 +659,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_https_outbound" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: HTTPS from ${each.key} nodes → AWS APIs, registries (covered by all_outbound)"
+  description       = "DOCUMENTATION: HTTPS from ${each.key} nodes to AWS APIs, registries (covered by all_outbound)"
   
   ip_protocol = "tcp"
   from_port   = 443
@@ -677,7 +677,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_http_outbound" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: HTTP from ${each.key} nodes → package repos, updates (covered by all_outbound)"
+  description       = "DOCUMENTATION: HTTP from ${each.key} nodes to package repos, updates (covered by all_outbound)"
   
   ip_protocol = "tcp"
   from_port   = 80
@@ -695,7 +695,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_ntp" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: NTP from ${each.key} nodes → time servers (covered by all_outbound)"
+  description       = "DOCUMENTATION: NTP from ${each.key} nodes to time servers (covered by all_outbound)"
   
   ip_protocol = "udp"
   from_port   = 123
@@ -713,7 +713,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_ephemeral_tcp" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: Ephemeral TCP ports from ${each.key} nodes → outbound connections (covered by all_outbound)"
+  description       = "DOCUMENTATION: Ephemeral TCP ports from ${each.key} nodes to outbound connections (covered by all_outbound)"
   
   ip_protocol = "tcp"
   from_port   = 1024
@@ -732,7 +732,7 @@ resource "aws_vpc_security_group_egress_rule" "nodes_custom_ports" {
   for_each = var.node_groups
 
   security_group_id = aws_security_group.nodes[each.key].id
-  description       = "DOCUMENTATION: Custom app ports from ${each.key} nodes → external services (covered by all_outbound)"
+  description       = "DOCUMENTATION: Custom app ports from ${each.key} nodes to external services (covered by all_outbound)"
   
   ip_protocol = "tcp"
   from_port   = 8000
@@ -772,11 +772,6 @@ resource "aws_vpc_security_group_egress_rule" "nodes_custom_ports" {
 # 2. Security documentation (specific rules show exactly what's needed)  
 # 3. Future flexibility (can remove broad rules and use specific ones)
 # ================================
-
-
-
-
-
 
 
 
