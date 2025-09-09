@@ -168,14 +168,4 @@ variable "global_scheduling" {
       })
     })
   })
-  default = {
-    nodeSelector = {}
-    tolerations = []
-    affinity = {
-      nodeAffinity = {
-        type = "none"
-        matchExpressions = []
-      }
-    }
-  }
 }

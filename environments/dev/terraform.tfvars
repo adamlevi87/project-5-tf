@@ -188,6 +188,31 @@ argocd_chart_version                = "8.2.3"
 argocd_app_of_apps_path             = "apps"
 argocd_app_of_apps_target_revision  = "main"
 argocd_base_domain_name             = "argocd"
+# ArgoCD Global Scheduling Configuration
+argocd_global_scheduling = {
+  nodeSelector = {
+    instance-size = "small"
+    workload-type = "system"
+  }
+  tolerations = [{
+    key      = "dedicated"
+    operator = "Equal"
+    value    = "critical"
+    effect   = "NoSchedule"
+  }]
+  affinity = {
+    nodeAffinity = {
+      type = "hard"
+      matchExpressions = [{
+        key      = "nodegroup-type"
+        operator = "In"
+        values   = ["critical"]
+      }]
+    }
+  }
+}
+
+
 
 json_view_base_domain_name = "json-view"
 

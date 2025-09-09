@@ -473,16 +473,6 @@ variable "global_scheduling" {
       })
     })
   })
-  default = {
-    nodeSelector = {}
-    tolerations = []
-    affinity = {
-      nodeAffinity = {
-        type = "none"
-        matchExpressions = []
-      }
-    }
-  }
 }
 
 variable "frontend_base_domain_name" {

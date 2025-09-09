@@ -460,6 +460,9 @@ module "argocd" {
   app_of_apps_path              = var.argocd_app_of_apps_path
   app_of_apps_target_revision   = var.argocd_app_of_apps_target_revision
 
+  # tolerations / affinity
+  global_scheduling = var.argocd_global_scheduling
+
   #github_oauth_client_id        = var.github_oauth_client_id
   github_admin_team             = var.github_admin_team
   github_readonly_team          = var.github_readonly_team
