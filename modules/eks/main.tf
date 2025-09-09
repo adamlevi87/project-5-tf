@@ -437,15 +437,6 @@ resource "aws_vpc_security_group_ingress_rule" "cluster_allow_node_api" {
 }
 
 # Node Group to Node Group allow all - WITHIN same group
-resource "aws_vpc_security_group_ingress_rule" "node_to_node_same_group" {
-  for_each = var.node_groups
-
-  security_group_id            = aws_security_group.nodes[each.key].id
-  referenced_security_group_id = aws_security_group.nodes[each.key].id
-  ip_protocol                  = "-1"  # All protocols
-  description                  = "Allow all communication between nodes in the same ${each.key} group"
-}
-
 resource "aws_vpc_security_group_egress_rule" "node_to_node_same_group" {
   for_each = var.node_groups
 
@@ -455,18 +446,18 @@ resource "aws_vpc_security_group_egress_rule" "node_to_node_same_group" {
   description                  = "Allow all communication between nodes in the same ${each.key} group"
 }
 
-# Cross-NodeGroup Ingress: Allow all communication from other node groups
-resource "aws_vpc_security_group_ingress_rule" "cross_nodegroup_communication" {
-  for_each = {
-    for pair in local.node_group_pairs : "${pair.source}-to-${pair.target}" => pair
-  }
+resource "aws_vpc_security_group_ingress_rule" "node_to_node_same_group" {
+  for_each = var.node_groups
 
-  security_group_id            = aws_security_group.nodes[each.value.target].id
-  referenced_security_group_id = aws_security_group.nodes[each.value.source].id
+  security_group_id            = aws_security_group.nodes[each.key].id
+  referenced_security_group_id = aws_security_group.nodes[each.key].id
   ip_protocol                  = "-1"  # All protocols
-  description                  = "Allow all communication from ${each.value.source} nodes to ${each.value.target} nodes"
+  description                  = "Allow all communication between nodes in the same ${each.key} group"
 }
 
+
+
+# Cross-NodeGroup Ingress: Allow all communication from other node groups
 # Cross-NodeGroup Egress: Allow all communication to other node groups  
 resource "aws_vpc_security_group_egress_rule" "cross_nodegroup_communication" {
   for_each = {
@@ -475,6 +466,17 @@ resource "aws_vpc_security_group_egress_rule" "cross_nodegroup_communication" {
 
   security_group_id            = aws_security_group.nodes[each.value.source].id
   referenced_security_group_id = aws_security_group.nodes[each.value.target].id
+  ip_protocol                  = "-1"  # All protocols
+  description                  = "Allow all communication from ${each.value.source} nodes to ${each.value.target} nodes"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cross_nodegroup_communication" {
+  for_each = {
+    for pair in local.node_group_pairs : "${pair.source}-to-${pair.target}" => pair
+  }
+
+  security_group_id            = aws_security_group.nodes[each.value.target].id
+  referenced_security_group_id = aws_security_group.nodes[each.value.source].id
   ip_protocol                  = "-1"  # All protocols
   description                  = "Allow all communication from ${each.value.source} nodes to ${each.value.target} nodes"
 }
