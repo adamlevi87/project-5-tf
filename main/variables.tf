@@ -452,7 +452,7 @@ variable "argocd_app_of_apps_target_revision" {
   default     = "main"
 }
 
-variable "global_scheduling" {
+variable "argocd_global_scheduling" {
   description = "Global scheduling configuration for all ArgoCD components"
   type = object({
     nodeSelector = map(string)
@@ -463,8 +463,9 @@ variable "global_scheduling" {
       effect   = string
     }))
     affinity = object({
+      podAntiAffinity = string  # "none", "soft", or "hard"
       nodeAffinity = object({
-        type = string
+        type = string  # "none", "soft", or "hard"
         matchExpressions = list(object({
           key      = string
           operator = string

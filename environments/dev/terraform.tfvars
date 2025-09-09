@@ -201,6 +201,7 @@ argocd_global_scheduling = {
     effect   = "NoSchedule"
   }]
   affinity = {
+    podAntiAffinity = "none"
     nodeAffinity = {
       type = "hard"
       matchExpressions = [{

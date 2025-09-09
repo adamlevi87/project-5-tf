@@ -158,8 +158,9 @@ variable "global_scheduling" {
       effect   = string
     }))
     affinity = object({
+      podAntiAffinity = string  # "none", "soft", or "hard"
       nodeAffinity = object({
-        type = string
+        type = string  # "none", "soft", or "hard"  
         matchExpressions = list(object({
           key      = string
           operator = string
