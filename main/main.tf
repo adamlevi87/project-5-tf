@@ -477,7 +477,7 @@ module "argocd" {
     module.secrets_app_envs
   ]
 }
- 
+
 module "external_secrets_operator" {
   source        = "../modules/helm/external-secrets-operator"
   
