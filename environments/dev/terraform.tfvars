@@ -213,8 +213,11 @@ argocd_global_scheduling = {
   }
 }
 
+# Kyverno Configuration
+kyverno_release_name = "kyverno"
+kyverno_namespace = "kyverno"
 
-
+# Cloudfront base url for json viewing (lambda s3 write result)
 json_view_base_domain_name = "json-view"
 
 

@@ -1,0 +1,42 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: inject-critical-node-tolerations
+  annotations:
+    policies.kyverno.io/title: Inject Critical Node Tolerations
+    policies.kyverno.io/category: Scheduling
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.6.0
+    policies.kyverno.io/description: >-
+      Automatically injects tolerations for critical nodes into system pods.
+      This ensures system components can be scheduled on nodes with 
+      'dedicated=critical:NoSchedule' taints.
+spec:
+  rules:
+  - name: inject-critical-tolerations
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaces:
+          - kube-system
+          - external-secrets
+          - argocd
+    mutate:
+      patchStrategicMerge:
+        spec:
+          tolerations:
+          - key: dedicated
+            operator: Equal
+            value: critical
+            effect: NoSchedule
+          - key: node.kubernetes.io/not-ready
+            operator: Exists
+            effect: NoExecute
+            tolerationSeconds: 300
+          - key: node.kubernetes.io/unreachable
+            operator: Exists
+            effect: NoExecute
+            tolerationSeconds: 300

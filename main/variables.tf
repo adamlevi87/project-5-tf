@@ -549,3 +549,14 @@ variable "json_view_base_domain_name" {
   type        = string
   default     = "json-view"
 }
+
+# Kyverno Configuration
+variable "kyverno_release_name" {
+  description = "Base name for Kyverno Helm release"
+  type        = string
+}
+
+variable "kyverno_namespace" {
+  description = "Kubernetes namespace for Kyverno"
+  type        = string
+}

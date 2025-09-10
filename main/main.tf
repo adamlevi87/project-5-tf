@@ -648,3 +648,15 @@ module "cloudfront" {
 
   depends_on = [module.s3_app_data, module.waf]
 }
+
+module "kyverno" {
+  source = "../modules/helm/kyverno"
+
+  project_tag = var.project_tag
+  environment = var.environment
+  
+  release_name = "${var.kyverno_release_name}-${var.environment}"
+  namespace    = var.kyverno_namespace
+  
+  depends_on = [module.eks]
+}
