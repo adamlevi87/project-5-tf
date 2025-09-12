@@ -1,3 +1,5 @@
+# .requirements/tfvars.tf
+
 aws_region = "us-east-1"
 environment = "dev"
 aws_dynamodb_table_name = "project-5-terraform-locks"

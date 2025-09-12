@@ -31,7 +31,7 @@ locals {
   }
 
   # Create all node group security group IDs for cross-communication
-  all_node_sg_ids = [for ng_name, ng_config in var.node_groups : aws_security_group.nodes[ng_name].id]
+  #all_node_sg_ids = [for ng_name, ng_config in var.node_groups : aws_security_group.nodes[ng_name].id]
 
   # Create a flattened list of node group pairs for cross-communication
   # Create all possible pairs of node groups (excluding self-pairs)
